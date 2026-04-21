@@ -2,7 +2,7 @@ package dk.siema.siemaexamproject.gui.util;
 
 import java.net.URL;
 
-public enum ViewPaths {
+public enum ViewPath {
     MAIN("/dk/siema/siemaexamproject/gui/hello-view.fxml"),
     OTHER("other.fxml");
 
@@ -11,7 +11,7 @@ public enum ViewPaths {
     private final String path;
 
 
-    ViewPaths(String path) {this.path = path;}
+    ViewPath(String path) {this.path = path;}
     public String getPath() {return path;}
-    public URL getURL() {return ViewPaths.class.getResource(path);}
+    public URL getURL() {return ViewPath.class.getResource(path);}
 }
