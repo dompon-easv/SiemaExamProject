@@ -1,6 +1,8 @@
-package dk.siema.siemaexamproject.dal;
+package dk.siema.siemaexamproject.dal.dao;
 
 import dk.siema.siemaexamproject.be.LogEntry;
+import dk.siema.siemaexamproject.dal.ConnectionManager;
+import dk.siema.siemaexamproject.dal.interfaces.ILogEntryDAO;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -10,7 +12,7 @@ import java.util.List;
 public class LogEntryDAO implements ILogEntryDAO {
 
     @Override
-    public void createLog(LogEntry log) throws SQLException {
+    public void add(LogEntry log) throws SQLException {
         String sql = "INSERT INTO LogEntry (user_id, action, details, time) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = ConnectionManager.getConnection();
@@ -22,6 +24,8 @@ public class LogEntryDAO implements ILogEntryDAO {
             stmt.setTimestamp(4, Timestamp.valueOf(log.getTime()));
 
             stmt.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
         }
     }
 
@@ -47,7 +51,7 @@ public class LogEntryDAO implements ILogEntryDAO {
     }
 
     @Override
-    public List<LogEntry> getAllLogs() throws SQLException {
+    public List<LogEntry> getAll() throws SQLException {
         String sql = "SELECT * FROM LogEntry ORDER BY time DESC";
 
         List<LogEntry> logs = new ArrayList<>();
