@@ -8,15 +8,22 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class SceneManager {
-    public static void openWindow(ViewPath viewType, String title) {
+    private final ViewFactory viewFactory;
+
+    public SceneManager(ViewFactory viewFactory) {
+        this.viewFactory = viewFactory;
+    }
+
+    public void openWindow(ViewPath viewPath, String title) {
         try {
-            FXMLLoader loader = new FXMLLoader(Application.class.getResource(viewType.getPath()));
+            FXMLLoader loader = viewFactory.createLoader(viewPath.getPath());
             Stage stage = new Stage();
             stage.setScene(new Scene(loader.load()));
             stage.setTitle(title);
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Could not open window: " + viewPath, e);
         }
     }
-}
+    }
+

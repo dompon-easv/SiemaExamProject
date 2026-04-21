@@ -1,5 +1,0 @@
-Server=localhost
-Database=db name
-User=your_username
-Password=your_password
-Port=1433
