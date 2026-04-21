@@ -1,6 +1,6 @@
 package dk.siema.siemaexamproject.be;
 
-public enum UserRoles {
+public enum UserRole {
     ADMIN,
     USER
 }
