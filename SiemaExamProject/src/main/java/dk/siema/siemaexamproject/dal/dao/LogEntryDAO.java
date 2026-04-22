@@ -71,10 +71,11 @@ public class LogEntryDAO implements ILogEntryDAO {
 
     private LogEntry mapLogEntry(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        int userId = rs.getInt("user_id");
+        int userId = rs.getInt("userId");
+        int fileId = rs.getInt("fileId");
         String action = rs.getString("action");
         String details = rs.getString("details");
         LocalDateTime time = rs.getTimestamp("time").toLocalDateTime();
-        return new LogEntry(id, userId, action, details, time);
+        return new LogEntry(id, userId,fileId, action, details, time);
     }
 }

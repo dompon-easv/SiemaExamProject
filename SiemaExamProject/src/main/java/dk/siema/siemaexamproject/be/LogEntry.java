@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public class LogEntry {
     private int id;
     private int userId;
+    private int fileId;
     private String action;
     private String details;
     private LocalDateTime time;
@@ -15,9 +16,10 @@ public class LogEntry {
         this.details = details;
         this.time = LocalDateTime.now();
     }
-    public LogEntry(int id, int userId, String action, String details, LocalDateTime time) {
+    public LogEntry(int id, int userId,int fileId, String action, String details, LocalDateTime time) {
         this.id = id;
         this.userId = userId;
+        this.fileId = fileId;
         this.action = action;
         this.details = details;
         this.time = time;
