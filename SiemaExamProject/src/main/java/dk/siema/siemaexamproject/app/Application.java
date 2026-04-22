@@ -10,13 +10,21 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Application extends javafx.application.Application {
+
+    private ApplicationServices services;
+
     @Override
     public void start(Stage stage) throws IOException {
 
-        ApplicationServices services = new ApplicationServices();
+        services = new ApplicationServices();
         ViewFactory viewFactory = new ViewFactory(services);
 
         SceneManager sceneManager = new SceneManager(viewFactory);
         sceneManager.openWindow(ViewPath.MAIN, "Menu");
+    }
+
+    @Override
+    public void stop() {
+        services.shutdown();
     }
 }

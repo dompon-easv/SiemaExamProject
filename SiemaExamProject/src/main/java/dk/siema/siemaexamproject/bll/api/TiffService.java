@@ -14,6 +14,13 @@ public class TiffService {
 
     public List<File> getAllTiffs() throws Exception {
 
+        File folder = new File("images/all");
+
+        // ✅ If already downloaded → skip API
+        if (folder.exists() && folder.listFiles() != null && folder.listFiles().length > 0) {
+            return List.of(folder.listFiles());
+        }
+
         InputStream zipStream = apiClient.fetchAllFiles();
 
         File zipFile = new File("all_tiffs.zip");
