@@ -9,6 +9,5 @@ public class ApplicationServices {
 
         // here set all logic fx this.authenticationLogic = new AuthenticationLogic();
     }
-
     // here getters for all logic
 }
