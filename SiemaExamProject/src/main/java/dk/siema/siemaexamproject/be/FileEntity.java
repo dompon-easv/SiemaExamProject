@@ -1,5 +1,7 @@
 package dk.siema.siemaexamproject.be;
 
+import java.io.File;
+
 public class FileEntity {
     private int id;
     private int referenceId; //fetched from API
@@ -29,4 +31,7 @@ public class FileEntity {
     public void setRotation(int rotation) {this.rotation = rotation;}
 
     public boolean isBarcode() {return isBarcode;}
+    public File toFile() {
+        return new File(filePath);
+    }
 }
