@@ -24,8 +24,16 @@
 
         <HBox alignment="CENTER_LEFT" spacing="12">
             <HBox fx:id="viewSwitchBox" styleClass="header-chip-group">
-                <Button fx:id="scannerButton" text="Scanner" styleClass="header-chip-selected" onAction="#showScannerView" />
-                <Button fx:id="adminButton" text="Admin" styleClass="header-chip" onAction="#showAdminView" visible="false" managed="false" />
+                    <Button fx:id="scannerButton"
+                            text="Scanner"
+                            styleClass="header-chip-selected"
+                            onAction="#showScannerView" />
+
+                    <Button fx:id="adminButton"
+                            text="Admin"
+                            styleClass="header-chip"
+                            onAction="#showAdminView" />
+                </HBox>
             </HBox>
 
             <Region styleClass="header-separator" />
@@ -42,7 +50,7 @@
 
             <Button text="↪" styleClass="logout-button" onAction="#logout" />
         </HBox>
-    </HBox>
+    
 
     <StackPane fx:id="contentContainer" VBox.vgrow="ALWAYS" />
 </VBox>

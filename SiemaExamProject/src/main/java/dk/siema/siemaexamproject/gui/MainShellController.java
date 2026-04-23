@@ -5,6 +5,7 @@ import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -12,6 +13,8 @@ public class MainShellController implements ApplicationServicesAware {
 
     @FXML
     private StackPane contentContainer;
+    @FXML private Button scannerButton;
+    @FXML private Button adminButton;
 
     private ApplicationServices applicationServices;
     private SceneManager sceneManager;
@@ -33,11 +36,16 @@ public class MainShellController implements ApplicationServicesAware {
 
     @FXML
     public void showScannerView() {
+        scannerButton.getStyleClass().add("header-chip-selected");
+        adminButton.getStyleClass().remove("header-chip-selected");
         sceneManager.setContent(contentContainer, ViewPath.SCANNERVIEW);
     }
 
     @FXML
     public void showAdminView() {
+        adminButton.getStyleClass().add("header-chip-selected");
+        scannerButton.getStyleClass().remove("header-chip-selected");
+
         AdminShellController controller =
                 sceneManager.loadInto(contentContainer, ViewPath.ADMINSHELL);
         controller.showDefaultView();
