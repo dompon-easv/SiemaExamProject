@@ -29,4 +29,5 @@ public class LogEntry {
     public String getDetails() {return details;}
     public LocalDateTime getTime() {return time;}
     public int getId() { return id; }
+    public void setId(int id) {this.id = id;} /* to set generated id*/
 }

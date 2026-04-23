@@ -12,11 +12,11 @@ import java.util.List;
 public class LogEntryDAO implements ILogEntryDAO {
 
     @Override
-    public void add(LogEntry log) throws SQLException {
+    public LogEntry add(LogEntry log) throws SQLException {
         String sql = "INSERT INTO LogEntry (user_id, action, details, time) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = ConnectionManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, log.getUserId());
             stmt.setString(2, log.getAction());
@@ -24,8 +24,15 @@ public class LogEntryDAO implements ILogEntryDAO {
             stmt.setTimestamp(4, Timestamp.valueOf(log.getTime()));
 
             stmt.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace();
+
+           // Get generated ID
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    log.setId(rs.getInt(1)); // assumes you have setId()
+                }
+            }
+
+            return log; // return updated entity
         }
     }
 
@@ -71,8 +78,8 @@ public class LogEntryDAO implements ILogEntryDAO {
 
     private LogEntry mapLogEntry(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        int userId = rs.getInt("userId");
-        int fileId = rs.getInt("fileId");
+        int userId = rs.getInt("user_id");
+        int fileId = rs.getInt("file_id");
         String action = rs.getString("action");
         String details = rs.getString("details");
         LocalDateTime time = rs.getTimestamp("time").toLocalDateTime();
