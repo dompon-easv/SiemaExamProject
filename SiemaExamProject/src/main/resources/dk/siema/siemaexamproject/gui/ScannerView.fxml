@@ -65,7 +65,7 @@
             <top>
                 <HBox styleClass="content-toolbar"
                       alignment="CENTER_LEFT"
-                      spacing="12">
+                      spacing="12"> </HBox>
 
                     <!-- LEFT INFO AREA -->
                     <HBox alignment="CENTER_LEFT" spacing="12">
@@ -85,7 +85,7 @@
                     <Region HBox.hgrow="ALWAYS"/>
 
                     <!-- RIGHT ACTION AREA -->
-                    <HBox alignment="CENTER_LEFT" spacing="6">
+                    <HBox alignment="CENTER_LEFT" spacing="6">  </HBox>
                         <HBox spacing="3">
                             <Button text="⟳" styleClass="tool-button"/>
                             <Button text="⊕" styleClass="tool-button"/>
