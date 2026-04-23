@@ -23,7 +23,7 @@ private final ScannerModel scannerModel;
     public ApplicationServices() {
         // here instantiate all DAO classes fx IUserDAO userDAO = new UserDAO();
 
-        // here set all logic fx this.authenticationLogic = new AuthenticationLogic();
+        // here set all logic fx this.authenticationService = new AuthenticationService();
 
         this.viewFactory= new ViewFactory(this);
         this.sceneManager = new SceneManager(viewFactory);
