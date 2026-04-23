@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dk.siema.siemaexamproject.gui.ScannerViewController"
+            stylesheets="@helpers/app.css" styleClass="scanner-root">
+    <left>
+        <VBox styleClass="sidebar">
+            <VBox styleClass="sidebar-section">
+                <Button text="⟳ Start New Scan" styleClass="primary-button" maxWidth="1.7976931348623157E308" />
+            </VBox>
+            <Region styleClass="sidebar-divider" />
+            <VBox styleClass="sidebar-section">
+                <Label text="Active Profile" styleClass="sidebar-title" />
+                <ComboBox fx:id="profileComboBox" styleClass="profile-combo" maxWidth="1.7976931348623157E308" />
+                <Label fx:id="profileDescriptionLabel" text="Standard invoice documents" styleClass="sidebar-subtext" wrapText="true" />
+            </VBox>
+            <Region styleClass="sidebar-divider" />
+            <VBox spacing="6" VBox.vgrow="ALWAYS" styleClass="sidebar-section">
+                <Label text="Recent Scans" styleClass="sidebar-title" />
+
+                <VBox spacing="3">
+                    <HBox styleClass="tree-row">
+                        <Label text="⌄" styleClass="small-icon" />
+                        <Label text="◫" styleClass="tree-icon" />
+                        <Label text="Box 001 (Fin...)" styleClass="tree-text" HBox.hgrow="ALWAYS" />
+                        <Label text="2026-04-22" styleClass="tree-date" />
+                    </HBox>
+
+                    <VBox spacing="3" padding="0 0 0 15">
+                        <HBox styleClass="tree-row">
+                            <Label text="⌄" styleClass="small-icon" />
+                            <Label text="▣" styleClass="tree-icon" />
+                            <Label text="Q1 Invoices" styleClass="tree-text" />
+                        </HBox>
+
+                        <VBox spacing="6" padding="0 0 0 18">
+                            <VBox styleClass="tree-row-selected">
+                                <HBox alignment="CENTER_LEFT" spacing="6">
+                                    <Label text="◫" styleClass="tree-icon" />
+                                    <Label text="Invoice_2026_001.tiff" styleClass="tree-text" HBox.hgrow="ALWAYS" />
+                                    <Button text="⌫" styleClass="table-action-button" />
+                                </HBox>
+                                <HBox spacing="6" padding="0 0 0 21">
+                                    <Label text="3 pages" styleClass="tree-meta" />
+                                    <Label text="10:30" styleClass="tree-meta" />
+                                </HBox>
+                            </VBox>
+
+                            <VBox styleClass="tree-row">
+                                <HBox alignment="CENTER_LEFT" spacing="6">
+                                    <Label text="◫" styleClass="tree-icon" />
+                                    <Label text="Receipt_Store_A.tiff" styleClass="tree-text" />
+                                </HBox>
+                                <HBox spacing="6" padding="0 0 0 18">
+                                    <Label text="1 page" styleClass="tree-meta" />
+                                    <Label text="11:15" styleClass="tree-meta" />
+                                </HBox>
+                            </VBox>
+                        </VBox>
+
+                        <HBox styleClass="tree-row" padding="0 0 0 18">
+                            <Label text="›" styleClass="small-icon" />
+                            <Label text="▣" styleClass="tree-icon" />
+                            <Label text="Contracts" styleClass="tree-text" />
+                        </HBox>
+
+                        <HBox styleClass="tree-row" padding="0 0 0 18">
+                            <Label text="›" styleClass="small-icon" />
+                            <Label text="▣" styleClass="tree-icon" />
+                            <Label text="Tax Forms" styleClass="tree-text" />
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <BorderPane>
+            <top>
+                <HBox styleClass="content-toolbar" alignment="CENTER_LEFT" spacing="12">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="Invoice_2026_001.tiff" styleClass="page-title" />
+                        <Label text="Page 1 of 3" styleClass="badge" />
+                    </HBox>
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <HBox spacing="3">
+                            <Button text="⟳" styleClass="tool-button" />
+                            <Button text="⊕" styleClass="tool-button" />
+                            <Button text="⊖" styleClass="tool-button" />
+                        </HBox>
+                        <Button text="⇩ Export" styleClass="top-action-button" />
+                    </HBox>
+                </HBox>
+            </top>
+
+            <center>
+                <VBox styleClass="preview-area" alignment="CENTER" spacing="18">
+                    <StackPane styleClass="document-card">
+                        <StackPane styleClass="document-dashed">
+                            <VBox alignment="CENTER" spacing="9">
+                                <Label text="◫" styleClass="document-icon" />
+                                <Label text="Document Content" styleClass="doc-title" />
+                                <Label text="Invoice_2026_001.tiff" styleClass="doc-name" />
+                                <HBox alignment="CENTER" spacing="6">
+                                    <Label text="300 DPI" styleClass="chip" />
+                                    <Label text="Grayscale" styleClass="chip" />
+                                </HBox>
+                            </VBox>
+                        </StackPane>
+                    </StackPane>
+
+                    <HBox styleClass="pagination-bar" alignment="CENTER" spacing="12">
+                        <Button text="‹" styleClass="pagination-button" />
+                        <Label text="Page 1 of 3" styleClass="tree-text" />
+                        <Button text="›" styleClass="pagination-button" />
+                    </HBox>
+                </VBox>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>
