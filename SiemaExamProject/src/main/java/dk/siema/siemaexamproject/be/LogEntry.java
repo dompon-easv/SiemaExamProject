@@ -9,13 +9,7 @@ public class LogEntry {
     private String action;
     private String details;
     private LocalDateTime time;
-
-    public LogEntry(int userId, String action, String details) {
-        this.userId = userId;
-        this.action = action;
-        this.details = details;
-        this.time = LocalDateTime.now();
-    }
+    
     public LogEntry(int id, int userId,int fileId, String action, String details, LocalDateTime time) {
         this.id = id;
         this.userId = userId;
