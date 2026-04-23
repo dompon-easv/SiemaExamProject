@@ -1,8 +1,10 @@
 package dk.siema.siemaexamproject.app;
 
+import dk.siema.siemaexamproject.gui.MainShellController;
+import dk.siema.siemaexamproject.gui.util.LoadedView;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
-import dk.siema.siemaexamproject.gui.util.ViewFactory;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -14,9 +16,16 @@ public class Application extends javafx.application.Application {
     public void start(Stage stage) throws IOException {
 
         ApplicationServices services = new ApplicationServices();
-        ViewFactory viewFactory = new ViewFactory(services);
+        SceneManager sceneManager = services.getSceneManager();
 
-        SceneManager sceneManager = new SceneManager(viewFactory);
-        sceneManager.openWindow(ViewPath.MAIN, "Menu");
+      //  sceneManager.setScene(stage, ViewPath.LOGIN, "Visione"); - come back to this one later
+
+        LoadedView<MainShellController> loaded =
+                services.getSceneManager().load(ViewPath.MAINSHELL);
+
+        stage.setScene(new Scene(loaded.root()));
+        stage.setTitle("Visione");
+        stage.show();
+        Platform.runLater(() -> loaded.controller().showAdminView());
     }
 }
