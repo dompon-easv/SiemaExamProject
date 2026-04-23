@@ -10,6 +10,7 @@ public enum ViewPath {
     USERMANAGEMENT("/dk/siema/siemaexamproject/gui/UserManagementView.fxml"),
     SCANNINGPROFILES("/dk/siema/siemaexamproject/gui/ScanningProfilesView.fxml"),
     ACTIVITYLOGS("/dk/siema/siemaexamproject/gui/ActivityLogsView.fxml"),
+    MAIN("/dk/siema/siemaexamproject/gui/hello-view.fxml"),
     OTHER("other.fxml");
 
 

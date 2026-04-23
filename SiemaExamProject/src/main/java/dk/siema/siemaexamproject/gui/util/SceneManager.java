@@ -18,7 +18,7 @@ public class SceneManager {
 
     // --- Create loader using ViewFactory ---
     public FXMLLoader createLoader(ViewPath viewPath) {
-        return viewFactory.createLoader(viewPath.getPath());
+        return viewFactory.createLoader(viewPath);
     }
 
     // --- Load only the view (no container, no stage) ---

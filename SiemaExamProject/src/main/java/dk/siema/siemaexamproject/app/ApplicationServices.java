@@ -49,8 +49,4 @@ private final DocumentBuilderService documentBuilderService;
     public DocumentBuilderService getDocumentBuilderService() {
         return documentBuilderService;
     }
-
-    public void shutdown() {
-        executorService.shutdown();
-    }
 }

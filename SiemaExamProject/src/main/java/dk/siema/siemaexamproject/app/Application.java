@@ -28,10 +28,4 @@ public class Application extends javafx.application.Application {
                 loaded.controller().showAdminView()
         );
     }
-
-    @Override
-    public void stop() {
-        AppplicationService service = new ApplicationServices();
-        services.shutdown();
-    }
 }
