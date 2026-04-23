@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.FlowPane?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -22,6 +22,7 @@
 
             <VBox styleClass="sidebar-section">
                 <Button text="⟳ Start New Scan"
+                        onAction="#onStartNewScan"
                         styleClass="primary-button"
                         maxWidth="1.7976931348623157E308"/>
             </VBox>
@@ -46,101 +47,12 @@
             <!-- ================= RECENT SCANS ================= -->
             <VBox spacing="6" VBox.vgrow="ALWAYS" styleClass="sidebar-section">
 
-                <Label text="Recent Scans" styleClass="sidebar-title"/>
+                <Label text="Document Structure" styleClass="sidebar-title"/>
 
-                <VBox spacing="3">
+                <TreeView fx:id="documentTree"
+                          VBox.vgrow="ALWAYS"
+                          styleClass="tree-view"/>
 
-                    <!-- Box 001 -->
-                    <HBox  fx:id="boxHeader" styleClass="tree-row">
-                        <Label text="⌄" styleClass="small-icon"/>
-                        <Label text="◫" styleClass="tree-icon"/>
-                        <Label text="Box 001 (Fin...)" styleClass="tree-text"
-                               HBox.hgrow="ALWAYS"/>
-                        <Label text="2026-04-22" styleClass="tree-date"/>
-                    </HBox>
-
-                    <!-- Indented group (15px) -->
-                    <VBox fx:id="boxContent" spacing="3">
-                        <padding>
-                            <Insets top="0" right="0" bottom="0" left="15"/>
-                        </padding>
-
-                        <HBox fx:id="invoiceHeader" styleClass="tree-row">
-                            <Label text="⌄" styleClass="small-icon"/>
-                            <Label text="▣" styleClass="tree-icon"/>
-                            <Label text="Q1 Invoices" styleClass="tree-text"/>
-                        </HBox>
-
-                        <!-- deeper indent (18px) -->
-                        <VBox fx:id="invoiceContent" spacing="6">
-                            <padding>
-                                <Insets top="0" right="0" bottom="0" left="18"/>
-                            </padding>
-
-                            <!-- selected item -->
-                            <VBox styleClass="tree-row-selected">
-
-                                <HBox alignment="CENTER_LEFT" spacing="6">
-                                    <Label text="◫" styleClass="tree-icon"/>
-                                    <Label text="Invoice_2026_001.tiff"
-                                           styleClass="tree-text"
-                                           HBox.hgrow="ALWAYS"/>
-                                    <Button text="⌫" styleClass="table-action-button"/>
-                                </HBox>
-
-                                <HBox spacing="6">
-                                    <padding>
-                                        <Insets top="0" right="0" bottom="0" left="21"/>
-                                    </padding>
-
-                                    <Label text="3 pages" styleClass="tree-meta"/>
-                                    <Label text="10:30" styleClass="tree-meta"/>
-                                </HBox>
-
-                            </VBox>
-
-                            <!-- second item -->
-                            <VBox styleClass="tree-row">
-
-                                <HBox alignment="CENTER_LEFT" spacing="6">
-                                    <Label text="◫" styleClass="tree-icon"/>
-                                    <Label text="Receipt_Store_A.tiff" styleClass="tree-text"/>
-                                </HBox>
-
-                                <HBox spacing="6">
-                                    <padding>
-                                        <Insets top="0" right="0" bottom="0" left="15"/>
-                                    </padding>
-
-                                    <Label text="1 page" styleClass="tree-meta"/>
-                                    <Label text="11:15" styleClass="tree-meta"/>
-                                </HBox>
-
-                            </VBox>
-
-                        </VBox>
-
-                        <!-- collapsed sections -->
-                        <HBox styleClass="tree-row">
-                            <padding>
-                                <Insets top="0" right="0" bottom="0" left="18"/>
-                            </padding>
-                            <Label text="›" styleClass="small-icon"/>
-                            <Label text="▣" styleClass="tree-icon"/>
-                            <Label text="Contracts" styleClass="tree-text"/>
-                        </HBox>
-
-                        <HBox styleClass="tree-row">
-                            <padding>
-                                <Insets top="0" right="0" bottom="0" left="18"/>
-                            </padding>
-                            <Label text="›" styleClass="small-icon"/>
-                            <Label text="▣" styleClass="tree-icon"/>
-                            <Label text="Tax Forms" styleClass="tree-text"/>
-                        </HBox>
-
-                    </VBox>
-                </VBox>
             </VBox>
         </VBox>
     </left>
@@ -150,14 +62,34 @@
         <BorderPane>
 
             <!-- TOP TOOLBAR -->
-            <!-- TOP TOOLBAR -->
             <top>
                 <HBox styleClass="content-toolbar"
                       alignment="CENTER_LEFT"
-                      spacing="12">
+                      spacing="12"> </HBox>
 
-                    <Region HBox.hgrow="ALWAYS"/>
+                <!-- LEFT INFO AREA -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
 
+                    <Label text="Invoice_2026_001.tiff"
+                           styleClass="page-title"/>
+
+                    <Label text="Page 1 of 3"
+                           styleClass="badge"/>
+
+                    <!-- ✅ STATUS LABEL (THIS FIXES YOUR NULL ERROR) -->
+                    <Label fx:id="welcomeText"
+                           text="Ready"
+                           styleClass="tree-text"/>
+                </HBox>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- RIGHT ACTION AREA -->
+                <HBox alignment="CENTER_LEFT" spacing="6">  </HBox>
+                <HBox spacing="3">
+                    <Button text="⟳" styleClass="tool-button"/>
+                    <Button text="⊕" styleClass="tool-button"/>
+                    <Button text="⊖" styleClass="tool-button"/>
                     <HBox alignment="CENTER" spacing="6">
 
                         <HBox spacing="3" alignment="CENTER">
@@ -178,22 +110,24 @@
                       alignment="CENTER"
                       spacing="18">
 
-                    <StackPane styleClass="document-card">
-                        <StackPane styleClass="document-dashed">
+                    <!-- IMAGE AREA -->
+                    <FlowPane fx:id="imageContainer"
+                              alignment="CENTER"
+                              hgap="10"
+                              vgap="10"
+                              styleClass="document-card"/>
 
-                            <VBox alignment="CENTER" spacing="9">
-                                <Label text="◫" styleClass="document-icon"/>
-                                <Label text="Document Content" styleClass="doc-title"/>
-                                <Label text="Invoice_2026_001.tiff" styleClass="doc-name"/>
+                    <!-- PAGINATION -->
+                    <HBox styleClass="pagination-bar"
+                          alignment="CENTER"
+                          spacing="12">
 
-                                <HBox alignment="CENTER" spacing="6">
-                                    <Label text="300 DPI" styleClass="chip"/>
-                                    <Label text="Grayscale" styleClass="chip"/>
-                                </HBox>
-                            </VBox>
+                        <Button text="‹" styleClass="pagination-button"/>
+                        <Label text="Page 1 of 3" styleClass="tree-text"/>
+                        <Button text="›" styleClass="pagination-button"/>
 
-                        </StackPane>
-                    </StackPane>
+                    </HBox>
+
                 </VBox>
             </center>
 
