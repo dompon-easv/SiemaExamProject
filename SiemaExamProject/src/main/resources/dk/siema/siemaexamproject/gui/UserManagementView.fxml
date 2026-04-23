@@ -15,7 +15,7 @@
     <HBox alignment="CENTER_LEFT">
         <Label text="User Management" styleClass="section-title" />
         <Region HBox.hgrow="ALWAYS" />
-        <Button text="＋ Add user" styleClass="top-action-button" />
+        <Button text="＋ Add user" styleClass="top-action-button" onAction="#showAddUser"/>
     </HBox>
 
     <VBox styleClass="table-card">
