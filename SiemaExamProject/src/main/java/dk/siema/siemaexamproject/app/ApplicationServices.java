@@ -1,5 +1,8 @@
 package dk.siema.siemaexamproject.app;
 
+import dk.siema.siemaexamproject.gui.models.AdminModel;
+import dk.siema.siemaexamproject.gui.models.ScannerModel;
+import dk.siema.siemaexamproject.gui.models.SessionModel;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewFactory;
 
@@ -7,6 +10,12 @@ public class ApplicationServices {
 
 private final ViewFactory viewFactory;
 private final SceneManager sceneManager;
+
+private final SessionModel sessionModel;
+private final AdminModel adminModel;
+private final ScannerModel scannerModel;
+
+
 
 // logic services here
 
@@ -18,6 +27,14 @@ private final SceneManager sceneManager;
 
         this.viewFactory= new ViewFactory(this);
         this.sceneManager = new SceneManager(viewFactory);
+
+
+
+
+
+        this.sessionModel = new SessionModel();
+        this.adminModel = new AdminModel();
+        this.scannerModel = new ScannerModel();
     }
 
     public SceneManager getSceneManager() {
