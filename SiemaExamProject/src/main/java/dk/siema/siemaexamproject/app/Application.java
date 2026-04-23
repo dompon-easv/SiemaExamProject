@@ -3,6 +3,7 @@ package dk.siema.siemaexamproject.app;
 import dk.siema.siemaexamproject.gui.MainShellController;
 import dk.siema.siemaexamproject.gui.util.LoadedView;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
+import dk.siema.siemaexamproject.gui.util.ViewFactory;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;

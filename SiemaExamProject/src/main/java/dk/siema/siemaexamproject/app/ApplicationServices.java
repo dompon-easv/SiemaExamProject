@@ -6,10 +6,19 @@ import dk.siema.siemaexamproject.gui.models.SessionModel;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewFactory;
 
+import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
+import dk.siema.siemaexamproject.bll.api.TiffService;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ApplicationServices {
 
 private final ViewFactory viewFactory;
 private final SceneManager sceneManager;
+private final ExecutorService executorService;
+private final TiffService tiffService;
+private final DocumentBuilderService documentBuilderService;
 
 private final SessionModel sessionModel;
 private final AdminModel adminModel;
@@ -19,14 +28,16 @@ private final ScannerModel scannerModel;
 
 // logic services here
 
-
     public ApplicationServices() {
         // here instantiate all DAO classes fx IUserDAO userDAO = new UserDAO();
 
-        // here set all logic fx this.authenticationService = new AuthenticationService();
+        // here set all logic fx this.authenticationLogic = new AuthenticationLogic();
 
         this.viewFactory= new ViewFactory(this);
         this.sceneManager = new SceneManager(viewFactory);
+        this.executorService = Executors.newFixedThreadPool(2);
+        this.tiffService = new TiffService();
+        this.documentBuilderService = new DocumentBuilderService();
 
 
 
@@ -44,5 +55,16 @@ private final ScannerModel scannerModel;
     public ViewFactory getViewFactory() {
         return viewFactory;
     }
-    // here getters for all logic
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public TiffService getTiffService() {
+        return tiffService;
+    }
+
+    public DocumentBuilderService getDocumentBuilderService() {
+        return documentBuilderService;
+    }
 }

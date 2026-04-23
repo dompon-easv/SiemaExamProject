@@ -12,9 +12,9 @@ public class ViewFactory {
             this.services = services;
         }
 
-        public FXMLLoader createLoader(String fxmlPath) {
+        public FXMLLoader createLoader(ViewPath viewPath) {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource(fxmlPath)
+                    viewPath.getURL()
             );
 
             loader.setControllerFactory(type -> {
