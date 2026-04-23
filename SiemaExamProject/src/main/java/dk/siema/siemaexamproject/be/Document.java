@@ -17,7 +17,7 @@ public class Document {
         this.pages.add(page);
     }
 
-    public void getId(int id){this.id = id;}
+    public int getId(int id){return id;}
     public void setId(int id){this.id = id;}
 
     public List<FileEntity> getPages() {return pages;}

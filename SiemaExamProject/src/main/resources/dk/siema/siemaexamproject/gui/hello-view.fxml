@@ -2,29 +2,45 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.FlowPane?>
-<VBox alignment="CENTER" spacing="20.0"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="dk.siema.siemaexamproject.gui.MainController">
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.SplitPane?>
 
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<SplitPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="dk.siema.siemaexamproject.gui.MainController">
 
-    <Label fx:id="welcomeText"/>
+    <!-- LEFT SIDE: DOCUMENT STRUCTURE -->
+    <VBox spacing="10.0">
 
-    <Button text="Load TIFF Images" onAction="#onLoadAllImages"/>
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        </padding>
 
-    <!-- Container for images -->
-    <ScrollPane fitToWidth="true">
-        <content>
-            <FlowPane fx:id="imageContainer" hgap="10" vgap="10"/>
-        </content>
-    </ScrollPane>
+        <Label fx:id="welcomeText" text="Documents"/>
 
-</VBox>
+        <Button text="Load TIFF Images" onAction="#onLoadAllImages"/>
+
+        <!-- TREE STRUCTURE -->
+        <TreeView fx:id="documentTree" prefWidth="250.0"/>
+
+    </VBox>
+
+    <!-- RIGHT SIDE: IMAGE PREVIEW -->
+    <VBox spacing="10.0">
+
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        </padding>
+
+        <ScrollPane fitToWidth="true">
+            <content>
+                <FlowPane fx:id="imageContainer" hgap="10" vgap="10"/>
+            </content>
+        </ScrollPane>
+
+    </VBox>
+
+</SplitPane>
