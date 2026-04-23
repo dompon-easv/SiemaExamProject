@@ -51,7 +51,7 @@
                 <VBox spacing="3">
 
                     <!-- Box 001 -->
-                    <HBox styleClass="tree-row">
+                    <HBox  fx:id="boxHeader" styleClass="tree-row">
                         <Label text="⌄" styleClass="small-icon"/>
                         <Label text="◫" styleClass="tree-icon"/>
                         <Label text="Box 001 (Fin...)" styleClass="tree-text"
@@ -60,19 +60,19 @@
                     </HBox>
 
                     <!-- Indented group (15px) -->
-                    <VBox spacing="3">
+                    <VBox fx:id="boxContent" spacing="3">
                         <padding>
                             <Insets top="0" right="0" bottom="0" left="15"/>
                         </padding>
 
-                        <HBox styleClass="tree-row">
+                        <HBox fx:id="invoiceHeader" styleClass="tree-row">
                             <Label text="⌄" styleClass="small-icon"/>
                             <Label text="▣" styleClass="tree-icon"/>
                             <Label text="Q1 Invoices" styleClass="tree-text"/>
                         </HBox>
 
                         <!-- deeper indent (18px) -->
-                        <VBox spacing="6">
+                        <VBox fx:id="invoiceContent" spacing="6">
                             <padding>
                                 <Insets top="0" right="0" bottom="0" left="18"/>
                             </padding>

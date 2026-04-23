@@ -6,6 +6,8 @@ import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -13,8 +15,10 @@ public class MainShellController implements ApplicationServicesAware {
 
     @FXML
     private StackPane contentContainer;
-    @FXML private Button scannerButton;
-    @FXML private Button adminButton;
+    @FXML private ToggleButton scannerButton;
+    @FXML private ToggleButton adminButton;
+
+    private ToggleGroup viewToggleGroup;
 
     private ApplicationServices applicationServices;
     private SceneManager sceneManager;
@@ -26,6 +30,11 @@ public class MainShellController implements ApplicationServicesAware {
 
     @FXML
     private void initialize() {
+        viewToggleGroup = new ToggleGroup();
+        scannerButton.setToggleGroup(viewToggleGroup);
+        adminButton.setToggleGroup(viewToggleGroup);
+
+        scannerButton.setSelected(true);
         // initialize() may run before ApplicationServices is injected,
         // so do not load default content here.
     }
