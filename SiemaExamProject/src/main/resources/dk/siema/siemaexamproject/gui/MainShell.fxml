@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.ToggleButton?>
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="dk.siema.siemaexamproject.gui.MainShellController"
       stylesheets="@helpers/app.css" styleClass="main-shell">
@@ -24,8 +25,19 @@
 
         <HBox alignment="CENTER_LEFT" spacing="12">
             <HBox fx:id="viewSwitchBox" styleClass="header-chip-group">
-                <Button fx:id="scannerButton" text="Scanner" styleClass="header-chip-selected" onAction="#showScannerView" />
-                <Button fx:id="adminButton" text="Admin" styleClass="header-chip" onAction="#showAdminView" visible="false" managed="false" />
+
+                <ToggleButton fx:id="scannerButton"
+                              text="Scanner"
+                              styleClass="header-chip"
+                              selected="true"
+                              onAction="#showScannerView"/>
+
+                <ToggleButton fx:id="adminButton"
+                              text="Admin"
+                              styleClass="header-chip"
+                              onAction="#showAdminView"/>
+
+            </HBox>
             </HBox>
 
             <Region styleClass="header-separator" />
@@ -42,7 +54,7 @@
 
             <Button text="↪" styleClass="logout-button" onAction="#logout" />
         </HBox>
-    </HBox>
+
 
     <StackPane fx:id="contentContainer" VBox.vgrow="ALWAYS" />
 </VBox>

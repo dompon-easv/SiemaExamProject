@@ -59,6 +59,7 @@ public class SceneManager {
     public void openWindow(ViewPath viewPath, String title) {
         Stage stage = new Stage();
         setScene(stage, viewPath, title);
+        stage.show();
     }
 
     // --- Inject view into a container (USED BY SHELLS) ---
@@ -77,5 +78,25 @@ public class SceneManager {
         } catch (IOException e) {
             throw new RuntimeException("Could not load view into container: " + viewPath, e);
         }
+    }
+
+    public <T> LoadedView<T> openDialog(ViewPath viewPath, String title, Stage owner) {
+        LoadedView<T> loaded = load(viewPath);
+
+        Scene scene = new Scene(loaded.root());
+
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle(title);
+
+        stage.initOwner(owner);
+        stage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+
+        stage.setResizable(false);
+        stage.sizeToScene();
+
+        stage.show();
+
+        return loaded;
     }
 }

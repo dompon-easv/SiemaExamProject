@@ -1,12 +1,19 @@
 package dk.siema.siemaexamproject.gui;
 
+import dk.siema.siemaexamproject.app.ApplicationServices;
+import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.gui.util.SceneManager;
+import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.Stage;
 
-public class ScanningProfilesViewController {
+public class ScanningProfilesViewController implements ApplicationServicesAware {
     @FXML
     private TableView<ProfileRow> profilesTable;
     @FXML private TableColumn<ProfileRow, String> profileNameColumn;
@@ -14,6 +21,13 @@ public class ScanningProfilesViewController {
     @FXML private TableColumn<ProfileRow, String> methodColumn;
     @FXML private TableColumn<ProfileRow, String> settingsColumn;
     @FXML private TableColumn<ProfileRow, String> actionsColumn;
+
+    private SceneManager sceneManager;
+    @Override
+    public void setApplicationServices(ApplicationServices services) {
+        this.sceneManager = services.getSceneManager();
+    }
+
 
     @FXML
     public void initialize() {
@@ -28,6 +42,14 @@ public class ScanningProfilesViewController {
                 new ProfileRow("Contract Documents", "Legal contracts and agreements", "Manual", "600 DPI, Color, PDF"),
                 new ProfileRow("Receipt Scanning", "Quick receipt scanning", "Barcode", "150 DPI, Black & White, TIFF")
         ));
+    }
+
+    public void showAddProfile(ActionEvent actionEvent) {
+        Stage owner = (Stage) ((Node) actionEvent.getSource())
+                .getScene()
+                .getWindow();
+
+        sceneManager.openDialog(ViewPath.ADDPROFILEVIEW, "Add Profile", owner);
     }
 
     public record ProfileRow(String profileName, String description, String method, String settings) {}

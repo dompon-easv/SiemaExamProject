@@ -15,7 +15,7 @@
     <HBox alignment="CENTER_LEFT">
         <Label text="Scanning Profiles" styleClass="section-title" />
         <Region HBox.hgrow="ALWAYS" />
-        <Button text="＋ Add profile" styleClass="top-action-button" />
+        <Button text="＋ Add profile" styleClass="top-action-button" onAction="#showAddProfile" />
     </HBox>
 
     <VBox styleClass="table-card">
