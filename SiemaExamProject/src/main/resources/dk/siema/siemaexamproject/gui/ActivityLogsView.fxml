@@ -19,7 +19,7 @@
     </HBox>
 
     <VBox styleClass="table-card">
-        <TableView fx:id="logsTable" columnResizePolicy="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" fixedCellSize="30">
+        <TableView fx:id="logsTable" fixedCellSize="30">
             <columns>
                 <TableColumn fx:id="timestampColumn" text="Timestamp" prefWidth="180" />
                 <TableColumn fx:id="userColumn" text="User" prefWidth="130" />

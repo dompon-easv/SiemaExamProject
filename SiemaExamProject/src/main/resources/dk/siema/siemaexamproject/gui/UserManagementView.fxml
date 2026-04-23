@@ -19,7 +19,7 @@
     </HBox>
 
     <VBox styleClass="table-card">
-        <TableView fx:id="usersTable" columnResizePolicy="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" fixedCellSize="30">
+        <TableView fx:id="usersTable" fixedCellSize="30">
             <columns>
                 <TableColumn fx:id="usernameColumn" text="Username" prefWidth="140" />
                 <TableColumn fx:id="emailColumn" text="Email" prefWidth="170" />

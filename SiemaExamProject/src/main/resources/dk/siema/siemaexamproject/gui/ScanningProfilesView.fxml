@@ -19,7 +19,7 @@
     </HBox>
 
     <VBox styleClass="table-card">
-        <TableView fx:id="profilesTable" columnResizePolicy="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" fixedCellSize="30">
+        <TableView fx:id="profilesTable" fixedCellSize="30">
             <columns>
                 <TableColumn fx:id="profileNameColumn" text="Profile Name" prefWidth="180" />
                 <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="250" />
