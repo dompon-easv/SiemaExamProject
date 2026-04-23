@@ -90,6 +90,12 @@
                             <Button text="⟳" styleClass="tool-button"/>
                             <Button text="⊕" styleClass="tool-button"/>
                             <Button text="⊖" styleClass="tool-button"/>
+                    <HBox alignment="CENTER" spacing="6">
+
+                        <HBox spacing="3" alignment="CENTER">
+                            <Button text="↻" styleClass="tool-button"/>
+                            <Button text="+" styleClass="tool-button"/>
+                            <Button text="−" styleClass="tool-button"/>
                         </HBox>
 
                         <Button text="⇩ Export" styleClass="top-action-button"/>
@@ -97,6 +103,7 @@
 
                 </HBox>
             </top>
+
             <!-- DOCUMENT PREVIEW -->
             <center>
                 <VBox styleClass="preview-area"

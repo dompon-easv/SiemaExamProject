@@ -18,7 +18,6 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
     private TableView<ProfileRow> profilesTable;
     @FXML private TableColumn<ProfileRow, String> profileNameColumn;
     @FXML private TableColumn<ProfileRow, String> descriptionColumn;
-    @FXML private TableColumn<ProfileRow, String> methodColumn;
     @FXML private TableColumn<ProfileRow, String> settingsColumn;
     @FXML private TableColumn<ProfileRow, String> actionsColumn;
 
@@ -33,7 +32,6 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
     public void initialize() {
         profileNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().profileName()));
         descriptionColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().description()));
-        methodColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().method()));
         settingsColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().settings()));
         actionsColumn.setCellValueFactory(data -> new SimpleStringProperty("✎  🗑"));
 

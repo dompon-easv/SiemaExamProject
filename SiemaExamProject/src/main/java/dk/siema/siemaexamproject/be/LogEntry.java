@@ -10,12 +10,6 @@ public class LogEntry {
     private String details;
     private LocalDateTime time;
 
-    public LogEntry(int userId, String action, String details) {
-        this.userId = userId;
-        this.action = action;
-        this.details = details;
-        this.time = LocalDateTime.now();
-    }
     public LogEntry(int id, int userId,int fileId, String action, String details, LocalDateTime time) {
         this.id = id;
         this.userId = userId;
@@ -29,4 +23,5 @@ public class LogEntry {
     public String getDetails() {return details;}
     public LocalDateTime getTime() {return time;}
     public int getId() { return id; }
+    public void setId(int id) {this.id = id;} /* to set generated id*/
 }

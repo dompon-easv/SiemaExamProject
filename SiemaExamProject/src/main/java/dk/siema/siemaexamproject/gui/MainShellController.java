@@ -44,7 +44,7 @@ public class MainShellController implements ApplicationServicesAware {
     }
 
     @FXML
-    public void showScannerView() {
+    private void showScannerView() {
         scannerButton.getStyleClass().add("header-chip-selected");
         adminButton.getStyleClass().remove("header-chip-selected");
         sceneManager.setContent(contentContainer, ViewPath.SCANNERVIEW);
