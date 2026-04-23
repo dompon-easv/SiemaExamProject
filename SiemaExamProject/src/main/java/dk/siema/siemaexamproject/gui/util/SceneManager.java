@@ -43,12 +43,17 @@ public class SceneManager {
     }
 
     // --- Replace scene on an existing stage ---
-    public void setScene(Stage stage, ViewPath viewPath, String title) {
-        Parent root = loadView(viewPath);
-        stage.setScene(new Scene(root));
+    public <T> LoadedView<T> setScene(Stage stage, ViewPath viewPath, String title) {
+        LoadedView<T> loaded = load(viewPath);
+
+        Scene scene = new Scene(loaded.root(), 1200, 800);
+
+        stage.setScene(scene);
         stage.setTitle(title);
-        stage.show();
+
+        return loaded; // ← IMPORTANT
     }
+
 
     // --- Open a completely new window ---
     public void openWindow(ViewPath viewPath, String title) {

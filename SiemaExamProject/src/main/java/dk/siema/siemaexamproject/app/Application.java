@@ -13,19 +13,18 @@ import java.io.IOException;
 
 public class Application extends javafx.application.Application {
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
 
         ApplicationServices services = new ApplicationServices();
         SceneManager sceneManager = services.getSceneManager();
 
-      //  sceneManager.setScene(stage, ViewPath.LOGIN, "Visione"); - come back to this one later
-
         LoadedView<MainShellController> loaded =
-                services.getSceneManager().load(ViewPath.MAINSHELL);
+                sceneManager.setScene(stage, ViewPath.MAINSHELL, "Visione");
 
-        stage.setScene(new Scene(loaded.root()));
-        stage.setTitle("Visione");
         stage.show();
-        Platform.runLater(() -> loaded.controller().showAdminView());
+
+        Platform.runLater(() ->
+                loaded.controller().showAdminView()
+        );
     }
 }
