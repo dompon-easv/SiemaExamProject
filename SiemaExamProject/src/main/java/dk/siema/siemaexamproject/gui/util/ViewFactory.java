@@ -23,13 +23,18 @@ public class ViewFactory {
 
                     if (controller instanceof ApplicationServicesAware aware) {
                         aware.setApplicationServices(services);
+                        System.out.println("Injected ApplicationServices into: "+ type.getName());
                     }
+
+
 
                     return controller;
                 } catch (Exception e) {
                     throw new RuntimeException("Could not create controller: " + type.getName(), e);
                 }
             });
+
+
 
             return loader;
         }

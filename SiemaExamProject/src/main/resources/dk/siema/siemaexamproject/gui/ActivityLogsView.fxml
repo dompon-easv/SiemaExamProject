@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="dk.siema.siemaexamproject.gui.ActivityLogsController"
+      stylesheets="@helpers/app.css" styleClass="admin-content" spacing="18">
+    <HBox alignment="CENTER_LEFT">
+        <Label text="Activity Logs" styleClass="section-title" />
+        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="searchField" promptText="Search logs..." styleClass="search-field,search-box" />
+    </HBox>
+
+    <VBox styleClass="table-card">
+        <TableView fx:id="logsTable" fixedCellSize="30">
+            <columns>
+                <TableColumn fx:id="timestampColumn" text="Timestamp" prefWidth="180" />
+                <TableColumn fx:id="userColumn" text="User" prefWidth="130" />
+                <TableColumn fx:id="actionColumn" text="Action" prefWidth="180" />
+                <TableColumn fx:id="detailsColumn" text="Details" prefWidth="220" />
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>
