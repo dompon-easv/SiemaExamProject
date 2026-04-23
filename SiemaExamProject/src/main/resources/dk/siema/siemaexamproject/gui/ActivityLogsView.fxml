@@ -23,7 +23,7 @@
             <columns>
                 <TableColumn fx:id="timestampColumn" text="Timestamp" prefWidth="180" />
                 <TableColumn fx:id="userColumn" text="User" prefWidth="130" />
-                <TableColumn fx:id="actionColumn" text="Action" prefWidth="180" />
+                <TableColumn fx:id="actionColumn" text="Action" prefWidth="450" />
                 <TableColumn fx:id="detailsColumn" text="Details" prefWidth="220" />
             </columns>
         </TableView>

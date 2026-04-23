@@ -42,13 +42,13 @@
 
             <Region styleClass="header-separator" />
 
-            <HBox alignment="CENTER_LEFT" spacing="9">
+            <HBox alignment="CENTER_LEFT" spacing="12">
                 <StackPane styleClass="avatar-circle">
-                    <Label fx:id="avatarLabel" text="US" styleClass="avatar-text" />
+                    <Label fx:id="avatarLabel" text="J D" styleClass="avatar-text" />
                 </StackPane>
-                <VBox spacing="0">
-                    <Label fx:id="userNameLabel" text="user" styleClass="user-name" />
-                    <Label fx:id="userRoleLabel" text="User" styleClass="user-role" />
+                <VBox spacing="2" alignment="CENTER_LEFT">
+                    <Label fx:id="userNameLabel" text="John Doe" styleClass="user-name" />
+                    <Label fx:id="userRoleLabel" text="Admin" styleClass="user-role" />
                 </VBox>
             </HBox>
 

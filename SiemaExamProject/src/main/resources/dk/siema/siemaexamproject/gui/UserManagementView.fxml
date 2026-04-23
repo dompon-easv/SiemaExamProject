@@ -22,10 +22,9 @@
         <TableView fx:id="usersTable" fixedCellSize="30">
             <columns>
                 <TableColumn fx:id="usernameColumn" text="Username" prefWidth="140" />
-                <TableColumn fx:id="emailColumn" text="Email" prefWidth="170" />
+                <TableColumn fx:id="emailColumn" text="Email" prefWidth="250" />
                 <TableColumn fx:id="roleColumn" text="Role" prefWidth="80" />
-                <TableColumn fx:id="profileAccessColumn" text="Profile Access" prefWidth="260" />
-                <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
+                <TableColumn fx:id="profileAccessColumn" text="Profile Access" prefWidth="450" />
                 <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="80" />
             </columns>
         </TableView>

@@ -23,8 +23,7 @@
             <columns>
                 <TableColumn fx:id="profileNameColumn" text="Profile Name" prefWidth="180" />
                 <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="250" />
-                <TableColumn fx:id="methodColumn" text="Method" prefWidth="100" />
-                <TableColumn fx:id="settingsColumn" text="Settings" prefWidth="220" />
+                <TableColumn fx:id="settingsColumn" text="Settings" prefWidth="450" />
                 <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="80" />
             </columns>
         </TableView>
