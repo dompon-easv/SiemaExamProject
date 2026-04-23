@@ -9,7 +9,7 @@ public class LogEntry {
     private String action;
     private String details;
     private LocalDateTime time;
-    
+
     public LogEntry(int id, int userId,int fileId, String action, String details, LocalDateTime time) {
         this.id = id;
         this.userId = userId;
