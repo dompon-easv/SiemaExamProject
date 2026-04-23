@@ -10,7 +10,7 @@
             stylesheets="@helpers/app.css" styleClass="admin-root">
     <top>
         <HBox styleClass="admin-top-tabs" spacing="6">
-            <Button fx:id="usersTabButton" text="User Management" styleClass="admin-tab-button-selected" onAction="#showUsers" />
+            <Button fx:id="usersTabButton" text="User Management" styleClass="admin-tab-button" onAction="#showUsers" />
             <Button fx:id="profilesTabButton" text="Scanning Profiles" styleClass="admin-tab-button" onAction="#showProfiles" />
             <Button fx:id="logsTabButton" text="Activity Logs" styleClass="admin-tab-button" onAction="#showLogs" />
         </HBox>

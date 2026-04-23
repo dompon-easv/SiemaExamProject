@@ -25,7 +25,6 @@ public class UserManagementController implements ApplicationServicesAware {
     @FXML private TableColumn<UserRow, String> emailColumn;
     @FXML private TableColumn<UserRow, String> roleColumn;
     @FXML private TableColumn<UserRow, String> profileAccessColumn;
-    @FXML private TableColumn<UserRow, String> statusColumn;
     @FXML private TableColumn<UserRow, String> actionsColumn;
     private SceneManager sceneManager;
     @Override
@@ -39,7 +38,6 @@ public class UserManagementController implements ApplicationServicesAware {
         emailColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().email()));
         roleColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().role()));
         profileAccessColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().profileAccess()));
-        statusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().status()));
         actionsColumn.setCellValueFactory(data -> new SimpleStringProperty("✎  🗑"));
 
         usersTable.setItems(FXCollections.observableArrayList(
