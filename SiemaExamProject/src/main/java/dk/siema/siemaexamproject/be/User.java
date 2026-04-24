@@ -5,13 +5,13 @@ import java.util.UUID;
 
 public class User {
 
-    private UUID id;;
+    private UUID id;
     private String username;
     private String email;
     private String password; // holds HASH, not raw password
     private UserRole role;
 
-    // 🔹 Constructor (without id - for creation)
+    //Constructor (without id - for creation)
     public User(String username, String email, String password, UserRole role) {
         this.username = username;
         this.email = email;
@@ -19,7 +19,7 @@ public class User {
         this.role = role;
     }
 
-    // 🔹 Constructor (with id - from DB)
+    //Constructor (with id - from DB)
     public User(UUID id, String username, String email, String password, UserRole role) {
         this. id = id;
         this.username = username;
@@ -39,8 +39,10 @@ public class User {
     public void setEmail(String email) { this.email = email; }
 
     public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public void changePassword(String hashedPassword) {this.password = hashedPassword;}
 
     public UserRole getRole() { return role; }
-    public void setRole(UserRole role) { this.role = role; }
+    public void changeRole(UserRole role) {this.role = role;}
+
+    /* controlled changes/hybrid ... IkwIm*/
 }

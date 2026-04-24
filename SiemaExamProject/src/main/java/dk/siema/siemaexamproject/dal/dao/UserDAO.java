@@ -108,6 +108,19 @@ public class UserDAO implements IUserDAO {
             stmt.executeUpdate();
         }
     }
+    @Override
+    public void updatePassword(UUID id, String newHash) throws SQLException {
+        String sql = "UPDATE Users SET password_hash = ? WHERE id = ?";
+
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, newHash);
+            stmt.setBytes(2, uuidToBytes(id));
+
+            stmt.executeUpdate();
+        }
+    }
 
      //DELETE
     @Override
