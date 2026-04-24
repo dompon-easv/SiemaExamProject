@@ -5,53 +5,39 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.FlowPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="dk.siema.siemaexamproject.gui.ScannerViewController"
-            stylesheets="@helpers/app.css"
-            styleClass="scanner-root">
+<BorderPane styleClass="scanner-root" stylesheets="@helpers/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.siema.siemaexamproject.gui.ScannerViewController">
 
     <!-- ================= LEFT SIDEBAR ================= -->
     <left>
         <VBox styleClass="sidebar">
 
             <VBox styleClass="sidebar-section">
-                <Button text="⟳ Start New Scan"
-                        onAction="#onStartNewScan"
-                        styleClass="primary-button"
-                        maxWidth="1.7976931348623157E308"/>
+                <Button maxWidth="1.7976931348623157E308" onAction="#onStartNewScan" styleClass="primary-button" text="⟳ Start New Scan" />
             </VBox>
 
-            <Region styleClass="sidebar-divider"/>
+            <Region styleClass="sidebar-divider" />
 
             <VBox styleClass="sidebar-section">
-                <Label text="Active Profile" styleClass="sidebar-title"/>
+                <Label styleClass="sidebar-title" text="Active Profile" />
 
-                <ComboBox fx:id="profileComboBox"
-                          styleClass="profile-combo"
-                          maxWidth="1.7976931348623157E308"/>
+                <ComboBox fx:id="profileComboBox" maxWidth="1.7976931348623157E308" styleClass="profile-combo" />
 
-                <Label fx:id="profileDescriptionLabel"
-                       text="Standard invoice documents"
-                       styleClass="sidebar-subtext"
-                       wrapText="true"/>
+                <Label fx:id="profileDescriptionLabel" styleClass="sidebar-subtext" text="Standard invoice documents" wrapText="true" />
             </VBox>
 
-            <Region styleClass="sidebar-divider"/>
+            <Region styleClass="sidebar-divider" />
 
             <!-- ================= RECENT SCANS ================= -->
-            <VBox spacing="6" VBox.vgrow="ALWAYS" styleClass="sidebar-section">
+            <VBox spacing="6" styleClass="sidebar-section" VBox.vgrow="ALWAYS">
 
-                <Label text="Document Structure" styleClass="sidebar-title"/>
+                <Label styleClass="sidebar-title" text="Document Structure" />
 
-                <TreeView fx:id="documentTree"
-                          VBox.vgrow="ALWAYS"
-                          styleClass="tree-view"/>
+                <TreeView fx:id="documentTree" styleClass="tree-view" VBox.vgrow="ALWAYS" />
 
             </VBox>
         </VBox>
@@ -63,67 +49,52 @@
 
             <!-- TOP TOOLBAR -->
             <top>
-                <HBox styleClass="content-toolbar"
-                      alignment="CENTER_LEFT"
-                      spacing="12">
+                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="content-toolbar">
 
                     <!-- LEFT SIDE -->
                     <HBox alignment="CENTER_LEFT" spacing="12">
 
-                        <Label text="Invoice_2026_001.tiff"
-                               styleClass="page-title"/>
+                        <Label styleClass="page-title" text="Invoice_2026_001.tiff" />
 
-                        <Label text="Page 1 of 3"
-                               styleClass="badge"/>
+                        <Label styleClass="badge" text="Page 1 of 3" />
 
-                        <Label fx:id="welcomeText"
-                               text="Ready"
-                               styleClass="tree-text"/>
+                        <Label fx:id="welcomeText" styleClass="tree-text" text="Ready" />
                     </HBox>
 
                     <!-- PUSH CENTER -->
-                    <Region HBox.hgrow="ALWAYS"/>
+                    <Region HBox.hgrow="ALWAYS" />
 
                     <!-- CENTER BUTTONS -->
                     <HBox alignment="CENTER" spacing="6">
 
-                        <Button text="↻" styleClass="tool-button"/>
-                        <Button text="+" styleClass="tool-button"/>
-                        <Button text="−" styleClass="tool-button"/>
+                        <Button onAction="#onRotateAction" styleClass="tool-button" text="↻" />
+                        <Button styleClass="tool-button" text="+" />
+                        <Button styleClass="tool-button" text="−" />
 
                     </HBox>
 
                     <!-- PUSH RIGHT -->
-                    <Region HBox.hgrow="ALWAYS"/>
+                    <Region HBox.hgrow="ALWAYS" />
 
                     <!-- RIGHT SIDE -->
-                    <Button text="⇩ Export"
-                            styleClass="top-action-button"/>
+                    <Button styleClass="top-action-button" text="⇩ Export" />
 
                 </HBox>
             </top>
 
             <!-- DOCUMENT PREVIEW -->
             <center>
-                <VBox styleClass="preview-area"
-                      alignment="CENTER"
-                      spacing="18">
+                <VBox alignment="CENTER" spacing="18" styleClass="preview-area">
 
                     <!-- IMAGE AREA -->
-                    <FlowPane fx:id="imageContainer"
-                              alignment="CENTER"
-                              hgap="10"
-                              vgap="10"
-                              styleClass="document-card"/>
+                    <FlowPane fx:id="imageContainer" alignment="CENTER" hgap="10" styleClass="document-card" vgap="10" />
 
                     <!-- PAGINATION -->
-                    <HBox styleClass="pagination-bar"
-                          alignment="CENTER"
-                          spacing="12">
+                    <HBox alignment="CENTER" spacing="12" styleClass="pagination-bar">
 
-                        <Button text="‹" styleClass="pagination-button"/>
-                        <Label text="Page 1 of 3" styleClass="tree-text"/>
-                        <Button text="›" styleClass="pagination-button"/>
+                        <Button styleClass="pagination-button" text="‹" />
+                        <Label styleClass="tree-text" text="Page 1 of 3" />
+                        <Button styleClass="pagination-button" text="›" />
 
                     </HBox>
 
