@@ -1,5 +1,6 @@
 package dk.siema.siemaexamproject.app;
 
+import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.models.MainModel;
@@ -19,6 +20,8 @@ private final SceneManager sceneManager;
 private final ExecutorService executorService;
 private final TiffService tiffService;
 private final DocumentBuilderService documentBuilderService;
+    private final ScannerService scannerService;
+
 
 private final MainModel mainModel;
 private final AdminModel adminModel;
@@ -34,9 +37,11 @@ private final ScannerModel scannerModel;
         // here set all logic fx this.authenticationLogic = new AuthenticationLogic();
         this.viewFactory= new ViewFactory(this);
         this.sceneManager = new SceneManager(viewFactory);
+
         this.executorService = Executors.newFixedThreadPool(2);
         this.tiffService = new TiffService();
         this.documentBuilderService = new DocumentBuilderService();
+        this.scannerService = new ScannerService(tiffService, documentBuilderService);
 
 
 
@@ -65,5 +70,13 @@ private final ScannerModel scannerModel;
 
     public DocumentBuilderService getDocumentBuilderService() {
         return documentBuilderService;
+    }
+
+    public ScannerService getScannerService() {
+        return scannerService;
+    }
+
+    public ScannerModel getScannerModel() {
+        return scannerModel;
     }
 }

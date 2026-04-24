@@ -16,7 +16,6 @@ public class TiffService {
 
         File folder = new File("images/all");
 
-        // ✅ If already downloaded → skip API
         if (folder.exists() && folder.listFiles() != null && folder.listFiles().length > 0) {
             return List.of(folder.listFiles());
         }
@@ -29,15 +28,14 @@ public class TiffService {
             zipStream.transferTo(fos);
         }
 
-        return unzip(zipFile, "images/all");
+        return unzip(zipFile, folder);
     }
 
-    private List<File> unzip(File zipFile, String outputDir) throws Exception {
+    private List<File> unzip(File zipFile, File outputDir) throws Exception {
 
         List<File> files = new ArrayList<>();
 
-        File dir = new File(outputDir);
-        if (!dir.exists()) dir.mkdirs();
+        if (!outputDir.exists()) outputDir.mkdirs();
 
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
 
@@ -45,7 +43,7 @@ public class TiffService {
 
             while ((entry = zis.getNextEntry()) != null) {
 
-                File outFile = new File(dir, entry.getName());
+                File outFile = new File(outputDir, entry.getName());
 
                 try (FileOutputStream fos = new FileOutputStream(outFile)) {
                     zis.transferTo(fos);

@@ -27,23 +27,22 @@ public class DocumentBuilderService {
                 BufferedImage image = ImageIO.read(file);
                 if (image == null) continue;
 
-                String barcode = barcodeReader.readBarcode(image);
+                boolean isBarcode = barcodeReader.readBarcode(image) != null;
 
-                boolean isBarcode = barcode != null;
-
-                // 🔥 NEW RULE: barcode OR first page starts new document
-                if (isBarcode || currentDocument == null) {
-
-                    // close previous document
-                    if (currentDocument != null && !currentDocument.getPages().isEmpty()) {
-                        documents.add(currentDocument);
-                    }
-
+                // barcode = start new document
+                if (isBarcode) {
                     currentDocument = new Document();
                     currentDocument.setId(docId++);
+                    documents.add(currentDocument);
                 }
 
-                // add page to current document
+                // safety fallback
+                if (currentDocument == null) {
+                    currentDocument = new Document();
+                    currentDocument.setId(docId++);
+                    documents.add(currentDocument);
+                }
+
                 FileEntity page = new FileEntity(
                         file.hashCode(),
                         0,
@@ -58,11 +57,6 @@ public class DocumentBuilderService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-
-        // add last document
-        if (currentDocument != null && !currentDocument.getPages().isEmpty()) {
-            documents.add(currentDocument);
         }
 
         return documents;
