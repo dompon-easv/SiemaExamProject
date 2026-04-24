@@ -1,4 +1,4 @@
-package dk.siema.siemaexamproject.dal.dao;
+/*package dk.siema.siemaexamproject.dal.dao;
 
 import dk.siema.siemaexamproject.be.LogEntry;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
@@ -85,3 +85,5 @@ public class LogEntryDAO implements ILogEntryDAO {
         return new LogEntry(id, userId,fileId, action, details, time);
     }
 }
+
+ */
