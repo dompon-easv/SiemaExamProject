@@ -19,7 +19,6 @@ public class LogEntryDAO implements ILogEntryDAO {
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, log.getUserId());
-            stmt.setString(2, log.getAction());
             stmt.setString(3, log.getDetails());
             stmt.setTimestamp(4, Timestamp.valueOf(log.getTime()));
 

@@ -2,7 +2,7 @@ package dk.siema.siemaexamproject.app;
 
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
-import dk.siema.siemaexamproject.gui.models.SessionModel;
+import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewFactory;
 
@@ -20,7 +20,7 @@ private final ExecutorService executorService;
 private final TiffService tiffService;
 private final DocumentBuilderService documentBuilderService;
 
-private final SessionModel sessionModel;
+private final MainModel mainModel;
 private final AdminModel adminModel;
 private final ScannerModel scannerModel;
 
@@ -42,7 +42,7 @@ private final ScannerModel scannerModel;
 
 
 
-        this.sessionModel = new SessionModel();
+        this.mainModel = new MainModel();
         this.adminModel = new AdminModel();
         this.scannerModel = new ScannerModel();
     }

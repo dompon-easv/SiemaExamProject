@@ -1,4 +1,5 @@
 package dk.siema.siemaexamproject.gui.models;
 
-public class SessionModel {
+public class MainModel {
+
 }
