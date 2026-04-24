@@ -9,6 +9,7 @@ import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -28,6 +29,8 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private Label welcomeText;
     @FXML private TreeView<TreeNode> documentTree;
     @FXML private FlowPane imageContainer;
+
+
 
     public record TreeNode(String label, FileEntity file) {
         @Override

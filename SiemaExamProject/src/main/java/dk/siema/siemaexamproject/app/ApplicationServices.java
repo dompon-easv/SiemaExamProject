@@ -52,31 +52,17 @@ private final ScannerModel scannerModel;
         this.scannerModel = new ScannerModel();
     }
 
-    public SceneManager getSceneManager() {
-        return sceneManager;
-    }
+    public SceneManager getSceneManager() {return sceneManager;}
 
-    public ViewFactory getViewFactory() {
-        return viewFactory;
-    }
+    public ViewFactory getViewFactory() {return viewFactory;}
 
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
+    public ExecutorService getExecutorService() {return executorService;}
 
-    public TiffService getTiffService() {
-        return tiffService;
-    }
+    public TiffService getTiffService() {return tiffService;}
 
-    public DocumentBuilderService getDocumentBuilderService() {
-        return documentBuilderService;
-    }
+    public DocumentBuilderService getDocumentBuilderService() {return documentBuilderService;}
 
-    public ScannerService getScannerService() {
-        return scannerService;
-    }
+    public ScannerService getScannerService() {return scannerService;}
 
-    public ScannerModel getScannerModel() {
-        return scannerModel;
-    }
+    public ScannerModel getScannerModel() {return scannerModel;}
 }

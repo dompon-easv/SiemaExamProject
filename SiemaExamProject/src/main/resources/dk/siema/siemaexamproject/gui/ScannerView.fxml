@@ -67,7 +67,7 @@
                     <!-- CENTER BUTTONS -->
                     <HBox alignment="CENTER" spacing="6">
 
-                        <Button onAction="#onRotateAction" styleClass="tool-button" text="↻" />
+                        <Button styleClass="tool-button" text="↻" />
                         <Button styleClass="tool-button" text="+" />
                         <Button styleClass="tool-button" text="−" />
 
