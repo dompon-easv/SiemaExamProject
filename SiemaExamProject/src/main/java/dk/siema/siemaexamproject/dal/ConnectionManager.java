@@ -37,6 +37,8 @@ public class ConnectionManager {
         ConnectionManager conn = new ConnectionManager();
         try (Connection connection = conn.getConnection()) {
             System.out.println("Is it open? " + !connection.isClosed());
+
+            System.out.println("Connected DB: " + dataSource.getDatabaseName());
         }
     }
 }

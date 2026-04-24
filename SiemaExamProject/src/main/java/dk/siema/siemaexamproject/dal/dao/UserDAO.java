@@ -16,7 +16,7 @@ public class UserDAO implements IUserDAO {
     //ADD
     @Override
     public User add(User user) throws SQLException {
-        String sql = "INSERT INTO Users (id, username, email, password_hash, role) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dbo.Users (id, username, email, password_hash, role) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -36,7 +36,7 @@ public class UserDAO implements IUserDAO {
     //GETTERS
     @Override
     public List<User> getAll() throws SQLException {
-        String sql = "SELECT * FROM Users";
+        String sql = "SELECT * FROM dbo.Users";
 
         List<User> users = new ArrayList<>();
 
@@ -55,7 +55,7 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public User getById(UUID id) throws SQLException {
-        String sql = "SELECT * FROM Users WHERE id = ?";
+        String sql = "SELECT * FROM dbo.Users WHERE id = ?";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -75,7 +75,7 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public User getByUsername(String username) throws SQLException {
-        String sql = "SELECT * FROM Users WHERE username = ?";
+        String sql = "SELECT * FROM dbo.Users WHERE username = ?";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -95,7 +95,7 @@ public class UserDAO implements IUserDAO {
     //UPDATE
     @Override
     public void update(User user) throws SQLException {
-        String sql = "UPDATE Users SET username = ?, email = ?, role = ? WHERE id = ?";
+        String sql = "UPDATE dbo.Users SET username = ?, email = ?, role = ? WHERE id = ?";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -110,7 +110,7 @@ public class UserDAO implements IUserDAO {
     }
     @Override
     public void updatePassword(UUID id, String newHash) throws SQLException {
-        String sql = "UPDATE Users SET password_hash = ? WHERE id = ?";
+        String sql = "UPDATE dbo.Users SET password_hash = ? WHERE id = ?";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -125,7 +125,7 @@ public class UserDAO implements IUserDAO {
      //DELETE
     @Override
     public void delete(UUID id) throws SQLException {
-        String sql = "DELETE FROM Users WHERE id = ?";
+        String sql = "DELETE FROM dbo.Users WHERE id = ?";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
