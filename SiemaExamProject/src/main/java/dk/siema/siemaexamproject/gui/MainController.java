@@ -1,4 +1,4 @@
-package dk.siema.siemaexamproject.gui;
+/*package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
@@ -130,4 +130,4 @@ public class MainController implements ApplicationServicesAware {
 
         documentTree.setRoot(root);
     }
-}
+}*/
