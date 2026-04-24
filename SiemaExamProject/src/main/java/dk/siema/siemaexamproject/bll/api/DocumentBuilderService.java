@@ -14,49 +14,59 @@ public class DocumentBuilderService {
 
     private final BarcodeReader barcodeReader = new BarcodeReader();
 
-    public List<Document> buildDocuments(List<File> tiffFiles) {
+    // 🔵 STEP 1 RESULT WRAPPER
+    public record PageResult(FileEntity entity, boolean barcode) {}
+
+    // 🔵 THREAD-SAFE: called in parallel
+    public PageResult processFile(File file) {
+
+        try {
+            BufferedImage image = ImageIO.read(file);
+            if (image == null) return null;
+
+            boolean isBarcode = barcodeReader.readBarcode(image) != null;
+
+            FileEntity entity = new FileEntity(
+                    file.hashCode(),
+                    0,
+                    0,
+                    file.getAbsolutePath(),
+                    0,
+                    isBarcode
+            );
+
+            return new PageResult(entity, isBarcode);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // 🔵 STEP 2: single-thread grouping logic
+    public List<Document> buildDocuments(List<PageResult> pages) {
 
         List<Document> documents = new ArrayList<>();
-        Document currentDocument = null;
-
+        Document current = null;
         int docId = 1;
 
-        for (File file : tiffFiles) {
+        for (PageResult page : pages) {
 
-            try {
-                BufferedImage image = ImageIO.read(file);
-                if (image == null) continue;
+            if (page == null) continue;
 
-                boolean isBarcode = barcodeReader.readBarcode(image) != null;
-
-                // barcode = start new document
-                if (isBarcode) {
-                    currentDocument = new Document();
-                    currentDocument.setId(docId++);
-                    documents.add(currentDocument);
-                }
-
-                // safety fallback
-                if (currentDocument == null) {
-                    currentDocument = new Document();
-                    currentDocument.setId(docId++);
-                    documents.add(currentDocument);
-                }
-
-                FileEntity page = new FileEntity(
-                        file.hashCode(),
-                        0,
-                        currentDocument.getPages().size(),
-                        file.getAbsolutePath(),
-                        0,
-                        isBarcode
-                );
-
-                currentDocument.addPage(page);
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (page.barcode()) {
+                current = new Document();
+                current.setId(docId++);
+                documents.add(current);
             }
+
+            if (current == null) {
+                current = new Document();
+                current.setId(docId++);
+                documents.add(current);
+            }
+
+            current.addPage(page.entity());
         }
 
         return documents;
