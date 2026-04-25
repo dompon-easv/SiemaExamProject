@@ -8,15 +8,12 @@ import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -29,6 +26,8 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private Label welcomeText;
     @FXML private TreeView<TreeNode> documentTree;
     @FXML private FlowPane imageContainer;
+
+    private ImageView previewImageView;
 
 
 
@@ -48,17 +47,22 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @FXML
     private void initialize() {
+        previewImageView = new ImageView();
+        previewImageView.setFitHeight(500);
+        previewImageView.setPreserveRatio(true);
+        imageContainer.getChildren().setAll(previewImageView);
+
         refreshTree();
 
-        documentTree.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldItem, newItem) -> {
-                    if (newItem == null) return;
+        scannerModel.currentPreviewImageProperty().addListener((obs, oldImg, newImg) -> {
+            previewImageView.setImage(newImg);
+        });
 
-                    TreeNode node = newItem.getValue();
-                    if (node != null && node.file() != null) {
-                        showImage(node.file().toFile());
-                    }
-                }
+        documentTree.getSelectionModel().selectedItemProperty().addListener((obs, oldItem, newItem) -> {
+            if  (newItem != null && newItem.getValue() != null){
+                scannerModel.setSelectedFile(newItem.getValue().file());
+            }
+        }
         );
     }
 
@@ -98,21 +102,4 @@ public class ScannerViewController implements ApplicationServicesAware {
         );
     }
 
-    // ================= IMAGE =================
-
-    private void showImage(File file) {
-        try {
-            BufferedImage img = javax.imageio.ImageIO.read(file);
-            if (img == null) return;
-
-            ImageView view = new ImageView(SwingFXUtils.toFXImage(img, null));
-            view.setFitWidth(400);
-            view.setPreserveRatio(true);
-
-            imageContainer.getChildren().setAll(view);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
