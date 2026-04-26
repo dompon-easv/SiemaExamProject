@@ -15,14 +15,7 @@ public class TiffService {
 
     public List<File> getAllTiffs() throws Exception {
 
-        // 🔥 ALWAYS reset folder to avoid stale data
-        if (OUTPUT_DIR.exists()) {
-            for (File f : Objects.requireNonNull(OUTPUT_DIR.listFiles())) {
-                f.delete();
-            }
-        } else {
-            OUTPUT_DIR.mkdirs();
-        }
+        resetFolder();
 
         // download fresh zip every time (prevents stale cache issues)
         InputStream zipStream = apiClient.fetchAllFiles();
@@ -35,10 +28,20 @@ public class TiffService {
 
         List<File> files = unzip(zipFile, OUTPUT_DIR);
 
-        // 🔥 CRITICAL: enforce correct numeric order (1.tiff, 2.tiff, ...)
+        //enforce correct numeric order (1.tiff, 2.tiff, ...)
         files.sort(Comparator.comparingInt(this::extractNumber));
 
         return files;
+    }
+
+    private void resetFolder() {
+        if (OUTPUT_DIR.exists()) {
+            for (File f : Objects.requireNonNull(OUTPUT_DIR.listFiles())) {
+                f.delete();
+            }
+        } else {
+            OUTPUT_DIR.mkdirs();
+        }
     }
 
     private List<File> unzip(File zipFile, File outputDir) throws Exception {
@@ -52,6 +55,7 @@ public class TiffService {
             while ((entry = zis.getNextEntry()) != null) {
 
                 File outFile = new File(outputDir, entry.getName());
+                outFile.getParentFile().mkdirs();
 
                 try (FileOutputStream fos = new FileOutputStream(outFile)) {
                     zis.transferTo(fos);
@@ -65,7 +69,6 @@ public class TiffService {
         return files;
     }
 
-    // 🔥 extracts number from "12.tiff" → 12
     private int extractNumber(File file) {
         try {
             String name = file.getName().replaceAll("\\D+", "");

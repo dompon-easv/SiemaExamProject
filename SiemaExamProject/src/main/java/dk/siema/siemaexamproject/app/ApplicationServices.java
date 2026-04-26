@@ -17,7 +17,9 @@ public class ApplicationServices {
 
 private final ViewFactory viewFactory;
 private final SceneManager sceneManager;
-private final ExecutorService executorService;
+
+private final ExecutorService cpuExecutor;
+private final ExecutorService ioExecutor;
 private final TiffService tiffService;
 private final DocumentBuilderService documentBuilderService;
     private final ScannerService scannerService;
@@ -38,10 +40,17 @@ private final ScannerModel scannerModel;
         this.viewFactory= new ViewFactory(this);
         this.sceneManager = new SceneManager(viewFactory);
 
-        this.executorService = Executors.newFixedThreadPool(2);
+        //CPU-bound tasks (barcode scanning)
+        this.cpuExecutor = Executors.newFixedThreadPool(
+                Runtime.getRuntime().availableProcessors()
+        );
+
+        //IO-bound tasks (image loading)
+        this.ioExecutor = Executors.newCachedThreadPool();
+
         this.tiffService = new TiffService();
         this.documentBuilderService = new DocumentBuilderService();
-        this.scannerService = new ScannerService(tiffService, documentBuilderService);
+        this.scannerService = new ScannerService(tiffService, documentBuilderService, cpuExecutor);
 
 
 
@@ -49,14 +58,14 @@ private final ScannerModel scannerModel;
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel();
-        this.scannerModel = new ScannerModel();
+        this.scannerModel = new ScannerModel(ioExecutor);
     }
 
     public SceneManager getSceneManager() {return sceneManager;}
 
     public ViewFactory getViewFactory() {return viewFactory;}
 
-    public ExecutorService getExecutorService() {return executorService;}
+    public ExecutorService getExecutorService() {return cpuExecutor;}
 
     public TiffService getTiffService() {return tiffService;}
 

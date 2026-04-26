@@ -24,9 +24,9 @@ public class ScannerModel {
 
     private final ObjectProperty<FileEntity> selectedFile = new SimpleObjectProperty<>();
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
+    private final ExecutorService executor;
 
-    // single background thread for image loading
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    public ScannerModel(ExecutorService executor) {this.executor = executor;}
 
     public List<Document> getDocuments() {
         return Collections.unmodifiableList(documents);
@@ -54,12 +54,9 @@ public class ScannerModel {
 
     public void setSelectedFile(FileEntity file) {
 
-        // avoid reloading same file
         if (file != null && file.equals(selectedFile.get())) return;
 
         selectedFile.set(file);
-
-        // clear UI immediately (better UX)
         currentPreviewImage.set(null);
 
         loadImageAsync(file);
@@ -67,7 +64,7 @@ public class ScannerModel {
 
     // ================= ASYNC IMAGE LOADING =================
 
-    // async loading (no UI freeze)
+    // async image loading
     private void loadImageAsync(FileEntity file) {
 
         if (file == null || file.toFile() == null) {
@@ -84,34 +81,17 @@ public class ScannerModel {
                         ? SwingFXUtils.toFXImage(img, null)
                         : null;
 
-                // 🔥 capture selection at start
-                FileEntity expectedFile = file;
+                FileEntity expected = file;
 
                 Platform.runLater(() -> {
-
-                    // 🔥 race-condition protection
-                    if (expectedFile.equals(selectedFile.get())) {
+                    if (expected.equals(selectedFile.get())) {
                         currentPreviewImage.set(fxImage);
                     }
                 });
 
             } catch (IOException e) {
-
                 Platform.runLater(() -> currentPreviewImage.set(null));
-                e.printStackTrace();
             }
         });
-    }
-
-    // ================= CLEANUP =================
-
-    //this method should be called once application is closed
-    public void shutdown() {
-        executor.shutdown();
-    }
-
-    public void rotateFile(FileEntity file) {
-        int newRotation = (file.getRotation() + 90) % 360;
-        file.setRotation(newRotation);
     }
 }

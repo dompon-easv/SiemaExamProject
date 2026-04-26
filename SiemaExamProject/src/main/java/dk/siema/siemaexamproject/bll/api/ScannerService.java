@@ -10,52 +10,50 @@ public class ScannerService {
 
     private final TiffService tiffService;
     private final DocumentBuilderService documentBuilderService;
-
-    private final ExecutorService executor =
-            Executors.newFixedThreadPool(
-                    Runtime.getRuntime().availableProcessors()
-            );
+    private final ExecutorService executor;
 
     public ScannerService(TiffService tiffService,
-                          DocumentBuilderService documentBuilderService) {
+                          DocumentBuilderService documentBuilderService,
+                          ExecutorService executor) {
+
         this.tiffService = tiffService;
         this.documentBuilderService = documentBuilderService;
+        this.executor = executor;
     }
 
-    // wrapper to preserve order
-    private record FileJob(int index, File file) {}
+    private record IndexedResult(int index, DocumentBuilderService.PageResult result) {}
 
     public List<Document> scan() throws Exception {
 
         List<File> files = tiffService.getAllTiffs();
 
-        List<Future<DocumentBuilderService.PageResult>> futures = new ArrayList<>();
+        CompletionService<IndexedResult> completion =
+                new ExecutorCompletionService<>(executor);
 
-        // STEP 1: attach index BEFORE parallelism
-        List<FileJob> jobs = new ArrayList<>();
+        // submit jobs
         for (int i = 0; i < files.size(); i++) {
-            jobs.add(new FileJob(i, files.get(i)));
+            int index = i;
+            File file = files.get(i);
+
+            completion.submit(() -> {
+                var result = documentBuilderService.processFile(file);
+                return new IndexedResult(index, result);
+            });
         }
 
-        Map<Integer, DocumentBuilderService.PageResult> orderedResults = new ConcurrentHashMap<>();
+        // collect results
+        Map<Integer, DocumentBuilderService.PageResult> ordered = new HashMap<>();
 
-        for (FileJob job : jobs) {
-            futures.add(executor.submit(() -> {
-                var result = documentBuilderService.processFile(job.file());
-                orderedResults.put(job.index(), result);
-                return result;
-            }));
+        for (int i = 0; i < files.size(); i++) {
+            IndexedResult r = completion.take().get();
+            ordered.put(r.index(), r.result());
         }
 
-        for (Future<?> f : futures) {
-            f.get();
-        }
-
-        // STEP 2: restore order explicitly
+        // rebuild correct order
         List<DocumentBuilderService.PageResult> pages = new ArrayList<>();
 
-        for (int i = 0; i < jobs.size(); i++) {
-            pages.add(orderedResults.get(i));
+        for (int i = 0; i < files.size(); i++) {
+            pages.add(ordered.get(i));
         }
 
         return documentBuilderService.buildDocuments(pages);
