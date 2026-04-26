@@ -47,6 +47,7 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @FXML
     private void initialize() {
+
         previewImageView = new ImageView();
         previewImageView.setFitHeight(500);
         previewImageView.setPreserveRatio(true);
@@ -54,15 +55,23 @@ public class ScannerViewController implements ApplicationServicesAware {
 
         refreshTree();
 
-        scannerModel.currentPreviewImageProperty().addListener((obs, oldImg, newImg) -> {
-            previewImageView.setImage(newImg);
-        });
+        // bind preview image
+        scannerModel.currentPreviewImageProperty().addListener(
+                (obs, oldImg, newImg) -> previewImageView.setImage(newImg)
+        );
 
-        documentTree.getSelectionModel().selectedItemProperty().addListener((obs, oldItem, newItem) -> {
-            if  (newItem != null && newItem.getValue() != null){
-                scannerModel.setSelectedFile(newItem.getValue().file());
-            }
-        }
+        // selection handling
+        documentTree.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldItem, newItem) -> {
+
+                    if (newItem == null || newItem.getValue() == null) return;
+
+                    FileEntity file = newItem.getValue().file();
+
+                    if (file != null) {
+                        scannerModel.setSelectedFile(file);
+                    }
+                }
         );
     }
 
