@@ -10,15 +10,15 @@ public class ScannerService {
 
     private final TiffService tiffService;
     private final DocumentBuilderService documentBuilderService;
-    private final ExecutorService executor;
+    private final ExecutorService cpuExecutor;
 
     public ScannerService(TiffService tiffService,
                           DocumentBuilderService documentBuilderService,
-                          ExecutorService executor) {
+                          ExecutorService cpuExecutor) {
 
         this.tiffService = tiffService;
         this.documentBuilderService = documentBuilderService;
-        this.executor = executor;
+        this.cpuExecutor = cpuExecutor;
     }
 
     private record IndexedResult(int index, DocumentBuilderService.PageResult result) {}
@@ -28,9 +28,9 @@ public class ScannerService {
         List<File> files = tiffService.getAllTiffs();
 
         CompletionService<IndexedResult> completion =
-                new ExecutorCompletionService<>(executor);
+                new ExecutorCompletionService<>(cpuExecutor);
 
-        // submit jobs
+        // submit CPU jobs
         for (int i = 0; i < files.size(); i++) {
             int index = i;
             File file = files.get(i);
@@ -49,7 +49,7 @@ public class ScannerService {
             ordered.put(r.index(), r.result());
         }
 
-        // rebuild correct order
+        // correct ordering
         List<DocumentBuilderService.PageResult> pages = new ArrayList<>();
 
         for (int i = 0; i < files.size(); i++) {

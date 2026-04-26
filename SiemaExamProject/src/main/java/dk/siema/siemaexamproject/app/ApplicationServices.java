@@ -65,7 +65,8 @@ private final ScannerModel scannerModel;
 
     public ViewFactory getViewFactory() {return viewFactory;}
 
-    public ExecutorService getExecutorService() {return cpuExecutor;}
+    public ExecutorService getCpuExecutor() {return cpuExecutor;}
+    public ExecutorService getIoExecutor() {return ioExecutor;}
 
     public TiffService getTiffService() {return tiffService;}
 
@@ -74,4 +75,9 @@ private final ScannerModel scannerModel;
     public ScannerService getScannerService() {return scannerService;}
 
     public ScannerModel getScannerModel() {return scannerModel;}
+
+    public void shutdown() {
+        cpuExecutor.shutdown();
+        ioExecutor.shutdown();
+    }
 }

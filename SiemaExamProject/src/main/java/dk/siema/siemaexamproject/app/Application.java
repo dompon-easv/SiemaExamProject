@@ -13,10 +13,13 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Application extends javafx.application.Application {
+
+    private ApplicationServices services;
+
     @Override
     public void start(Stage stage) {
 
-        ApplicationServices services = new ApplicationServices();
+        services = new ApplicationServices();
         SceneManager sceneManager = services.getSceneManager();
 
         LoadedView<MainShellController> loaded =
@@ -27,5 +30,12 @@ public class Application extends javafx.application.Application {
         Platform.runLater(() ->
                 loaded.controller().showAdminView()
         );
+    }
+
+    @Override
+    public void stop() {
+        if (services != null) {
+            services.shutdown();
+        }
     }
 }

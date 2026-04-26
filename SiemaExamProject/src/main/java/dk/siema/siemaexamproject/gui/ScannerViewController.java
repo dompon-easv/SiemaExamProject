@@ -22,15 +22,12 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     private ScannerService scannerService;
     private ScannerModel scannerModel;
-    private ExecutorService executor;
 
     @FXML private Label welcomeText;
     @FXML private TreeView<TreeNode> documentTree;
     @FXML private FlowPane imageContainer;
 
     private ImageView previewImageView;
-
-
 
     public record TreeNode(String label, FileEntity file) {
         @Override
@@ -43,7 +40,6 @@ public class ScannerViewController implements ApplicationServicesAware {
     public void setApplicationServices(ApplicationServices services) {
         this.scannerService = services.getScannerService();
         this.scannerModel = services.getScannerModel();
-        this.executor = services.getExecutorService();
     }
 
     @FXML
@@ -116,10 +112,10 @@ public class ScannerViewController implements ApplicationServicesAware {
             task.getException().printStackTrace();
         });
 
-        executor.submit(task);
+        new Thread(task).start();
     }
 
-    // Rotation
+    // ================= IMAGE ROTATION =================
 
     @FXML private void onRotateAction(ActionEvent actionEvent) {
         TreeItem<TreeNode> selectedItem = documentTree.getSelectionModel().getSelectedItem();
