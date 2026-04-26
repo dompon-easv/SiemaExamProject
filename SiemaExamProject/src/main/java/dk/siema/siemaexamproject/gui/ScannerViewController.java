@@ -90,6 +90,7 @@ public class ScannerViewController implements ApplicationServicesAware {
         };
 
         task.setOnSucceeded(e -> {
+            scannerModel.clear();
             scannerModel.setDocuments(task.getValue());
             refreshTree();
             welcomeText.setText("Scan complete");
