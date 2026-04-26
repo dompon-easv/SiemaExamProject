@@ -94,4 +94,11 @@ public class ScannerModel {
             }
         });
     }
+
+    // ================= IMAGE ROTATION =================
+
+    public void rotateFile(FileEntity file) {
+        int newRotation = (file.getRotation() + 90) % 360;
+        file.setRotation(newRotation);
+    }
 }
