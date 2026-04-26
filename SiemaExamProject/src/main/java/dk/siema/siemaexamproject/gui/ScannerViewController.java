@@ -8,6 +8,7 @@ import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -59,6 +60,16 @@ public class ScannerViewController implements ApplicationServicesAware {
         scannerModel.currentPreviewImageProperty().addListener(
                 (obs, oldImg, newImg) -> previewImageView.setImage(newImg)
         );
+        // Ask the model what is the rotation of currently selected file
+        FileEntity currentFile = scannerModel.selectedFileProperty().get();
+
+        if (currentFile != null) {
+            //spin the frame to match the memory
+            previewImageView.setRotate(currentFile.getRotation());
+        } else {
+            previewImageView.setRotate(0);
+        } // reset if nothing is selected
+
 
         // selection handling
         documentTree.getSelectionModel().selectedItemProperty().addListener(
@@ -69,7 +80,11 @@ public class ScannerViewController implements ApplicationServicesAware {
                     FileEntity file = newItem.getValue().file();
 
                     if (file != null) {
+                        System.out.println(" You clicked on " + file.getFilePath() + "In memory has rotation: " + file.getRotation());
                         scannerModel.setSelectedFile(file);
+
+                        previewImageView.setRotate(file.getRotation());
+
                     }
                 }
         );
@@ -101,6 +116,20 @@ public class ScannerViewController implements ApplicationServicesAware {
         });
 
         executor.submit(task);
+    }
+
+    // Rotation
+
+    @FXML private void onRotateAction(ActionEvent actionEvent) {
+        TreeItem<TreeNode> selectedItem = documentTree.getSelectionModel().getSelectedItem();
+
+        if (selectedItem != null && selectedItem.getValue() != null) {
+            FileEntity file = selectedItem.getValue().file();
+
+            scannerModel.rotateFile(file);
+
+            previewImageView.setRotate(file.getRotation());
+        }
     }
 
     // ================= UI UPDATE =================
