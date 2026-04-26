@@ -9,16 +9,11 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ScannerModel {
 
@@ -26,20 +21,22 @@ public class ScannerModel {
 
     private final ObjectProperty<FileEntity> selectedFile = new SimpleObjectProperty<>();
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
+
     private final ExecutorService ioExecutor;
 
-    private final Map<FileEntity, Image> imageCache = new ConcurrentHashMap<>();
+    // Simple in-memory cache for loaded images (key = file path)
+    private final Map<String, Image> imageCache = new HashMap<>();
 
-    public ScannerModel(ExecutorService ioExecutor) {this.ioExecutor = ioExecutor;}
+    public ScannerModel(ExecutorService ioExecutor) {
+        this.ioExecutor = ioExecutor;
+    }
 
     public List<Document> getDocuments() {
         return Collections.unmodifiableList(documents);
     }
 
     public void setDocuments(List<Document> documents) {
-        this.documents = (documents == null)
-                ? new ArrayList<>()
-                : new ArrayList<>(documents);
+        this.documents = (documents == null) ? new ArrayList<>() : new ArrayList<>(documents);
     }
 
     public void clear() {
@@ -61,12 +58,21 @@ public class ScannerModel {
 
     public void setSelectedFile(FileEntity file) {
 
+        // Avoid reloading if same file is selected again
         if (file != null && file.equals(selectedFile.get())) return;
 
         selectedFile.set(file);
 
-        if (file != null && imageCache.containsKey(file)) {
-            currentPreviewImage.set(imageCache.get(file));
+        if (file == null) {
+            currentPreviewImage.set(null);
+            return;
+        }
+
+        String key = file.getFilePath();
+
+        // If image already exists in cache, reuse it immediately
+        if (imageCache.containsKey(key)) {
+            currentPreviewImage.set(imageCache.get(key));
             return;
         }
 
@@ -74,15 +80,11 @@ public class ScannerModel {
         loadImageAsync(file);
     }
 
-    // ================= ASYNC IMAGE LOADING =================
+    // ================= IMAGE LOADING =================
 
-    // async image loading
     private void loadImageAsync(FileEntity file) {
 
-        if (file == null || file.toFile() == null) {
-            currentPreviewImage.set(null);
-            return;
-        }
+        if (file == null || file.toFile() == null) return;
 
         ioExecutor.submit(() -> {
             try {
@@ -92,8 +94,10 @@ public class ScannerModel {
                         ? SwingFXUtils.toFXImage(img, null)
                         : null;
 
-                imageCache.put(file, fxImage);
+                // Store result in cache for future fast access
+                imageCache.put(file.getFilePath(), fxImage);
 
+                // Ensure UI update happens on JavaFX thread
                 Platform.runLater(() -> {
                     if (file.equals(selectedFile.get())) {
                         currentPreviewImage.set(fxImage);

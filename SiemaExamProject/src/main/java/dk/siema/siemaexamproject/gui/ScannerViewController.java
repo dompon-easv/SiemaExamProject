@@ -7,16 +7,15 @@ import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
+
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 public class ScannerViewController implements ApplicationServicesAware {
 

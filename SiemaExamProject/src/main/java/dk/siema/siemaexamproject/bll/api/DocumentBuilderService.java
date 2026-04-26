@@ -14,10 +14,10 @@ public class DocumentBuilderService {
 
     private final BarcodeReader barcodeReader = new BarcodeReader();
 
-    // 🔵 STEP 1 RESULT WRAPPER
+    // STEP 1: Result of parallel processing (one file → one PageResult)
     public record PageResult(FileEntity entity, boolean barcode) {}
 
-    // 🔵 THREAD-SAFE: called in parallel
+    // STEP 2: Process a single file (executed in parallel threads)
     public PageResult processFile(File file) {
 
         try {
@@ -43,7 +43,7 @@ public class DocumentBuilderService {
         }
     }
 
-    // 🔵 STEP 2: single-thread grouping logic
+    // STEP 3: Build final documents (runs after all parallel processing is finished)
     public List<Document> buildDocuments(List<PageResult> pages) {
 
         List<Document> documents = new ArrayList<>();

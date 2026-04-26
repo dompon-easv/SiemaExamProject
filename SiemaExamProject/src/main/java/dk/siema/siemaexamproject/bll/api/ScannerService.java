@@ -3,8 +3,10 @@ package dk.siema.siemaexamproject.bll.api;
 import dk.siema.siemaexamproject.be.Document;
 
 import java.io.File;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 public class ScannerService {
 
@@ -21,41 +23,32 @@ public class ScannerService {
         this.cpuExecutor = cpuExecutor;
     }
 
-    private record IndexedResult(int index, DocumentBuilderService.PageResult result) {}
-
+    // STEP 1: Start scan and fetch TIFF files (I/O operation)
     public List<Document> scan() throws Exception {
 
         List<File> files = tiffService.getAllTiffs();
 
-        CompletionService<IndexedResult> completion =
-                new ExecutorCompletionService<>(cpuExecutor);
+        // STEP 2: Submit all files for parallel processing (CPU-bound work)
+        List<Future<DocumentBuilderService.PageResult>> futures = new ArrayList<>();
 
-        // submit CPU jobs
-        for (int i = 0; i < files.size(); i++) {
-            int index = i;
-            File file = files.get(i);
-
-            completion.submit(() -> {
-                var result = documentBuilderService.processFile(file);
-                return new IndexedResult(index, result);
-            });
+        for (File file : files) {
+            futures.add(cpuExecutor.submit(() ->
+                    documentBuilderService.processFile(file)
+            ));
         }
 
-        // collect results
-        Map<Integer, DocumentBuilderService.PageResult> ordered = new HashMap<>();
-
-        for (int i = 0; i < files.size(); i++) {
-            IndexedResult r = completion.take().get();
-            ordered.put(r.index(), r.result());
-        }
-
-        // correct ordering
+        // STEP 3: Collect results from parallel execution
         List<DocumentBuilderService.PageResult> pages = new ArrayList<>();
 
-        for (int i = 0; i < files.size(); i++) {
-            pages.add(ordered.get(i));
+        for (Future<DocumentBuilderService.PageResult> future : futures) {
+            DocumentBuilderService.PageResult result = future.get();
+
+            if (result != null) {
+                pages.add(result);
+            }
         }
 
+        // STEP 4: Build final document structure
         return documentBuilderService.buildDocuments(pages);
     }
 }
