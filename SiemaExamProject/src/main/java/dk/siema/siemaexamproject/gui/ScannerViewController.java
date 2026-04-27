@@ -11,10 +11,10 @@ import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.StackPane;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @FXML private Label welcomeText;
     @FXML private TreeView<TreeNode> documentTree;
-    @FXML private FlowPane imageContainer;
+    @FXML private ScrollPane imageContainer;
 
     private static final double ZOOM_FACTOR = 1.2;
     private static final double MAX_ZOOM = 5.0;
@@ -53,12 +53,13 @@ public class ScannerViewController implements ApplicationServicesAware {
         previewImageView = new ImageView();
         previewImageView.setFitHeight(500);
         previewImageView.setPreserveRatio(true);
-        imageContainer.getChildren().setAll(previewImageView);
+        // imageContainer.getChildren().setAll(previewImageView);
 
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(imageContainer.widthProperty());
-        clip.heightProperty().bind(imageContainer.heightProperty());
-        imageContainer.setClip(clip);
+        Group zoomGroup = new Group(previewImageView);
+        StackPane centerPane = new StackPane(zoomGroup);
+        imageContainer.setContent(centerPane);
+        imageContainer.setPannable(true);
+
 
         refreshTree();
 
@@ -168,6 +169,9 @@ public class ScannerViewController implements ApplicationServicesAware {
     private void resetZoom() {
         currentZoom = 1.0;
         applyZoom();
+
+        imageContainer.setHvalue(0.5);
+        imageContainer.setVvalue(0.5);
     }
 
     // ================= UI UPDATE =================
