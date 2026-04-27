@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 
@@ -25,6 +26,11 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private Label welcomeText;
     @FXML private TreeView<TreeNode> documentTree;
     @FXML private FlowPane imageContainer;
+
+    private static final double ZOOM_FACTOR = 1.2;
+    private static final double MAX_ZOOM = 5.0;
+    private static final double MIN_ZOOM = 0.2;
+    private double currentZoom = 1.0;
 
     private ImageView previewImageView;
 
@@ -48,6 +54,11 @@ public class ScannerViewController implements ApplicationServicesAware {
         previewImageView.setFitHeight(500);
         previewImageView.setPreserveRatio(true);
         imageContainer.getChildren().setAll(previewImageView);
+
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(imageContainer.widthProperty());
+        clip.heightProperty().bind(imageContainer.heightProperty());
+        imageContainer.setClip(clip);
 
         refreshTree();
 
@@ -79,6 +90,7 @@ public class ScannerViewController implements ApplicationServicesAware {
                         scannerModel.setSelectedFile(file);
 
                         previewImageView.setRotate(file.getRotation());
+                        resetZoom();
 
                     }
                 }
@@ -114,7 +126,7 @@ public class ScannerViewController implements ApplicationServicesAware {
         new Thread(task).start();
     }
 
-    // ================= IMAGE ROTATION =================
+    // ================= IMAGE ROTATION AND ZOOMING =================
 
     @FXML private void onRotateAction(ActionEvent actionEvent) {
         TreeItem<TreeNode> selectedItem = documentTree.getSelectionModel().getSelectedItem();
@@ -126,6 +138,32 @@ public class ScannerViewController implements ApplicationServicesAware {
 
             previewImageView.setRotate(file.getRotation());
         }
+    }
+
+    @FXML
+    private void onZoomInAction(ActionEvent event) {
+      if (currentZoom * ZOOM_FACTOR <= MAX_ZOOM) {
+          currentZoom*= ZOOM_FACTOR;
+          applyZoom();
+      }
+    }
+
+    @FXML
+    private void onZoomOutAction(ActionEvent event) {
+        if (currentZoom / ZOOM_FACTOR >= MIN_ZOOM) {
+            currentZoom /= ZOOM_FACTOR;
+            applyZoom();
+        }
+    }
+
+    private void applyZoom() {
+        previewImageView.setScaleX(currentZoom);
+        previewImageView.setScaleY(currentZoom);
+    }
+
+    private void resetZoom() {
+        currentZoom = 1.0;
+        applyZoom();
     }
 
     // ================= UI UPDATE =================
