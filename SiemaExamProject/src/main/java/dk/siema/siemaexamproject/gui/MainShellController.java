@@ -41,7 +41,7 @@ public class MainShellController implements ApplicationServicesAware {
         contentContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 // Calling clear here forces the helper to initialize the global shortcuts
-                KeyBindingHelper.clearAllShortcuts(newScene);
+                KeyBindingHelper.refreshAccelerators(newScene);
             }
         });
         }

@@ -142,17 +142,19 @@ public class ScannerViewController implements ApplicationServicesAware {
                 }
         );
 
-        Platform.runLater(() -> {
-            Scene currentScene = imageContainer.getScene();
-            if (currentScene != null) {
-                KeyBindingHelper.setupShortcutsForScanning(currentScene,
+        imageContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+
+                KeyBindingHelper.setupShortcutsForScanning(
+                        newScene,
                         this::startNewScan,
                         this::zoomIn,
                         this::zoomOut,
                         this::doRotate
-                        );
+                );
             }
         });
+
     }
 
     // ================= SCAN =================
