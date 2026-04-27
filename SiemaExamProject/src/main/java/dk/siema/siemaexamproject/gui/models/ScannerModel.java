@@ -5,6 +5,8 @@ import dk.siema.siemaexamproject.be.FileEntity;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
@@ -22,6 +24,8 @@ public class ScannerModel {
 
     private final ObjectProperty<FileEntity> selectedFile = new SimpleObjectProperty<>();
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
+    private final StringProperty pageCountInfo = new SimpleStringProperty("0 / 0");
+
 
     private final ExecutorService ioExecutor;
 
@@ -38,6 +42,7 @@ public class ScannerModel {
 
     public void setDocuments(List<Document> documents) {
         this.documents = (documents == null) ? new ArrayList<>() : new ArrayList<>(documents);
+        updatePageCountInfo();
     }
 
     public void clear() {
@@ -45,6 +50,7 @@ public class ScannerModel {
         selectedFile.set(null);
         currentPreviewImage.set(null);
         imageCache.clear();
+        updatePageCountInfo();
     }
 
     public ObjectProperty<FileEntity> selectedFileProperty() {
@@ -63,6 +69,7 @@ public class ScannerModel {
         if (file != null && file.equals(selectedFile.get())) return;
 
         selectedFile.set(file);
+        updatePageCountInfo();
 
         if (file == null) {
             currentPreviewImage.set(null);
@@ -82,6 +89,8 @@ public class ScannerModel {
     }
 
     // ================= PAGE NAVIGATION =================
+
+    public StringProperty pageCountInfoProperty() {return pageCountInfo;}
 
     public void goToNextPage() {
         FileEntity current = selectedFile.get();
@@ -113,6 +122,35 @@ public class ScannerModel {
             flatList.addAll(doc.getPages());
         }
         return flatList;
+    }
+
+    private void updatePageCountInfo() {
+
+        FileEntity current = selectedFile.get();
+
+        if( current == null || documents.isEmpty() ) {
+            pageCountInfo.set("No file selected");
+            return;
+        }
+
+        for (int d = 0; d < documents.size(); d++) {
+            Document doc = documents.get(d);
+            List<FileEntity> filesInDoc = doc.getPages();
+
+            for(int f = 0; f < filesInDoc.size(); f++) {
+                FileEntity checkFile = filesInDoc.get(f);
+
+
+            if (checkFile.getFilePath().equals(current.getFilePath())) {
+                //Found the file , build the label.
+                int docNumber = d+1;
+                int currentFileNumber = f + 1;
+                int totalFilesInDoc = filesInDoc.size();
+
+                pageCountInfo.set("Document # " + docNumber + " / " + totalFilesInDoc);
+            }
+        }
+    }
     }
 
     // ================= IMAGE LOADING =================

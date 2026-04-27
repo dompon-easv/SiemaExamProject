@@ -94,7 +94,7 @@
                     <HBox alignment="CENTER" spacing="12" styleClass="pagination-bar">
 
                         <Button onAction="#onPreviousPageAction" styleClass="pagination-button" text="‹" />
-                        <Label styleClass="tree-text" text="Page 1 of 3" />
+                        <Label fx:id="pageInfoLbl" styleClass="tree-text" text="Page 1 of 3" />
                         <Button onAction="#onNextPageAction" styleClass="pagination-button" text="›" />
 
                     </HBox>

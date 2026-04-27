@@ -20,10 +20,14 @@ import java.util.List;
 
 public class ScannerViewController implements ApplicationServicesAware {
 
+
     private ScannerService scannerService;
     private ScannerModel scannerModel;
 
     @FXML private Label welcomeText;
+    @FXML private Label pageInfoLbl;
+
+
     @FXML private TreeView<TreeNode> documentTree;
     @FXML private ScrollPane imageContainer;
 
@@ -60,6 +64,8 @@ public class ScannerViewController implements ApplicationServicesAware {
         imageContainer.setContent(centerPane);
         imageContainer.setPannable(true);
 
+
+        pageInfoLbl.textProperty().bind(scannerModel.pageCountInfoProperty());
 
         refreshTree();
 
