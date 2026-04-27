@@ -32,14 +32,14 @@ public class UserService {
             throw new ValidationException("Email is required");
         }
 
-        if (user.getPassword() == null || user.getPassword().isBlank()) {
+        if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
             throw new ValidationException("Password is required");
         }
 
         UUID id = UuidCreator.getTimeOrderedEpoch();
         user.setId(id);
 try {
-    String hashed = PasswordUtil.hashPassword(user.getPassword());
+    String hashed = PasswordUtil.hashPassword(user.getPasswordHash());
     user.changePassword(hashed);
 } catch (Exception e) {throw new ServiceException("Error processing password", e);
 }
@@ -139,7 +139,7 @@ try {
 
             boolean valid;
             try {
-                valid = PasswordUtil.verifyPassword(password, user.getPassword());
+                valid = PasswordUtil.verifyPassword(password, user.getPasswordHash());
             } catch (Exception e) {throw new ServiceException("Error verifying password", e);}
 
             if (!valid) {

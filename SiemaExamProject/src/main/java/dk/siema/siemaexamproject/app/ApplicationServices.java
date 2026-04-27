@@ -6,6 +6,9 @@ import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewFactory;
+import dk.siema.siemaexamproject.bll.service.UserService;
+import dk.siema.siemaexamproject.dal.dao.UserDAO;
+import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.TiffService;
@@ -17,6 +20,7 @@ public class ApplicationServices {
 
 private final ViewFactory viewFactory;
 private final SceneManager sceneManager;
+private final UserService userService;
 
 private final ExecutorService cpuExecutor;
 private final ExecutorService ioExecutor;
@@ -52,6 +56,9 @@ private final ScannerModel scannerModel;
         this.documentBuilderService = new DocumentBuilderService();
         this.scannerService = new ScannerService(tiffService, documentBuilderService, cpuExecutor);
 
+        /* User task*/
+        IUserDAO userDAO = new UserDAO();
+        this.userService = new UserService(userDAO);
 
 
 
@@ -79,5 +86,9 @@ private final ScannerModel scannerModel;
     public void shutdown() {
         cpuExecutor.shutdown();
         ioExecutor.shutdown();
+
     }
+    public UserService getUserService() {return userService;
+    }
+
 }

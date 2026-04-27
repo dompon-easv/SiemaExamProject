@@ -571,3 +571,16 @@
 .search-box {
     -fx-pref-width: 160;
 }
+
+/* add edit users related */
+.modal-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.35);
+    -fx-alignment: center;
+}
+.modal-card {
+    -fx-pref-width: 320;
+}
+.error-text {
+    -fx-text-fill: #D32F2F;
+    -fx-font-size: 11px;
+}

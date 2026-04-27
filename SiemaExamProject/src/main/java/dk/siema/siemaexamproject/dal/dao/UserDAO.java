@@ -24,7 +24,7 @@ public class UserDAO implements IUserDAO {
             stmt.setBytes(1, uuidToBytes(user.getId()));
             stmt.setString(2, user.getUsername());
             stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getPassword());
+            stmt.setString(4, user.getPasswordHash());
             stmt.setString(5, user.getRole().name());
 
             stmt.executeUpdate();
