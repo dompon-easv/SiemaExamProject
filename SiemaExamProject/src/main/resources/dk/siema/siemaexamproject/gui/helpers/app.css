@@ -584,3 +584,42 @@
     -fx-text-fill: #D32F2F;
     -fx-font-size: 11px;
 }
+
+/* --- Table action buttons (edit/delete) --- */
+
+.table-action-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 14px;
+
+    -fx-min-width: 28;
+    -fx-pref-width: 28;
+    -fx-max-width: 28;
+
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+    -fx-max-height: 28;
+
+    -fx-alignment: center;
+    -fx-padding: 0;
+}
+.table-action-button:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #2D3D4F;
+    -fx-background-radius: 6;
+}
+.table-action-delete {
+    -fx-text-fill: #DC2626;
+}
+
+.table-action-delete:hover {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #B91C1C;
+}
+.table-action-button:pressed {
+    -fx-background-color: #E2E8F0;
+}
+.table-action-container {
+    -fx-alignment: center;
+    -fx-spacing: 6;
+}
