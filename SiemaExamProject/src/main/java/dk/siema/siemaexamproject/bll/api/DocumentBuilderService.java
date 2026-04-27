@@ -2,10 +2,12 @@ package dk.siema.siemaexamproject.bll.api;
 
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.bll.exceptions.APIException;
 import dk.siema.siemaexamproject.bll.util.BarcodeReader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,7 @@ public class DocumentBuilderService {
     public record PageResult(FileEntity entity, boolean barcode) {}
 
     // STEP 2: Process a single file (executed in parallel threads)
-    public PageResult processFile(File file) {
+    public PageResult processFile(File file) throws Exception {
 
         try {
             BufferedImage image = ImageIO.read(file);
@@ -39,7 +41,7 @@ public class DocumentBuilderService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            throw  new APIException("File has not been processed");
         }
     }
 
