@@ -14,27 +14,28 @@ public class TiffService {
     private static final File OUTPUT_DIR = new File("images/all");
     private static final File ZIP_FILE = new File("all_tiffs.zip");
 
-    // STEP 1: simple session cache
+    // STEP 1: session cache (in-memory)
     private List<File> cachedFiles = null;
 
     public List<File> getAllTiffs() throws Exception {
 
-        // STEP 2: return from memory if already loaded
+        // STEP 2: return from memory cache
         if (cachedFiles != null && !cachedFiles.isEmpty()) {
             return cachedFiles;
         }
 
-        // STEP 3: if files already exist locally → reuse them (fast path)
-        if (OUTPUT_DIR.exists() && OUTPUT_DIR.listFiles() != null && OUTPUT_DIR.listFiles().length > 0) {
-            cachedFiles = new ArrayList<>(Arrays.asList(OUTPUT_DIR.listFiles()));
+        OUTPUT_DIR.mkdirs();
+
+        // STEP 3: fast path → reuse already unzipped files
+        File[] existing = OUTPUT_DIR.listFiles((dir, name) -> name.toLowerCase().endsWith(".tiff"));
+
+        if (existing != null && existing.length > 0) {
+            cachedFiles = new ArrayList<>(Arrays.asList(existing));
             cachedFiles.sort(Comparator.comparingInt(this::extractNumber));
             return cachedFiles;
         }
 
-        // STEP 4: ensure folder exists
-        OUTPUT_DIR.mkdirs();
-
-        // STEP 5: download ZIP only if not already downloaded
+        // STEP 4: download ZIP only if missing
         if (!ZIP_FILE.exists()) {
             try (InputStream in = apiClient.fetchAllFiles();
                  FileOutputStream fos = new FileOutputStream(ZIP_FILE)) {
@@ -42,15 +43,16 @@ public class TiffService {
             }
         }
 
-        // STEP 6: unzip only if needed
+        // STEP 5: unzip
         cachedFiles = unzip(ZIP_FILE, OUTPUT_DIR);
 
-        // STEP 7: sort files correctly
+        // STEP 6: sort correctly
         cachedFiles.sort(Comparator.comparingInt(this::extractNumber));
 
         return cachedFiles;
     }
 
+    // unzip ZIP file into folder
     private List<File> unzip(File zipFile, File outputDir) throws Exception {
 
         List<File> files = new ArrayList<>();
@@ -77,6 +79,7 @@ public class TiffService {
         return files;
     }
 
+    // extract numeric ordering from filename
     private int extractNumber(File file) {
         try {
             String name = file.getName().replaceAll("\\D+", "");
