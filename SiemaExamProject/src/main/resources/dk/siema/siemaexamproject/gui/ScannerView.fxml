@@ -92,9 +92,9 @@
                     <!-- PAGINATION -->
                     <HBox alignment="CENTER" spacing="12" styleClass="pagination-bar">
 
-                        <Button styleClass="pagination-button" text="‹" />
+                        <Button onAction="#onPreviousPageAction" styleClass="pagination-button" text="‹" />
                         <Label styleClass="tree-text" text="Page 1 of 3" />
-                        <Button styleClass="pagination-button" text="›" />
+                        <Button onAction="#onNextPageAction" styleClass="pagination-button" text="›" />
 
                     </HBox>
 

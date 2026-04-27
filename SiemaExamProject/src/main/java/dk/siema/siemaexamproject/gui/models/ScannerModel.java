@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 public class ScannerModel {
@@ -25,7 +26,7 @@ public class ScannerModel {
     private final ExecutorService ioExecutor;
 
     // Simple in-memory cache for loaded images (key = file path)
-    private final Map<String, Image> imageCache = new HashMap<>();
+    private final Map<String, Image> imageCache = new ConcurrentHashMap<>() {};
 
     public ScannerModel(ExecutorService ioExecutor) {
         this.ioExecutor = ioExecutor;
@@ -78,6 +79,40 @@ public class ScannerModel {
 
         currentPreviewImage.set(null);
         loadImageAsync(file);
+    }
+
+    // ================= PAGE NAVIGATION =================
+
+    public void goToNextPage() {
+        FileEntity current = selectedFile.get();
+        if (current == null) return;
+
+        List<FileEntity> allPages = getAllPagesFlattened();
+        int currentIndex = allPages.indexOf(current);
+
+        if (currentIndex >= 0 && currentIndex < allPages.size() - 1) {
+            setSelectedFile(allPages.get(currentIndex + 1));
+        }
+    }
+
+    public void goToPreviousPage() {
+        FileEntity current = selectedFile.get();
+        if (current == null) return;
+
+        List<FileEntity> allPages = getAllPagesFlattened();
+        int currentIndex = allPages.indexOf(current);
+
+        if (currentIndex > 0) {
+            setSelectedFile(allPages.get(currentIndex - 1));
+        }
+    }
+
+    private List<FileEntity> getAllPagesFlattened() {
+        List<FileEntity> flatList = new ArrayList<>();
+        for (Document doc : documents) {
+            flatList.addAll(doc.getPages());
+        }
+        return flatList;
     }
 
     // ================= IMAGE LOADING =================

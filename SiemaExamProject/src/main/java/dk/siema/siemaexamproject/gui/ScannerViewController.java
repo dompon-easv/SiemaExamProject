@@ -139,6 +139,10 @@ public class ScannerViewController implements ApplicationServicesAware {
             previewImageView.setRotate(file.getRotation());
         }
     }
+    public void onPreviousPageAction(ActionEvent actionEvent) {scannerModel.goToPreviousPage();}
+
+    public void onNextPageAction(ActionEvent actionEvent) {scannerModel.goToNextPage();}
+
 
     @FXML
     private void onZoomInAction(ActionEvent event) {
