@@ -27,6 +27,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     private ScannerService scannerService;
     private ScannerModel scannerModel;
 
+    @FXML private Label fileNameLabel;
     @FXML private Label welcomeText;
     @FXML private Label pageInfoLbl;
 
@@ -91,18 +92,53 @@ public class ScannerViewController implements ApplicationServicesAware {
         documentTree.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldItem, newItem) -> {
 
-                    if (newItem == null || newItem.getValue() == null) return;
+                    if (newItem == null || newItem.getValue() == null) {
+                        fileNameLabel.setText("");
+                        return;
+                    }
 
-                    FileEntity file = newItem.getValue().file();
+                    TreeNode node = newItem.getValue();
 
-                    if (file != null) {
-                        System.out.println(" You clicked on " + file.getFilePath() + "In memory has rotation: " + file.getRotation());
+                    // ================= PAGE =================
+                    if (node.file() != null) {
+
+                        FileEntity file = node.file();
+
                         scannerModel.setSelectedFile(file);
-
                         previewImageView.setRotate(file.getRotation());
                         resetZoom();
 
+                        fileNameLabel.setText(
+                                new java.io.File(file.getFilePath()).getName()
+                        );
+
+                        return;
                     }
+
+                    // ================= DOCUMENT =================
+                    if (!newItem.getChildren().isEmpty()
+                            && newItem.getParent() != null
+                            && newItem.getParent().getValue() != null) {
+
+                        TreeItem<TreeNode> firstPage = newItem.getChildren().get(0);
+                        FileEntity firstFile = firstPage.getValue().file();
+
+                        if (firstFile != null) {
+                            scannerModel.setSelectedFile(firstFile);
+                            previewImageView.setRotate(firstFile.getRotation());
+                        }
+
+                        fileNameLabel.setText(node.label());
+                        return;
+                    }
+
+                    // ================= BOX =================
+                    fileNameLabel.setText(node.label());
+
+                    scannerModel.setSelectedFile(null);
+                    previewImageView.setImage(null);
+                    previewImageView.setRotate(0);
+                    return;
                 }
         );
 

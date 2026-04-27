@@ -55,7 +55,7 @@
                     <!-- LEFT SIDE -->
                     <HBox alignment="CENTER_LEFT" spacing="12">
 
-                        <Label styleClass="page-title" text="Invoice_2026_001.tiff" />
+                        <Label fx:id="fileNameLabel" styleClass="page-title" text="Awaiting selection" />
 
                         <Label styleClass="badge" text="Page 1 of 3" />
 
