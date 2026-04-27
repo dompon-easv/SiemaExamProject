@@ -2,6 +2,7 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.fxml.FXML;
@@ -35,9 +36,15 @@ public class MainShellController implements ApplicationServicesAware {
         adminButton.setToggleGroup(viewToggleGroup);
 
         scannerButton.setSelected(true);
-        // initialize() may run before ApplicationServices is injected,
-        // so do not load default content here.
-    }
+
+        KeyBindingHelper.setGlobalLogoutAction(this::logout);
+        contentContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                // Calling clear here forces the helper to initialize the global shortcuts
+                KeyBindingHelper.clearAllShortcuts(newScene);
+            }
+        });
+        }
 
     public void showDefaultView() {
         sceneManager.setContent(contentContainer, ViewPath.SCANNERVIEW);

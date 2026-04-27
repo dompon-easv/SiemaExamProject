@@ -8,10 +8,13 @@ import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 
+import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -102,12 +105,27 @@ public class ScannerViewController implements ApplicationServicesAware {
                     }
                 }
         );
+
+        Platform.runLater(() -> {
+            Scene currentScene = imageContainer.getScene();
+            if (currentScene != null) {
+                KeyBindingHelper.setupShortcutsForScanning(currentScene,
+                        this::startNewScan,
+                        this::zoomIn,
+                        this::zoomOut,
+                        this::doRotate
+                        );
+            }
+        });
     }
 
     // ================= SCAN =================
 
     @FXML
     public void onStartNewScan() {
+        startNewScan();
+    }
+    public void startNewScan() {
 
         welcomeText.setText("Scanning...");
 
@@ -136,6 +154,9 @@ public class ScannerViewController implements ApplicationServicesAware {
     // ================= IMAGE ROTATION AND ZOOMING =================
 
     @FXML private void onRotateAction(ActionEvent actionEvent) {
+        doRotate();}
+
+    public void doRotate() {
         TreeItem<TreeNode> selectedItem = documentTree.getSelectionModel().getSelectedItem();
 
         if (selectedItem != null && selectedItem.getValue() != null) {
@@ -153,6 +174,9 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @FXML
     private void onZoomInAction(ActionEvent event) {
+        zoomIn(); }
+
+    public void zoomIn() {
       if (currentZoom * ZOOM_FACTOR <= MAX_ZOOM) {
           currentZoom*= ZOOM_FACTOR;
           applyZoom();
@@ -161,6 +185,9 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @FXML
     private void onZoomOutAction(ActionEvent event) {
+        zoomOut(); }
+
+    public void zoomOut() {
         if (currentZoom / ZOOM_FACTOR >= MIN_ZOOM) {
             currentZoom /= ZOOM_FACTOR;
             applyZoom();

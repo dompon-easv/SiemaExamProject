@@ -40,7 +40,7 @@
                 </StackPane>
             </VBox>
 
-            <Button text="Sign In" styleClass="primary-button" maxWidth="1.7976931348623157E308" onAction="#signIn" />
+            <Button text="Sign In" styleClass="primary-button" maxWidth="1.7976931348623157E308" onAction="#signIn" defaultButton="true"/>
         </VBox>
     </VBox>
 </StackPane>
