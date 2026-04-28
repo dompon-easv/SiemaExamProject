@@ -18,20 +18,20 @@ import java.util.concurrent.Executors;
 
 public class ApplicationServices {
 
-private final ViewFactory viewFactory;
-private final SceneManager sceneManager;
-private final UserService userService;
+    private final ViewFactory viewFactory;
+    private final SceneManager sceneManager;
+    private final UserService userService;
 
-private final ExecutorService cpuExecutor;
-private final ExecutorService ioExecutor;
-private final TiffService tiffService;
-private final DocumentBuilderService documentBuilderService;
+    private final ExecutorService cpuExecutor;
+    private final ExecutorService ioExecutor;
+    private final TiffService tiffService;
+    private final DocumentBuilderService documentBuilderService;
     private final ScannerService scannerService;
 
 
-private final MainModel mainModel;
-private final AdminModel adminModel;
-private final ScannerModel scannerModel;
+    private final MainModel mainModel;
+    private final AdminModel adminModel;
+    private final ScannerModel scannerModel;
 
 
 

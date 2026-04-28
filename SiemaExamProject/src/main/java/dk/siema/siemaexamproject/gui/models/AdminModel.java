@@ -32,7 +32,7 @@ public class AdminModel {
         users.add(user); // immediate UI update (no reload)
     }
 
-     /*update user*/
+    /*update user*/
     public void updateUser(User user) throws ServiceException {
         userService.updateUser(user);
 
