@@ -2,6 +2,7 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.fxml.FXML;
@@ -24,9 +25,20 @@ public class AdminShellController implements ApplicationServicesAware {
 
     @FXML
     private void initialize() {
-        // Same reason as MainShellController:
-        // wait until services are injected before loading default content.
+        adminContentContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+
+                KeyBindingHelper.setupShortcutsForAdminShell(
+                        newScene,
+                        this::showUsers,
+                        this::showProfiles,
+                        this::showLogs
+
+                );
+            }
+        });
     }
+
 
     public void showDefaultView() {
         sceneManager.setContent(adminContentContainer, ViewPath.USERMANAGEMENT);
