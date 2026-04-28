@@ -2,11 +2,11 @@ package dk.siema.siemaexamproject.gui.models;
 
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.bll.api.ScannerService;
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
@@ -20,28 +20,29 @@ import java.util.concurrent.ExecutorService;
 
 public class ScannerModel {
 
-    private List<Document> documents = new ArrayList<>();
-
+    private final ListProperty<Document> documents = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final BooleanProperty scanning = new SimpleBooleanProperty(false);
     private final ObjectProperty<FileEntity> selectedFile = new SimpleObjectProperty<>();
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
     private final StringProperty pageCountInfo = new SimpleStringProperty("0 / 0");
 
-
+    private final ScannerService scannerService;
     private final ExecutorService ioExecutor;
 
     // Simple in-memory cache for loaded images (key = file path)
     private final Map<String, Image> imageCache = new ConcurrentHashMap<>() {};
 
-    public ScannerModel(ExecutorService ioExecutor) {
+    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService) {
         this.ioExecutor = ioExecutor;
+        this.scannerService = scannerService;
     }
 
     public List<Document> getDocuments() {
-        return Collections.unmodifiableList(documents);
+        return Collections.unmodifiableList(documents.get());
     }
 
-    public void setDocuments(List<Document> documents) {
-        this.documents = (documents == null) ? new ArrayList<>() : new ArrayList<>(documents);
+    public void setDocuments(List<Document> docs) {
+        this.documents.setAll(docs);
         updatePageCountInfo();
     }
 
@@ -53,12 +54,60 @@ public class ScannerModel {
         updatePageCountInfo();
     }
 
+    public ReadOnlyBooleanProperty scanningProperty() {
+        return scanning;
+    }
+
+    public ReadOnlyListProperty<Document> documentsProperty() {
+        return documents;
+    }
+
     public ObjectProperty<FileEntity> selectedFileProperty() {
         return selectedFile;
     }
 
     public ObjectProperty<Image> currentPreviewImageProperty() {
         return currentPreviewImage;
+    }
+
+    // ================= SCAN =================
+
+    public void startScan() {
+
+        Task<List<Document>> task = new Task<>() {
+            @Override
+            protected List<Document> call() throws Exception {
+                return scannerService.scan();
+            }
+
+            @Override
+            protected void running() {
+                scanning.set(true);
+            }
+
+            @Override
+            protected void succeeded() {
+                scanning.set(false);
+
+                List<Document> result = getValue();
+                clear();
+                setDocuments(result);
+
+                if (!result.isEmpty() && !result.get(0).getPages().isEmpty()) {
+                    setSelectedFile(result.get(0).getPages().get(0));
+                }
+            }
+
+            @Override
+            protected void failed() {
+                scanning.set(false);
+                getException().printStackTrace();
+            }
+        };
+
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
     }
 
     // ================= SELECTION =================
