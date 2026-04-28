@@ -21,7 +21,6 @@ public class KeyBindingHelper {
 
     private static final Map<UserRole, String> shortcutInfo = new HashMap<>();
 
-    // Static block runs exactly once when the app starts
     static {
         shortcutInfo.put(UserRole.EMPLOYEE, """
                 SHOW HELP:   CTRL + H
@@ -29,7 +28,8 @@ public class KeyBindingHelper {
                 NEW SCAN: CTRL + S
                 PREVIEW ZOOM IN: CTRL + PLUS
                 PREVIEW ZOOM OUT: CTRL + MINUS
-                FILE ROTATION: CTRL + R""");
+                FILE ROTATION: CTRL + R
+                EXPORT BOX: CTRL + E """);
 
         shortcutInfo.put(UserRole.ADMIN, """
                 SCANNER VIEW: CTRL + 1
@@ -109,12 +109,6 @@ public class KeyBindingHelper {
         refreshAccelerators(scene);
     }
 
-    // ================= CORE ENGINE =================
-
-    /**
-     * Wipes the scene's current shortcuts and safely re-applies them layer by layer.
-     * Can be called manually if you just need to force a refresh.
-     */
     public static void refreshAccelerators(Scene scene) {
         if (scene == null) return;
 

@@ -6,6 +6,7 @@ import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.*;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
+import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import dk.siema.siemaexamproject.gui.util.LoadedView;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.beans.property.SimpleStringProperty;
@@ -59,6 +60,18 @@ public class UserManagementController implements ApplicationServicesAware {
 
         initialized = true;
         tryInit();
+
+        usersTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+
+                KeyBindingHelper.setupShortcutsForUserManagement(
+                        newScene,
+                        this::showAddUser,
+                        this::editUser,
+                        this::delete
+                        );
+            }
+        });
     }
 
     private void tryInit() {
@@ -108,9 +121,9 @@ public class UserManagementController implements ApplicationServicesAware {
         });
     }
 
-    public void showAddUser(ActionEvent actionEvent) {
+    public void showAddUser() {
 
-        Stage owner = (Stage) ((Node) actionEvent.getSource())
+        Stage owner = (Stage) usersTable
                 .getScene()
                 .getWindow();
 
@@ -129,6 +142,13 @@ public class UserManagementController implements ApplicationServicesAware {
         loaded.controller().setUser(user);
     }
 
+    private void editUser() {
+        User selectedUser = usersTable.getSelectionModel().getSelectedItem();
+        if (selectedUser != null) {
+        openEditUser(selectedUser); }
+        else { AlertHelper.warning("Invalid input", "Please select a user"); }
+    }
+
     private void deleteUser(User user) {
         try {
             model.deleteUser(user);
@@ -142,5 +162,12 @@ public class UserManagementController implements ApplicationServicesAware {
         } catch (ServiceException e) {
             AlertHelper.error("Error", e.getMessage());
         }
+    }
+
+    private void delete() {
+        User selectedUser = usersTable.getSelectionModel().getSelectedItem();
+        if (selectedUser != null) {
+            deleteUser(selectedUser); }
+        else { AlertHelper.warning("Invalid input", "Please select a user"); }
     }
 }
