@@ -26,7 +26,7 @@ public class DocumentTreeBuilder {
 
             for (FileEntity file : doc.getPages()) {
 
-                String label = "Page " + pageIndex++;
+                String label = "File " + pageIndex++;
 
                 if (file.isBarcode()) {
                     label += " (BARCODE)";
