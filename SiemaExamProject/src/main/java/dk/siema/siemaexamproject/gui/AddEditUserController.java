@@ -5,6 +5,7 @@ import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.be.enums.UserRole;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
+import dk.siema.siemaexamproject.gui.models.AdminModel;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -17,12 +18,12 @@ public class AddEditUserController implements ApplicationServicesAware {
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
 
-    private ApplicationServices services;
+    private AdminModel model;
     private User currentUser;
 
     @Override
     public void setApplicationServices(ApplicationServices services) {
-        this.services = services;
+        this.model = services.getAdminModel();
     }
 
     @FXML
@@ -30,7 +31,7 @@ public class AddEditUserController implements ApplicationServicesAware {
         roleCombo.getItems().setAll(UserRole.values());
     }
 
-    // EDIT MODE
+    /*EDIT MODE*/
     public void setUser(User user) {
         this.currentUser = user;
 
@@ -41,13 +42,15 @@ public class AddEditUserController implements ApplicationServicesAware {
             emailField.setText(user.getEmail());
             roleCombo.setValue(user.getRole());
 
+            passwordField.clear();
             passwordField.setPromptText("Leave empty to keep current password");
         }
     }
 
-    // SAVE
+
     @FXML
     private void handleSave() {
+        errorLabel.setText("");
         try {
             if (currentUser == null) {
                 createUser();
@@ -62,31 +65,33 @@ public class AddEditUserController implements ApplicationServicesAware {
         }
     }
 
-    // CREATE
+
     private void createUser() throws ServiceException {
+
         User user = new User(
-                usernameField.getText(),
-                emailField.getText(),
+                usernameField.getText().trim(),
+                emailField.getText().trim(),
                 passwordField.getText(),
                 roleCombo.getValue()
         );
 
-        services.getUserService().createUser(user);
+        model.createUser(user);
     }
 
-    // UPDATE
+
     private void updateUser() throws ServiceException {
 
-        currentUser.setUsername(usernameField.getText());
-        currentUser.setEmail(emailField.getText());
+        currentUser.setUsername(usernameField.getText().trim());
+        currentUser.setEmail(emailField.getText().trim());
         currentUser.changeRole(roleCombo.getValue());
 
-        services.getUserService().updateUser(currentUser);
+        model.updateUser(currentUser);
 
-        // only update password if provided
-        if (!passwordField.getText().isBlank()) {
-            services.getUserService()
-                    .updatePassword(currentUser.getId(), passwordField.getText());
+
+        String newPassword = passwordField.getText();
+
+        if (newPassword != null && !newPassword.isBlank()) {
+            model.updatePassword(currentUser, newPassword);
         }
     }
 

@@ -4,11 +4,11 @@ import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.*;
+import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.gui.util.LoadedView;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -26,11 +26,18 @@ public class UserManagementController implements ApplicationServicesAware {
     @FXML private TableColumn<User, Void> actionsColumn;
 
     private ApplicationServices services;
+    private AdminModel model;
+
+    private boolean initialized = false;
+    private boolean servicesInjected = false;
 
     @Override
     public void setApplicationServices(ApplicationServices services) {
         this.services = services;
-        tryLoadUsers();
+        this.model = services.getAdminModel();
+
+        servicesInjected = true;
+        tryInit();
     }
 
     @FXML
@@ -51,25 +58,21 @@ public class UserManagementController implements ApplicationServicesAware {
         setupActionsColumn();
 
         initialized = true;
-        tryLoadUsers(); // safe call
+        tryInit();
     }
-    private boolean initialized = false;
 
+    private void tryInit() {
+        if (initialized && servicesInjected) {
 
-    private void loadUsers() {
-        try {
-            usersTable.setItems(FXCollections.observableArrayList(
-                    services.getUserService().getAllUsers()
-            ));
+            usersTable.setItems(model.getUsers());
 
-        } catch (DataAccessException e) {
-            AlertHelper.error("Database Error", e.getMessage());
-
-        } catch (ServiceException e) {
-            AlertHelper.error("Error", e.getMessage());
+            try {
+                model.loadUsers();
+            } catch (ServiceException e) {
+                AlertHelper.error("Error", e.getMessage());
+            }
         }
     }
-
 
     private void setupActionsColumn() {
         actionsColumn.setCellFactory(col -> new TableCell<>() {
@@ -80,12 +83,7 @@ public class UserManagementController implements ApplicationServicesAware {
 
             {
                 editBtn.getStyleClass().add("table-action-button");
-
-                deleteBtn.getStyleClass().addAll(
-                        "table-action-button",
-                        "table-action-delete"
-                );
-
+                deleteBtn.getStyleClass().addAll("table-action-button", "table-action-delete");
                 box.getStyleClass().add("table-action-container");
 
                 editBtn.setTooltip(new Tooltip("Edit user"));
@@ -110,7 +108,6 @@ public class UserManagementController implements ApplicationServicesAware {
         });
     }
 
-
     public void showAddUser(ActionEvent actionEvent) {
 
         Stage owner = (Stage) ((Node) actionEvent.getSource())
@@ -119,10 +116,7 @@ public class UserManagementController implements ApplicationServicesAware {
 
         services.getSceneManager()
                 .openDialog(ViewPath.ADDUSERVIEW, "Add User", owner);
-
-        loadUsers();
     }
-
 
     private void openEditUser(User user) {
 
@@ -133,15 +127,11 @@ public class UserManagementController implements ApplicationServicesAware {
                         .openDialog(ViewPath.ADDUSERVIEW, "Edit User", stage);
 
         loaded.controller().setUser(user);
-
-        loadUsers();
     }
-
 
     private void deleteUser(User user) {
         try {
-            services.getUserService().deleteUser(user.getId());
-            loadUsers();
+            model.deleteUser(user);
 
         } catch (ValidationException e) {
             AlertHelper.warning("Invalid Input", e.getMessage());
@@ -151,11 +141,6 @@ public class UserManagementController implements ApplicationServicesAware {
 
         } catch (ServiceException e) {
             AlertHelper.error("Error", e.getMessage());
-        }
-    }
-    private void tryLoadUsers() {
-        if (initialized && services != null) {
-            loadUsers();
         }
     }
 }

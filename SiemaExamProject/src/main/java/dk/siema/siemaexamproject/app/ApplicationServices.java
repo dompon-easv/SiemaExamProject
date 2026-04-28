@@ -64,7 +64,7 @@ private final ScannerModel scannerModel;
 
 
         this.mainModel = new MainModel();
-        this.adminModel = new AdminModel();
+        this.adminModel = new AdminModel(userService);
         this.scannerModel = new ScannerModel(ioExecutor);
     }
 
@@ -89,6 +89,8 @@ private final ScannerModel scannerModel;
 
     }
     public UserService getUserService() {return userService;
+    }
+    public AdminModel getAdminModel() {return adminModel;
     }
 
 }
