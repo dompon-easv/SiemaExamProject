@@ -1,16 +1,18 @@
 package dk.siema.siemaexamproject.be;
 
 import java.io.File;
+import java.util.UUID;
 
 public class FileEntity {
     private int id;
-    private int referenceId; //fetched from API
+    private UUID referenceId; //fetched from API
     private int sortOrder;  //order after sorting
     private String filePath; // path to TIFF file
     private int rotation; // 0,90,180,270
     private boolean isBarcode;
 
-    public FileEntity(int id, int referenceId, int sortOrder, String filePath, int rotation, boolean isBarcode) {
+    //constructor for existing files
+    public FileEntity(int id, UUID referenceId, int sortOrder, String filePath, int rotation, boolean isBarcode) {
         this.id = id;
         this.referenceId = referenceId;
         this.sortOrder = sortOrder;
@@ -18,8 +20,18 @@ public class FileEntity {
         this.rotation = rotation;
         this.isBarcode = isBarcode;
     }
+    //constructor for API
+    public FileEntity(UUID referenceId, int sortOrder, String filePath, int rotation, boolean isBarcode) {
+        this.id = 0;
+        this.referenceId = referenceId;
+        this.sortOrder = sortOrder;
+        this.filePath = filePath;
+        this.rotation = rotation;
+        this.isBarcode = isBarcode;
+    }
+
     public int getId() {return id;}
-    public int getReferenceId() {return referenceId;}
+    public UUID getReferenceId() {return referenceId;}
 
     public int getSortOrder() {return sortOrder;}
     public void setSortOrder(int sortOrder) {this.sortOrder = sortOrder;}

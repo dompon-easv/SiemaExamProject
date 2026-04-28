@@ -4,6 +4,7 @@ import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.bll.exceptions.APIException;
 import dk.siema.siemaexamproject.bll.util.BarcodeReader;
+import com.github.f4b6a3.uuid.UuidCreator;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -11,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class DocumentBuilderService {
 
@@ -28,9 +30,9 @@ public class DocumentBuilderService {
 
             boolean isBarcode = barcodeReader.readBarcode(image) != null;
 
+             UUID referenceId = UuidCreator.getTimeOrderedEpoch();
             FileEntity entity = new FileEntity(
-                    file.hashCode(),
-                    0,
+                    referenceId,
                     0,
                     file.getAbsolutePath(),
                     0,
