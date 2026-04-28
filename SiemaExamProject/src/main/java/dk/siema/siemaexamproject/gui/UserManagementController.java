@@ -5,6 +5,7 @@ import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.*;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
+import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import dk.siema.siemaexamproject.gui.util.LoadedView;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.beans.property.SimpleStringProperty;
@@ -52,6 +53,21 @@ public class UserManagementController implements ApplicationServicesAware {
 
         initialized = true;
         tryLoadUsers(); // safe call
+
+
+        usersTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+
+                KeyBindingHelper.setupShortcutsForUserManagement(
+                        newScene,
+                        this::showAddUser,
+                        this::showEditUser,
+                        this::delete
+
+                );
+            }
+        });
+
     }
     private boolean initialized = false;
 
@@ -111,10 +127,9 @@ public class UserManagementController implements ApplicationServicesAware {
     }
 
 
-    public void showAddUser(ActionEvent actionEvent) {
-
-        Stage owner = (Stage) ((Node) actionEvent.getSource())
-                .getScene()
+   @FXML
+   private void showAddUser() {
+        Stage owner = (Stage) usersTable.getScene()
                 .getWindow();
 
         services.getSceneManager()
@@ -137,6 +152,12 @@ public class UserManagementController implements ApplicationServicesAware {
         loadUsers();
     }
 
+    public void showEditUser() {
+        User selectedUser = usersTable.getSelectionModel().getSelectedItem();
+        if (selectedUser == null) {
+            AlertHelper.warning("No selection", "Please select user you want to edit.");
+        } else openEditUser(selectedUser);
+    }
 
     private void deleteUser(User user) {
         try {
@@ -153,6 +174,13 @@ public class UserManagementController implements ApplicationServicesAware {
             AlertHelper.error("Error", e.getMessage());
         }
     }
+    private void delete() {
+        User selectedUser = usersTable.getSelectionModel().getSelectedItem();
+        if (selectedUser == null) {
+            AlertHelper.warning("No selection", "Please select user you want to delete.");
+        } else deleteUser(selectedUser);
+    }
+
     private void tryLoadUsers() {
         if (initialized && services != null) {
             loadUsers();

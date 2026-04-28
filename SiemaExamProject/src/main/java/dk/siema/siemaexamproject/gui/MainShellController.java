@@ -2,15 +2,21 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.app.SessionManager;
+import dk.siema.siemaexamproject.be.enums.UserRole;
+import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
+import java.util.Map;
 
 public class MainShellController implements ApplicationServicesAware {
 
@@ -37,7 +43,7 @@ public class MainShellController implements ApplicationServicesAware {
 
         scannerButton.setSelected(true);
 
-        KeyBindingHelper.setGlobalLogoutAction(this::logout);
+        KeyBindingHelper.setGlobalLogoutAction(this::logout, this::showScannerView, this::showAdminView, this::showHelpAction);
         contentContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 // Calling clear here forces the helper to initialize the global shortcuts
@@ -71,5 +77,27 @@ public class MainShellController implements ApplicationServicesAware {
     public void logout() {
         Stage currentStage = (Stage) contentContainer.getScene().getWindow();
         sceneManager.setScene(currentStage, ViewPath.LOGIN, "Login");
+    }
+
+    public void showHelpAction() {
+       // UserRole currentRole = SessionManager.getCurrentUser().getRole();
+
+        UserRole currentRole = UserRole.ADMIN;
+
+        Map<UserRole, String> shortcuts = KeyBindingHelper.getShortcutInfo();
+        StringBuilder helpText = new StringBuilder();
+
+        // 3. Build the text based on role
+        if (currentRole == UserRole.ADMIN) {
+            helpText.append("--- SCANNER SHORTCUTS ---\n");
+            helpText.append(shortcuts.get(UserRole.EMPLOYEE));
+            helpText.append("\n\n--- ADMIN SHORTCUTS ---\n");
+            helpText.append(shortcuts.get(UserRole.ADMIN));
+        } else {
+            helpText.append("--- SHORTCUTS ---\n");
+            helpText.append(shortcuts.get(UserRole.EMPLOYEE));
+        }
+
+        AlertHelper.information("Shortcut list",  helpText.toString());
     }
 }
