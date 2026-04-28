@@ -104,7 +104,12 @@ public class ScannerViewController implements ApplicationServicesAware {
 
                         FileEntity file = node.file();
 
-                        scannerModel.setSelectedFile(file);
+                        if (file != null) {
+                            System.out.println(" You clicked on " + file.getFilePath() + "In memory has rotation: " + file.getRotation());
+
+                            scannerModel.setSelectedFile(file);
+                        }
+
                         previewImageView.setRotate(file.getRotation());
                         resetZoom();
 
