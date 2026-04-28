@@ -189,4 +189,9 @@ public class ScannerModel {
         int newRotation = (file.getRotation() + 90) % 360;
         file.setRotation(newRotation);
     }
+
+    // ================= EXPORT ========================
+
+    public void exportDocuments() {
+    }
 }

@@ -42,6 +42,7 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     private ImageView previewImageView;
 
+
     public record TreeNode(String label, FileEntity file) {
         @Override
         public String toString() {
@@ -256,6 +257,13 @@ public class ScannerViewController implements ApplicationServicesAware {
         documentTree.setRoot(
                 DocumentTreeBuilder.build(scannerModel.getDocuments())
         );
+    }
+
+    // ================= EXPORT ====================
+
+    @FXML private void onExportAction(ActionEvent actionEvent) {
+        scannerModel.exportDocuments();
+        System.out.println("Export has started");
     }
 
 }

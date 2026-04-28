@@ -2,6 +2,7 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.beans.property.SimpleStringProperty;
@@ -40,12 +41,20 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
                 new ProfileRow("Contract Documents", "Legal contracts and agreements", "Manual", "600 DPI, Color, PDF"),
                 new ProfileRow("Receipt Scanning", "Quick receipt scanning", "Barcode", "150 DPI, Black & White, TIFF")
         ));
+
+        profilesTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+
+                KeyBindingHelper.setupShortcutsForScanningProfiles(
+                        newScene,
+                        this::showAddProfile);
+            }
+        });
     }
 
-    public void showAddProfile(ActionEvent actionEvent) {
-        Stage owner = (Stage) ((Node) actionEvent.getSource())
-                .getScene()
-                .getWindow();
+    @FXML
+    private void showAddProfile() {
+        Stage owner = (Stage) profilesTable.getScene().getWindow();
 
         sceneManager.openDialog(ViewPath.ADDPROFILEVIEW, "Add Profile", owner);
     }
