@@ -3,6 +3,7 @@ import dk.siema.siemaexamproject.be.enums.UserRole;
 import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.bll.service.UserService;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ArchitectureComparisonTest {
 
     @Test
+    @DisplayName("Allow Invalid objects creation")
     public void testVulnerableArchitecture_AllowsInvalidObjectCreation(){
         User corrupterUser = new User(
                 "",
@@ -27,6 +29,7 @@ public class ArchitectureComparisonTest {
     }
 
     @Test
+    @DisplayName("Service prevents invalid object creation")
     public void testVulnerableArchitecture_PreventsInvalidObjectCreation(){
 
         //set up the logic layer
