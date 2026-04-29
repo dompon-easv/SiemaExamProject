@@ -23,9 +23,9 @@ public class ScannerService {
         this.cpuExecutor = cpuExecutor;
     }
 
-    // STEP 1: Start scan and fetch TIFF files (I/O operation)
     public List<Document> scan() throws Exception {
 
+        // STEP 1: Start scan and fetch TIFF files (I/O operation)
         List<File> files = tiffService.getAllTiffs();
 
         // STEP 2: Submit all files for parallel processing (CPU-bound work)
