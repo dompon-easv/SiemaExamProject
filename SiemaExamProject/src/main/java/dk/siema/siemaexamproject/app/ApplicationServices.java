@@ -65,7 +65,7 @@ public class ApplicationServices {
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel(userService);
-        this.scannerModel = new ScannerModel(ioExecutor);
+        this.scannerModel = new ScannerModel(ioExecutor, scannerService);
     }
 
     public SceneManager getSceneManager() {return sceneManager;}

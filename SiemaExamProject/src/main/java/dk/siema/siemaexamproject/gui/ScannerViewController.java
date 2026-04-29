@@ -10,6 +10,7 @@ import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,12 +24,10 @@ import java.util.List;
 
 public class ScannerViewController implements ApplicationServicesAware {
 
-
-    private ScannerService scannerService;
     private ScannerModel scannerModel;
 
     @FXML private Label fileNameLabel;
-    @FXML private Label welcomeText;
+    @FXML private Label scanStatusLabel;
     @FXML private Label pageInfoLbl;
 
 
@@ -52,12 +51,19 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @Override
     public void setApplicationServices(ApplicationServices services) {
-        this.scannerService = services.getScannerService();
         this.scannerModel = services.getScannerModel();
     }
 
     @FXML
     private void initialize() {
+
+        scannerModel.scanningProperty().addListener((obs, oldVal, newVal) -> {
+            scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");
+        });
+
+        scannerModel.documentsProperty().addListener((ListChangeListener<Document>) change -> {
+            refreshTree();
+        });
 
         previewImageView = new ImageView();
         previewImageView.setFitHeight(500);
@@ -166,33 +172,12 @@ public class ScannerViewController implements ApplicationServicesAware {
     // ================= SCAN =================
 
     @FXML
-    public void onStartNewScan() {
+    private void onStartNewScan(ActionEvent event) {
         startNewScan();
     }
+
     public void startNewScan() {
-
-        welcomeText.setText("Scanning...");
-
-        Task<List<Document>> task = new Task<>() {
-            @Override
-            protected List<Document> call() throws Exception {
-                return scannerService.scan();
-            }
-        };
-
-        task.setOnSucceeded(e -> {
-            scannerModel.clear();
-            scannerModel.setDocuments(task.getValue());
-            refreshTree();
-            welcomeText.setText("Scan complete");
-        });
-
-        task.setOnFailed(e -> {
-            welcomeText.setText("Scan failed");
-            task.getException().printStackTrace();
-        });
-
-        new Thread(task).start();
+        scannerModel.startScan();
     }
 
     // ================= IMAGE ROTATION AND ZOOMING =================
@@ -254,9 +239,8 @@ public class ScannerViewController implements ApplicationServicesAware {
     // ================= UI UPDATE =================
 
     private void refreshTree() {
-        documentTree.setRoot(
-                DocumentTreeBuilder.build(scannerModel.getDocuments())
-        );
+        TreeItem<TreeNode> root = DocumentTreeBuilder.build(scannerModel.getDocuments());
+        documentTree.setRoot(root);
     }
 
     // ================= EXPORT ====================
