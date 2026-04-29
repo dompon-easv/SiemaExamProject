@@ -27,7 +27,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     private ScannerModel scannerModel;
 
     @FXML private Label fileNameLabel;
-    @FXML private Label welcomeText;
+    @FXML private Label scanStatusLabel;
     @FXML private Label pageInfoLbl;
 
 
@@ -58,7 +58,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     private void initialize() {
 
         scannerModel.scanningProperty().addListener((obs, oldVal, newVal) -> {
-            welcomeText.setText(newVal ? "Scanning..." : "Scan complete");
+            scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");
         });
 
         scannerModel.documentsProperty().addListener((ListChangeListener<Document>) change -> {
