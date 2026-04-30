@@ -58,7 +58,7 @@
 
                         <Label styleClass="badge" text="Page 1 of 3" />
 
-                        <Label fx:id="scanStatusLabel" styleClass="tree-text" text="Ready" />
+                        <Label fx:id="welcomeText" styleClass="tree-text" text="Ready" />
                     </HBox>
 
                     <!-- PUSH CENTER -->
