@@ -61,9 +61,14 @@ public class ScannerViewController implements ApplicationServicesAware {
             scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");
         });
 
-        scannerModel.documentsProperty().addListener((ListChangeListener<Document>) change -> {
-            refreshTree();
+        scannerModel.selectedFileProperty().addListener((obs, oldFile, newFile) -> {
+            if (newFile != null) {
+                selectFileInTree(newFile);
+            }
         });
+
+        TreeItem<TreeNode> root = DocumentTreeBuilder.build(scannerModel.documentsProperty());
+        documentTree.setRoot(root);
 
         previewImageView = new ImageView();
         previewImageView.setFitHeight(500);
@@ -75,10 +80,7 @@ public class ScannerViewController implements ApplicationServicesAware {
         imageContainer.setContent(centerPane);
         imageContainer.setPannable(true);
 
-
         pageInfoLbl.textProperty().bind(scannerModel.pageCountInfoProperty());
-
-        refreshTree();
 
         // bind preview image
         scannerModel.currentPreviewImageProperty().addListener(
@@ -177,7 +179,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     }
 
     public void startNewScan() {
-        scannerModel.startScan();
+        scannerModel.scanNext();
     }
 
     // ================= IMAGE ROTATION AND ZOOMING =================
@@ -236,11 +238,37 @@ public class ScannerViewController implements ApplicationServicesAware {
         imageContainer.setVvalue(0.5);
     }
 
-    // ================= UI UPDATE =================
+    // ====== TREE FILE SELECTION DURING SCAN ======
 
-    private void refreshTree() {
-        TreeItem<TreeNode> root = DocumentTreeBuilder.build(scannerModel.getDocuments());
-        documentTree.setRoot(root);
+    private void selectFileInTree(FileEntity targetFile) {
+        TreeItem<TreeNode> root = documentTree.getRoot();
+
+        if (root == null) return;
+
+        TreeItem<TreeNode> found = findTreeItem(root, targetFile);
+
+        if (found != null) {
+            documentTree.getSelectionModel().select(found);
+
+            // optional: scroll to it
+            documentTree.scrollTo(documentTree.getRow(found));
+        }
+    }
+
+    private TreeItem<TreeNode> findTreeItem(TreeItem<TreeNode> current, FileEntity targetFile) {
+
+        if (current.getValue() != null && current.getValue().file() != null) {
+            if (current.getValue().file().equals(targetFile)) {
+                return current;
+            }
+        }
+
+        for (TreeItem<TreeNode> child : current.getChildren()) {
+            TreeItem<TreeNode> result = findTreeItem(child, targetFile);
+            if (result != null) return result;
+        }
+
+        return null;
     }
 
     // ================= EXPORT ====================

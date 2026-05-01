@@ -2,6 +2,7 @@ package dk.siema.siemaexamproject.gui.models;
 
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
 import javafx.application.Platform;
 import javafx.beans.property.*;
@@ -42,7 +43,6 @@ public class ScannerModel {
     }
 
     public void setDocuments(List<Document> docs) {
-        this.documents.setAll(docs);
         updatePageCountInfo();
     }
 
@@ -72,12 +72,12 @@ public class ScannerModel {
 
     // ================= SCAN =================
 
-    public void startScan() {
+    public void scanNext() {
 
-        Task<List<Document>> task = new Task<>() {
+        Task<DocumentBuilderService.PageResult> task = new Task<>() {
             @Override
-            protected List<Document> call() throws Exception {
-                return scannerService.scan();
+            protected DocumentBuilderService.PageResult call() throws Exception {
+                return scannerService.scanNext();
             }
 
             @Override
@@ -89,13 +89,16 @@ public class ScannerModel {
             protected void succeeded() {
                 scanning.set(false);
 
-                List<Document> result = getValue();
-                clear();
-                setDocuments(result);
+                DocumentBuilderService.PageResult page = getValue();
 
-                if (!result.isEmpty() && !result.get(0).getPages().isEmpty()) {
-                    setSelectedFile(result.get(0).getPages().get(0));
-                }
+                if (page == null) return;
+
+                // Incrementally build documents
+                scannerService.getDocumentBuilderService()
+                        .addPageToDocuments(page, documents);
+
+                // Update UI selection
+                setSelectedFile(page.entity());
             }
 
             @Override
@@ -105,9 +108,7 @@ public class ScannerModel {
             }
         };
 
-        Thread t = new Thread(task);
-        t.setDaemon(true);
-        t.start();
+        new Thread(task).start();
     }
 
     // ================= SELECTION =================

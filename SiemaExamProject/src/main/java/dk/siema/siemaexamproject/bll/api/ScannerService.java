@@ -14,6 +14,13 @@ public class ScannerService {
     private final DocumentBuilderService documentBuilderService;
     private final ExecutorService cpuExecutor;
 
+    private List<File> files;
+    private int currentIndex = 0;
+
+    public DocumentBuilderService getDocumentBuilderService() {
+        return documentBuilderService;
+    }
+
     public ScannerService(TiffService tiffService,
                           DocumentBuilderService documentBuilderService,
                           ExecutorService cpuExecutor) {
@@ -23,32 +30,17 @@ public class ScannerService {
         this.cpuExecutor = cpuExecutor;
     }
 
-    public List<Document> scan() throws Exception {
+    public DocumentBuilderService.PageResult scanNext() throws Exception {
 
-        // STEP 1: Start scan and fetch TIFF files (I/O operation)
-        List<File> files = tiffService.getAllTiffs();
-
-        // STEP 2: Submit all files for parallel processing (CPU-bound work)
-        List<Future<DocumentBuilderService.PageResult>> futures = new ArrayList<>();
-
-        for (File file : files) {
-            futures.add(cpuExecutor.submit(() ->
-                    documentBuilderService.processFile(file)
-            ));
+        if (files == null) {
+            files = tiffService.getAllTiffs(); // already sorted
         }
 
-        // STEP 3: Collect results from parallel execution
-        List<DocumentBuilderService.PageResult> pages = new ArrayList<>();
-
-        for (Future<DocumentBuilderService.PageResult> future : futures) {
-            DocumentBuilderService.PageResult result = future.get();
-
-            if (result != null) {
-                pages.add(result);
-            }
+        if (currentIndex >= files.size()) {
+            return null; // no more files
         }
 
-        // STEP 4: Build final document structure
-        return documentBuilderService.buildDocuments(pages);
+        File file = files.get(currentIndex++);
+        return documentBuilderService.processFile(file);
     }
 }

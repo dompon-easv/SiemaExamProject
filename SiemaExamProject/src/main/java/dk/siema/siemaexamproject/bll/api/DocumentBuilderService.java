@@ -17,6 +17,8 @@ import java.util.UUID;
 public class DocumentBuilderService {
 
     private final BarcodeReader barcodeReader = new BarcodeReader();
+    private Document currentDocument = null;
+    private int docId = 1;
 
     // STEP 1: Result of parallel processing (one file → one PageResult)
     public record PageResult(FileEntity entity, boolean barcode) {}
@@ -74,5 +76,26 @@ public class DocumentBuilderService {
         }
 
         return documents;
+    }
+
+    public Document addPageToDocuments(PageResult page, List<Document> documents) {
+
+        if (page == null) return null;
+
+        if (page.barcode()) {
+            currentDocument = new Document();
+            currentDocument.setId(docId++);
+            documents.add(currentDocument);
+        }
+
+        if (currentDocument == null) {
+            currentDocument = new Document();
+            currentDocument.setId(docId++);
+            documents.add(currentDocument);
+        }
+
+        currentDocument.addPage(page.entity());
+
+        return currentDocument;
     }
 }
