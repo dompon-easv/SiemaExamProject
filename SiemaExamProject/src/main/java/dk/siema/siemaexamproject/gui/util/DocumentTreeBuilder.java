@@ -7,17 +7,25 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DocumentTreeBuilder {
 
-    public static TreeItem<TreeNode> build(ObservableList<Document> documents) {
+    private final Map<String, TreeItem<TreeNode>> nodeMap = new HashMap<>();
 
-        TreeItem<TreeNode> root =
-                new TreeItem<>(new TreeNode("BOX", null));
+    public TreeItem<TreeNode> getNode(FileEntity file) {
+        return (file == null) ? null : nodeMap.get(file.getFilePath());
+    }
+
+    public TreeItem<TreeNode> build(ObservableList<Document> documents) {
+
+        nodeMap.clear();
+
+        TreeItem<TreeNode> root = new TreeItem<>(new TreeNode("BOX", null, -1));
         root.setExpanded(true);
 
-        // Listen to documents being added
+        // Listen for new documents
         documents.addListener((ListChangeListener<Document>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
@@ -37,26 +45,27 @@ public class DocumentTreeBuilder {
         return root;
     }
 
-    private static TreeItem<TreeNode> createDocumentNode(Document doc, int docIndex) {
+    private TreeItem<TreeNode> createDocumentNode(Document doc, int docIndex) {
 
         TreeItem<TreeNode> docNode =
-                new TreeItem<>(new TreeNode("Document " + docIndex, null));
+                new TreeItem<>(new TreeNode("Document " + docIndex, null, docIndex -1));
 
-        // 🔥 Listen to pages inside document
+        // Listen to pages
         doc.getPages().addListener((ListChangeListener<FileEntity>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     for (FileEntity file : change.getAddedSubList()) {
 
                         String label = "File " + (docNode.getChildren().size() + 1);
-
                         if (file.isBarcode()) {
                             label += " (BARCODE)";
                         }
 
-                        docNode.getChildren().add(
-                                new TreeItem<>(new TreeNode(label, file))
-                        );
+                        TreeItem<TreeNode> item =
+                                new TreeItem<>(new TreeNode(label, file, docIndex -1));
+
+                        nodeMap.put(file.getFilePath(), item);
+                        docNode.getChildren().add(item);
                     }
                 }
             }

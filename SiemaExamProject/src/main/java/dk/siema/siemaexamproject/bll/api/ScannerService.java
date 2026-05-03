@@ -1,12 +1,8 @@
 package dk.siema.siemaexamproject.bll.api;
 
-import dk.siema.siemaexamproject.be.Document;
-
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class ScannerService {
 
@@ -14,11 +10,12 @@ public class ScannerService {
     private final DocumentBuilderService documentBuilderService;
     private final ExecutorService cpuExecutor;
 
-    private List<File> files;
-    private int currentIndex = 0;
+    public List<File> getAllFiles() throws Exception {
+        return tiffService.getAllTiffs();
+    }
 
-    public DocumentBuilderService getDocumentBuilderService() {
-        return documentBuilderService;
+    public DocumentBuilderService.PageResult processFile(File file) throws Exception {
+        return documentBuilderService.processFile(file);
     }
 
     public ScannerService(TiffService tiffService,
@@ -28,19 +25,5 @@ public class ScannerService {
         this.tiffService = tiffService;
         this.documentBuilderService = documentBuilderService;
         this.cpuExecutor = cpuExecutor;
-    }
-
-    public DocumentBuilderService.PageResult scanNext() throws Exception {
-
-        if (files == null) {
-            files = tiffService.getAllTiffs(); // already sorted
-        }
-
-        if (currentIndex >= files.size()) {
-            return null; // no more files
-        }
-
-        File file = files.get(currentIndex++);
-        return documentBuilderService.processFile(file);
     }
 }
