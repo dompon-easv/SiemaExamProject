@@ -2,6 +2,7 @@ package dk.siema.siemaexamproject.gui.models;
 
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
 import javafx.application.Platform;
 import javafx.beans.property.*;
@@ -26,32 +27,18 @@ public class ScannerModel {
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
     private final StringProperty pageCountInfo = new SimpleStringProperty("0 / 0");
 
+    //private List<File> files; getalltiffs
+    //private int currentIndex = 0; getalltiffs
+
     private final ScannerService scannerService;
     private final ExecutorService ioExecutor;
 
     // Simple in-memory cache for loaded images (key = file path)
-    private final Map<String, Image> imageCache = new ConcurrentHashMap<>() {};
+    private final Map<String, Image> imageCache = new ConcurrentHashMap<>();
 
     public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService) {
         this.ioExecutor = ioExecutor;
         this.scannerService = scannerService;
-    }
-
-    public List<Document> getDocuments() {
-        return Collections.unmodifiableList(documents.get());
-    }
-
-    public void setDocuments(List<Document> docs) {
-        this.documents.setAll(docs);
-        updatePageCountInfo();
-    }
-
-    public void clear() {
-        documents.clear();
-        selectedFile.set(null);
-        currentPreviewImage.set(null);
-        imageCache.clear();
-        updatePageCountInfo();
     }
 
     public ReadOnlyBooleanProperty scanningProperty() {
@@ -72,12 +59,14 @@ public class ScannerModel {
 
     // ================= SCAN =================
 
-    public void startScan() {
+    public void scanNext() {
 
-        Task<List<Document>> task = new Task<>() {
+        Task<DocumentBuilderService.PageResult> task = new Task<>() {
             @Override
-            protected List<Document> call() throws Exception {
-                return scannerService.scan();
+            protected DocumentBuilderService.PageResult call() throws Exception {
+                File file = scannerService.getRandomFile();
+                if (file == null) return null;
+                return scannerService.processFile(file);
             }
 
             @Override
@@ -89,13 +78,15 @@ public class ScannerModel {
             protected void succeeded() {
                 scanning.set(false);
 
-                List<Document> result = getValue();
-                clear();
-                setDocuments(result);
+                DocumentBuilderService.PageResult page = getValue();
+                if (page == null) return;
 
-                if (!result.isEmpty() && !result.get(0).getPages().isEmpty()) {
-                    setSelectedFile(result.get(0).getPages().get(0));
-                }
+                List<Document> updateDocs = scannerService.handlePage(page);
+
+                Platform.runLater(() -> {
+                    documents.setAll(updateDocs);
+                    setSelectedFile(page.entity());
+                });
             }
 
             @Override
@@ -105,16 +96,35 @@ public class ScannerModel {
             }
         };
 
-        Thread t = new Thread(task);
-        t.setDaemon(true);
-        t.start();
+        ioExecutor.submit(task);
     }
 
     // ================= SELECTION =================
 
+    public void selectNode(FileEntity file, int documentIndex) {
+
+        // PAGE
+        if (file != null) {
+            setSelectedFile(file);
+            return;
+        }
+
+        // DOCUMENT
+        if (documentIndex >= 0 && documentIndex < documents.size()) {
+            Document doc = documents.get(documentIndex);
+
+            if (!doc.getPages().isEmpty()) {
+                setSelectedFile(doc.getPages().get(0));
+                return;
+            }
+        }
+
+        // BOX
+        setSelectedFile(null);
+    }
+
     public void setSelectedFile(FileEntity file) {
 
-        // Avoid reloading if same file is selected again
         if (file != null && file.equals(selectedFile.get())) return;
 
         selectedFile.set(file);
@@ -127,14 +137,46 @@ public class ScannerModel {
 
         String key = file.getFilePath();
 
-        // If image already exists in cache, reuse it immediately
-        if (imageCache.containsKey(key)) {
-            currentPreviewImage.set(imageCache.get(key));
+        Image cached = imageCache.get(key);
+        if (cached != null) {
+            currentPreviewImage.set(cached);
             return;
         }
 
         currentPreviewImage.set(null);
         loadImageAsync(file);
+    }
+
+    // ================= IMAGE LOADING =================
+
+    private void loadImageAsync(FileEntity file) {
+
+        if (file == null || file.toFile() == null) return;
+
+        ioExecutor.submit(() -> {
+            try {
+                BufferedImage img = ImageIO.read(file.toFile());
+
+                Image fxImage = (img != null)
+                        ? SwingFXUtils.toFXImage(img, null)
+                        : null;
+
+                Platform.runLater(() -> {
+                    imageCache.put(file.getFilePath(), fxImage);
+
+                    if (file.equals(selectedFile.get())) {
+                        currentPreviewImage.set(fxImage);
+                    }
+                });
+
+            } catch (IOException e) {
+                Platform.runLater(() -> {
+                    if (file.equals(selectedFile.get())) {
+                        currentPreviewImage.set(null);
+                    }
+                });
+            }
+        });
     }
 
     // ================= PAGE NAVIGATION =================
@@ -177,7 +219,7 @@ public class ScannerModel {
 
         FileEntity current = selectedFile.get();
 
-        if( current == null || documents.isEmpty() ) {
+        if (current == null || documents.isEmpty()) {
             pageCountInfo.set("No file selected");
             return;
         }
@@ -186,50 +228,19 @@ public class ScannerModel {
             Document doc = documents.get(d);
             List<FileEntity> filesInDoc = doc.getPages();
 
-            for(int f = 0; f < filesInDoc.size(); f++) {
+            for (int f = 0; f < filesInDoc.size(); f++) {
                 FileEntity checkFile = filesInDoc.get(f);
 
 
-            if (checkFile.getFilePath().equals(current.getFilePath())) {
-                //Found the file , build the label.
-                int docNumber = d+1;
-                int currentFileNumber = f + 1;
-                int totalFilesInDoc = filesInDoc.size();
+                if (checkFile.getFilePath().equals(current.getFilePath())) {
+                    //Found the file , build the label.
+                    int docNumber = d + 1;
+                    int totalFilesInDoc = filesInDoc.size();
 
-                pageCountInfo.set("Document # " + docNumber + " / " + totalFilesInDoc);
+                    pageCountInfo.set("Document " + docNumber + " — Page " + (f + 1) + "/" + totalFilesInDoc);
+                }
             }
         }
-    }
-    }
-
-    // ================= IMAGE LOADING =================
-
-    private void loadImageAsync(FileEntity file) {
-
-        if (file == null || file.toFile() == null) return;
-
-        ioExecutor.submit(() -> {
-            try {
-                BufferedImage img = ImageIO.read(file.toFile());
-
-                Image fxImage = (img != null)
-                        ? SwingFXUtils.toFXImage(img, null)
-                        : null;
-
-                // Store result in cache for future fast access
-                imageCache.put(file.getFilePath(), fxImage);
-
-                // Ensure UI update happens on JavaFX thread
-                Platform.runLater(() -> {
-                    if (file.equals(selectedFile.get())) {
-                        currentPreviewImage.set(fxImage);
-                    }
-                });
-
-            } catch (IOException e) {
-                Platform.runLater(() -> currentPreviewImage.set(null));
-            }
-        });
     }
 
     // ================= IMAGE ROTATION =================

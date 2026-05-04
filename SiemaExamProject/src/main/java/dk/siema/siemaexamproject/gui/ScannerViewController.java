@@ -10,6 +10,7 @@ import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import javafx.application.Platform;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -40,9 +41,9 @@ public class ScannerViewController implements ApplicationServicesAware {
     private double currentZoom = 1.0;
 
     private ImageView previewImageView;
+    private DocumentTreeBuilder treeBuilder;
 
-
-    public record TreeNode(String label, FileEntity file) {
+    public record TreeNode(String label, FileEntity file, int documentIndex) {
         @Override
         public String toString() {
             return label;
@@ -61,9 +62,18 @@ public class ScannerViewController implements ApplicationServicesAware {
             scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");
         });
 
-        scannerModel.documentsProperty().addListener((ListChangeListener<Document>) change -> {
-            refreshTree();
+        scannerModel.selectedFileProperty().addListener((obs, oldFile, newFile) -> {
+            if (newFile != null) {
+                selectFileInTree(newFile);
+            }
         });
+
+        scannerModel.documentsProperty().addListener((obs, oldVal, newVal) -> {
+            rebuildTree();
+        });
+
+        treeBuilder = new DocumentTreeBuilder();
+        documentTree.setRoot(treeBuilder.build(scannerModel.documentsProperty()));
 
         previewImageView = new ImageView();
         previewImageView.setFitHeight(500);
@@ -75,15 +85,13 @@ public class ScannerViewController implements ApplicationServicesAware {
         imageContainer.setContent(centerPane);
         imageContainer.setPannable(true);
 
-
         pageInfoLbl.textProperty().bind(scannerModel.pageCountInfoProperty());
-
-        refreshTree();
 
         // bind preview image
         scannerModel.currentPreviewImageProperty().addListener(
                 (obs, oldImg, newImg) -> previewImageView.setImage(newImg)
         );
+
         // Ask the model what is the rotation of currently selected file
         FileEntity currentFile = scannerModel.selectedFileProperty().get();
 
@@ -99,58 +107,24 @@ public class ScannerViewController implements ApplicationServicesAware {
         documentTree.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldItem, newItem) -> {
 
-                    if (newItem == null || newItem.getValue() == null) {
+                    TreeNode node = (newItem != null) ? newItem.getValue() : null;
+
+                    if (node == null) {
+                        scannerModel.selectNode(null, -1);
+                    } else {
+                        scannerModel.selectNode(node.file(), node.documentIndex());
+                    }
+
+                    resetZoom();
+
+                    if (node == null) {
                         fileNameLabel.setText("");
-                        return;
-                    }
-
-                    TreeNode node = newItem.getValue();
-
-                    // ================= PAGE =================
-                    if (node.file() != null) {
-
-                        FileEntity file = node.file();
-
-                        if (file != null) {
-                            System.out.println(" You clicked on " + file.getFilePath() + "In memory has rotation: " + file.getRotation());
-
-                            scannerModel.setSelectedFile(file);
-                        }
-
-                        previewImageView.setRotate(file.getRotation());
-                        resetZoom();
-
+                    } else if (node.file() != null) {
                         fileNameLabel.setText(
-                                new java.io.File(file.getFilePath()).getName()
-                        );
-
-                        return;
-                    }
-
-                    // ================= DOCUMENT =================
-                    if (!newItem.getChildren().isEmpty()
-                            && newItem.getParent() != null
-                            && newItem.getParent().getValue() != null) {
-
-                        TreeItem<TreeNode> firstPage = newItem.getChildren().get(0);
-                        FileEntity firstFile = firstPage.getValue().file();
-
-                        if (firstFile != null) {
-                            scannerModel.setSelectedFile(firstFile);
-                            previewImageView.setRotate(firstFile.getRotation());
-                        }
-
+                                new java.io.File(node.file().getFilePath()).getName());
+                    } else {
                         fileNameLabel.setText(node.label());
-                        return;
                     }
-
-                    // ================= BOX =================
-                    fileNameLabel.setText(node.label());
-
-                    scannerModel.setSelectedFile(null);
-                    previewImageView.setImage(null);
-                    previewImageView.setRotate(0);
-                    return;
                 }
         );
 
@@ -177,7 +151,16 @@ public class ScannerViewController implements ApplicationServicesAware {
     }
 
     public void startNewScan() {
-        scannerModel.startScan();
+        scannerModel.scanNext();
+    }
+
+    // ================= TREE UPDATES =================
+
+    private void rebuildTree() {
+        TreeItem<TreeNode> root =
+                treeBuilder.build(scannerModel.documentsProperty());
+
+        documentTree.setRoot(root);
     }
 
     // ================= IMAGE ROTATION AND ZOOMING =================
@@ -236,11 +219,30 @@ public class ScannerViewController implements ApplicationServicesAware {
         imageContainer.setVvalue(0.5);
     }
 
-    // ================= UI UPDATE =================
+    // ====== TREE SELECTION SYNC ======
 
-    private void refreshTree() {
-        TreeItem<TreeNode> root = DocumentTreeBuilder.build(scannerModel.getDocuments());
-        documentTree.setRoot(root);
+    private void selectFileInTree(FileEntity file) {
+        Platform.runLater(() -> trySelect(file, 0));
+    }
+
+    private void trySelect(FileEntity file, int attempt) {
+
+        TreeItem<TreeNode> item = treeBuilder.getNode(file);
+
+        if (item != null) {
+            documentTree.getSelectionModel().select(item);
+            documentTree.scrollTo(documentTree.getRow(item));
+            return;
+        }
+
+        if (attempt < 5) {
+            Platform.runLater(() -> {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ignored) {}
+                trySelect(file, attempt + 1);
+            });
+        }
     }
 
     // ================= EXPORT ====================

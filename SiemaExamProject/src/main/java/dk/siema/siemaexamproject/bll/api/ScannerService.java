@@ -6,13 +6,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class ScannerService {
 
     private final TiffService tiffService;
     private final DocumentBuilderService documentBuilderService;
     private final ExecutorService cpuExecutor;
+
+    private Document currentDocument = null;
+    private int docId = 1;
+    private final List<Document> documents = new ArrayList<>();
 
     public ScannerService(TiffService tiffService,
                           DocumentBuilderService documentBuilderService,
@@ -23,32 +26,36 @@ public class ScannerService {
         this.cpuExecutor = cpuExecutor;
     }
 
-    public List<Document> scan() throws Exception {
+    public File getRandomFile() throws Exception {
+        return tiffService.getRandomTiff();
+    }
 
-        // STEP 1: Start scan and fetch TIFF files (I/O operation)
-        List<File> files = tiffService.getAllTiffs();
+    public List<File> getAllFiles() throws Exception {
+        return tiffService.getAllTiffs();
+    }
 
-        // STEP 2: Submit all files for parallel processing (CPU-bound work)
-        List<Future<DocumentBuilderService.PageResult>> futures = new ArrayList<>();
+    public DocumentBuilderService.PageResult processFile(File file) throws Exception {
+        return documentBuilderService.processFile(file);
+    }
 
-        for (File file : files) {
-            futures.add(cpuExecutor.submit(() ->
-                    documentBuilderService.processFile(file)
-            ));
+    public List<Document> handlePage(DocumentBuilderService.PageResult page) {
+
+        if (page == null) return documents;
+
+        if (page.barcode()) {
+            currentDocument = new Document();
+            currentDocument.setId(docId++);
+            documents.add(currentDocument);
         }
 
-        // STEP 3: Collect results from parallel execution
-        List<DocumentBuilderService.PageResult> pages = new ArrayList<>();
-
-        for (Future<DocumentBuilderService.PageResult> future : futures) {
-            DocumentBuilderService.PageResult result = future.get();
-
-            if (result != null) {
-                pages.add(result);
-            }
+        if (currentDocument == null) {
+            currentDocument = new Document();
+            currentDocument.setId(docId++);
+            documents.add(currentDocument);
         }
 
-        // STEP 4: Build final document structure
-        return documentBuilderService.buildDocuments(pages);
+        currentDocument.addPage(page.entity());
+
+        return documents;
     }
 }
