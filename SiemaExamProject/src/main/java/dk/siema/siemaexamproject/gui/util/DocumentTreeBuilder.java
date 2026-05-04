@@ -3,11 +3,10 @@ package dk.siema.siemaexamproject.gui.util;
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.gui.ScannerViewController.TreeNode;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DocumentTreeBuilder {
@@ -18,59 +17,42 @@ public class DocumentTreeBuilder {
         return (file == null) ? null : nodeMap.get(file.getFilePath());
     }
 
-    public TreeItem<TreeNode> build(ObservableList<Document> documents) {
+    public TreeItem<TreeNode> build(List<Document> documents) {
 
         nodeMap.clear();
 
-        TreeItem<TreeNode> root = new TreeItem<>(new TreeNode("BOX", null, -1));
+        TreeItem<TreeNode> root =
+                new TreeItem<>(new TreeNode("BOX", null, -1));
+
         root.setExpanded(true);
 
-        // Listen for new documents
-        documents.addListener((ListChangeListener<Document>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    for (Document doc : change.getAddedSubList()) {
-                        root.getChildren().add(createDocumentNode(doc, root.getChildren().size() + 1));
-                    }
-                }
-            }
-        });
+        for (int d = 0; d < documents.size(); d++) {
 
-        // Add existing documents
-        int docIndex = 1;
-        for (Document doc : documents) {
-            root.getChildren().add(createDocumentNode(doc, docIndex++));
+            Document doc = documents.get(d);
+
+            TreeItem<TreeNode> docNode =
+                    new TreeItem<>(new TreeNode("Document " + (d + 1), null, d));
+
+            for (int f = 0; f < doc.getPages().size(); f++) {
+
+                FileEntity file = doc.getPages().get(f);
+
+                String label = "File " + (f + 1);
+                if (file.isBarcode()) {
+                    label += " (BARCODE)";
+                }
+
+                TreeItem<TreeNode> fileNode =
+                        new TreeItem<>(new TreeNode(label, file, d));
+
+                nodeMap.put(file.getFilePath(), fileNode);
+
+                docNode.getChildren().add(fileNode);
+            }
+
+            root.getChildren().add(docNode);
         }
 
         return root;
-    }
-
-    private TreeItem<TreeNode> createDocumentNode(Document doc, int docIndex) {
-
-        TreeItem<TreeNode> docNode =
-                new TreeItem<>(new TreeNode("Document " + docIndex, null, docIndex -1));
-
-        // Listen to pages
-        doc.getPages().addListener((ListChangeListener<FileEntity>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    for (FileEntity file : change.getAddedSubList()) {
-
-                        String label = "File " + (docNode.getChildren().size() + 1);
-                        if (file.isBarcode()) {
-                            label += " (BARCODE)";
-                        }
-
-                        TreeItem<TreeNode> item =
-                                new TreeItem<>(new TreeNode(label, file, docIndex -1));
-
-                        nodeMap.put(file.getFilePath(), item);
-                        docNode.getChildren().add(item);
-                    }
-                }
-            }
-        });
-
-        return docNode;
     }
 }

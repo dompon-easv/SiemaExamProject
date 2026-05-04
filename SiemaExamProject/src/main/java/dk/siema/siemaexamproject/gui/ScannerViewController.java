@@ -68,6 +68,10 @@ public class ScannerViewController implements ApplicationServicesAware {
             }
         });
 
+        scannerModel.documentsProperty().addListener((obs, oldVal, newVal) -> {
+            rebuildTree();
+        });
+
         treeBuilder = new DocumentTreeBuilder();
         documentTree.setRoot(treeBuilder.build(scannerModel.documentsProperty()));
 
@@ -148,6 +152,15 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     public void startNewScan() {
         scannerModel.scanNext();
+    }
+
+    // ================= TREE UPDATES =================
+
+    private void rebuildTree() {
+        TreeItem<TreeNode> root =
+                treeBuilder.build(scannerModel.documentsProperty());
+
+        documentTree.setRoot(root);
     }
 
     // ================= IMAGE ROTATION AND ZOOMING =================

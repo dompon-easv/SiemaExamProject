@@ -27,10 +27,8 @@ public class ScannerModel {
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
     private final StringProperty pageCountInfo = new SimpleStringProperty("0 / 0");
 
-    private List<File> files;
-    private int currentIndex = 0;
-    private Document currentDocument = null;
-    private int docId = 1;
+    //private List<File> files; getalltiffs
+    //private int currentIndex = 0; getalltiffs
 
     private final ScannerService scannerService;
     private final ExecutorService ioExecutor;
@@ -66,11 +64,8 @@ public class ScannerModel {
         Task<DocumentBuilderService.PageResult> task = new Task<>() {
             @Override
             protected DocumentBuilderService.PageResult call() throws Exception {
-                if (files == null) {
-                    files = scannerService.getAllFiles();
-                }
-                if (currentIndex >= files.size()) return null;
-                File file = files.get(currentIndex++);
+                File file = scannerService.getRandomFile();
+                if (file == null) return null;
                 return scannerService.processFile(file);
             }
 
@@ -86,20 +81,12 @@ public class ScannerModel {
                 DocumentBuilderService.PageResult page = getValue();
                 if (page == null) return;
 
-                if (page.barcode()) {
-                    currentDocument = new Document();
-                    currentDocument.setId(docId++);
-                    documents.add(currentDocument);
-                }
+                List<Document> updateDocs = scannerService.handlePage(page);
 
-                if (currentDocument == null) {
-                    currentDocument = new Document();
-                    currentDocument.setId(docId++);
-                    documents.add(currentDocument);
-                }
-
-                currentDocument.addPage(page.entity());
-                setSelectedFile(page.entity());
+                Platform.runLater(() -> {
+                    documents.setAll(updateDocs);
+                    setSelectedFile(page.entity());
+                });
             }
 
             @Override

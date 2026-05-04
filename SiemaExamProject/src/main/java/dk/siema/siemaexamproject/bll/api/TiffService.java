@@ -17,6 +17,24 @@ public class TiffService {
     // STEP 1: session cache (in-memory)
     private List<File> cachedFiles = null;
 
+    public File getRandomTiff() throws Exception {
+
+        File tempZip = File.createTempFile("scan_", ".zip");
+
+        try (InputStream in = apiClient.fetchRandomFile();
+             FileOutputStream fos = new FileOutputStream(tempZip)) {
+
+            in.transferTo(fos);
+        }
+
+        // unzip (expecting 1 file inside)
+        List<File> files = unzip(tempZip, OUTPUT_DIR);
+
+        if (files.isEmpty()) return null;
+
+        return files.get(0);
+    }
+
     public List<File> getAllTiffs() throws Exception {
 
         // STEP 2: return from memory cache
