@@ -12,7 +12,11 @@ public enum ViewPath {
     ACTIVITYLOGS("/dk/siema/siemaexamproject/gui/ActivityLogsView.fxml"),
     ADDUSERVIEW("/dk/siema/siemaexamproject/gui/AddUserView.fxml"),
     ADDPROFILEVIEW("/dk/siema/siemaexamproject/gui/AddProfileView.fxml"),
+<<<<<<< Updated upstream
     MAIN("/dk/siema/siemaexamproject/gui/hello-view.fxml"),
+=======
+    CLIENTMANAGEMENT("/dk/siema/siemaexamproject/gui/ClientManagementView.fxml"),
+>>>>>>> Stashed changes
     OTHER("other.fxml");
 
 

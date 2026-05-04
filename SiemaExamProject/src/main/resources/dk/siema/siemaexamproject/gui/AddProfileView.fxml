@@ -2,8 +2,8 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.geometry.Insets?>
+
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="dk.siema.siemaexamproject.gui.AddProfileController"
@@ -14,13 +14,23 @@
           alignment="CENTER">
 
         <!-- modal -->
-        <VBox styleClass="surface-card" spacing="12"
-              prefWidth="300">
+        <!-- Bumped prefWidth to 400 to fit the side-by-side layout comfortably -->
+        <VBox styleClass="surface-card" spacing="12" prefWidth="400">
             <padding>
                 <Insets top="18" right="18" bottom="18" left="18"/>
             </padding>
 
             <Label text="Add Profile" styleClass="section-title"/>
+
+            <!-- NEW CLIENT SECTION -->
+            <VBox spacing="6">
+                <Label text="Client" styleClass="form-label"/>
+                <HBox spacing="8">
+                    <!-- HBox.hgrow="ALWAYS" makes the list stretch to fill available space -->
+                    <ListView fx:id="clientListView" prefHeight="100" HBox.hgrow="ALWAYS" styleClass="client-list"/>
+                    <Button text="Manage Client list" onAction="#openClientManager" styleClass="secondary-button"/>
+                </HBox>
+            </VBox>
 
             <VBox spacing="6">
                 <Label text="Profile Name" styleClass="form-label"/>
@@ -37,17 +47,12 @@
             <VBox spacing="6">
                 <Label text="Settings" styleClass="form-label"/>
                 <ComboBox promptText="Select settings"
-                          styleClass="profile-combo"/>
+                          styleClass="profile-combo" maxWidth="Infinity"/>
             </VBox>
 
             <HBox spacing="12" alignment="CENTER_RIGHT">
-
-                <Button text="Cancel"
-                        styleClass="secondary-button"/>
-
-                <Button text="Save"
-                        styleClass="primary-button"/>
-
+                <Button text="Cancel" styleClass="secondary-button"/>
+                <Button text="Save" styleClass="primary-button"/>
             </HBox>
 
         </VBox>

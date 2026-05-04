@@ -1,7 +1,11 @@
 package dk.siema.siemaexamproject.app;
 
 import dk.siema.siemaexamproject.bll.api.ScannerService;
+import dk.siema.siemaexamproject.bll.service.ClientProfileService;
+import dk.siema.siemaexamproject.dal.dao.ClientDAO;
+import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
+import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
@@ -21,6 +25,7 @@ public class ApplicationServices {
     private final ViewFactory viewFactory;
     private final SceneManager sceneManager;
     private final UserService userService;
+    private final ClientProfileService clientProfileService;
 
     private final ExecutorService cpuExecutor;
     private final ExecutorService ioExecutor;
@@ -32,6 +37,7 @@ public class ApplicationServices {
     private final MainModel mainModel;
     private final AdminModel adminModel;
     private final ScannerModel scannerModel;
+    private final ClientProfileModel clientProfileModel;
 
 
 
@@ -60,12 +66,20 @@ public class ApplicationServices {
         IUserDAO userDAO = new UserDAO();
         this.userService = new UserService(userDAO);
 
+        IClientDAO clientDAO = new ClientDAO();
+        this.clientProfileService = new ClientProfileService(clientDAO);
+
 
 
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel(userService);
+<<<<<<< Updated upstream
         this.scannerModel = new ScannerModel(ioExecutor);
+=======
+        this.scannerModel = new ScannerModel(ioExecutor, scannerService);
+        this.clientProfileModel = new ClientProfileModel(clientProfileService);
+>>>>>>> Stashed changes
     }
 
     public SceneManager getSceneManager() {return sceneManager;}
@@ -93,4 +107,7 @@ public class ApplicationServices {
     public AdminModel getAdminModel() {return adminModel;
     }
 
+    public ClientProfileModel getClientProfileModel() {
+        return clientProfileModel;
+    }
 }

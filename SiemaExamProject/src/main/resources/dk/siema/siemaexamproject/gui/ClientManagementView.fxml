@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="dk.siema.siemaexamproject.gui.ClientManagementController"
+           styleClass="content-root">
+
+    <VBox style="-fx-background-color: rgba(0,0,0,0.35);" alignment="CENTER">
+
+        <VBox styleClass="surface-card" spacing="12" prefWidth="450">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <Label text="Manage Clients" styleClass="section-title"/>
+
+            <!-- LIST VIEW -->
+            <VBox spacing="6" VBox.vgrow="ALWAYS">
+                <ListView fx:id="clientListView" prefHeight="200" styleClass="client-list"/>
+            </VBox>
+
+            <!-- NEW: INLINE ADD CLIENT SECTION -->
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <TextField fx:id="newClientField"
+                           promptText="Enter new client name..."
+                           HBox.hgrow="ALWAYS"
+                           styleClass="text-input"
+                           onAction="#addNewClient"/> <!-- onAction lets them press Enter! -->
+
+                <Button text="Add Client" styleClass="primary-button" onAction="#addNewClient" fx:id="btnAdd"/>
+            </HBox>
+
+            <!-- A little spacer to separate the add area from the window controls -->
+            <Region prefHeight="8"/>
+
+            <!-- BOTTOM ACTION BUTTONS -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="Close" styleClass="secondary-button" onAction="#closeWindow"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="Delete Selected" styleClass="danger-button" onAction="#deleteSelectedClient"/>
+                <Button text="Update Selected" styleClass="secondary-button" onAction="#updateSelectedClient"/>
+            </HBox>
+
+        </VBox>
+    </VBox>
+</StackPane>
