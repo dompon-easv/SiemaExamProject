@@ -6,22 +6,22 @@ import java.util.List;
 public class Document {
     private int id;
     private String status;
-    private List<FileEntity> pages;
+    private List<FileEntity> files;
 
     public Document(){
-        pages = new ArrayList<>();
+        files = new ArrayList<>();
         this.status = "In Progress";
     }
 
     public void addPage(FileEntity page){
-        this.pages.add(page);
+        this.files.add(page);
     }
 
-    public int getId(int id){return id;}
+    public int getId(){return id;}
     public void setId(int id){this.id = id;}
 
-    public List<FileEntity> getPages() {return pages;}
-    public void setPages(List<FileEntity> pages) {this.pages = pages;}
+    public List<FileEntity> getPages() {return files;}
+    public void setPages(List<FileEntity> pages) {this.files = pages;}
 
     public String getStatus() {return status;}
     public void setStatus(String status) {this.status = status;}
