@@ -74,12 +74,8 @@ public class ApplicationServices {
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel(userService);
-<<<<<<< Updated upstream
-        this.scannerModel = new ScannerModel(ioExecutor, scannerService);
-=======
         this.scannerModel = new ScannerModel(ioExecutor, scannerService);
         this.clientProfileModel = new ClientProfileModel(clientProfileService);
->>>>>>> Stashed changes
     }
 
     public SceneManager getSceneManager() {return sceneManager;}
