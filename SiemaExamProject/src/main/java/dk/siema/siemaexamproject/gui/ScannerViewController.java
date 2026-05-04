@@ -2,26 +2,19 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
-import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
-import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import javafx.application.Platform;
-import javafx.beans.property.StringProperty;
-import javafx.collections.ListChangeListener;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
-import java.util.List;
 
 public class ScannerViewController implements ApplicationServicesAware {
 
@@ -68,12 +61,11 @@ public class ScannerViewController implements ApplicationServicesAware {
             }
         });
 
-        scannerModel.documentsProperty().addListener((obs, oldVal, newVal) -> {
-            rebuildTree();
-        });
-
         treeBuilder = new DocumentTreeBuilder();
-        documentTree.setRoot(treeBuilder.build(scannerModel.documentsProperty()));
+
+        scannerModel.documentsProperty().addListener((obs, oldVal, newVal) -> rebuildTree());
+
+        rebuildTree();
 
         previewImageView = new ImageView();
         previewImageView.setFitHeight(500);
@@ -111,20 +103,18 @@ public class ScannerViewController implements ApplicationServicesAware {
 
                     if (node == null) {
                         scannerModel.selectNode(null, -1);
-                    } else {
-                        scannerModel.selectNode(node.file(), node.documentIndex());
+                        fileNameLabel.setText("");
+                        return;
                     }
 
+                    scannerModel.selectNode(node.file(), node.documentIndex());
                     resetZoom();
 
-                    if (node == null) {
-                        fileNameLabel.setText("");
-                    } else if (node.file() != null) {
-                        fileNameLabel.setText(
-                                new java.io.File(node.file().getFilePath()).getName());
-                    } else {
-                        fileNameLabel.setText(node.label());
-                    }
+                    fileNameLabel.setText(
+                            node.file() != null
+                                    ? new java.io.File(node.file().getFilePath()).getName()
+                                    : node.label()
+                    );
                 }
         );
 
@@ -157,9 +147,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     // ================= TREE UPDATES =================
 
     private void rebuildTree() {
-        TreeItem<TreeNode> root =
-                treeBuilder.build(scannerModel.documentsProperty());
-
+        TreeItem<TreeNode> root = treeBuilder.build(scannerModel.documentsProperty().get());
         documentTree.setRoot(root);
     }
 
@@ -222,26 +210,11 @@ public class ScannerViewController implements ApplicationServicesAware {
     // ====== TREE SELECTION SYNC ======
 
     private void selectFileInTree(FileEntity file) {
-        Platform.runLater(() -> trySelect(file, 0));
-    }
-
-    private void trySelect(FileEntity file, int attempt) {
-
         TreeItem<TreeNode> item = treeBuilder.getNode(file);
 
         if (item != null) {
             documentTree.getSelectionModel().select(item);
             documentTree.scrollTo(documentTree.getRow(item));
-            return;
-        }
-
-        if (attempt < 5) {
-            Platform.runLater(() -> {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ignored) {}
-                trySelect(file, attempt + 1);
-            });
         }
     }
 
