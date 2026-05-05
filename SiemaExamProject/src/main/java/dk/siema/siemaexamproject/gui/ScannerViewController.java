@@ -30,6 +30,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     private ScannerModel scannerModel;
 
     @FXML private Label fileNameLabel;
+    @FXML private Label totalFilesLabel;
     @FXML private Label scanStatusLabel;
     @FXML private Label pageInfoLbl;
 
@@ -78,6 +79,8 @@ public class ScannerViewController implements ApplicationServicesAware {
         mockRectangleVisual.setOnMouseClicked(event -> doRotate());
 
         setupRotationSlider();
+
+        totalFilesLabel.textProperty().bind(scannerModel.totalInfoProperty());
 
         rotationValueLbl.textProperty().bind(rotationSlider.valueProperty().asString("%.0f°;"));
 
@@ -269,9 +272,7 @@ public class ScannerViewController implements ApplicationServicesAware {
                 scannerModel.updateRotationForFiles(filesToRotate, newAngle);
             }
         });
-
     }
-
 
 
     @FXML

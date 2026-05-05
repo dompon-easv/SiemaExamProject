@@ -58,7 +58,7 @@
 
                         <Label fx:id="fileNameLabel" styleClass="page-title" text="Awaiting selection" />
 
-                        <Label styleClass="badge" text="Page 1 of 3" />
+                        <Label fx:id="totalFilesLabel" styleClass="badge" text="Total scanned files: " />
 
                         <Label fx:id="scanStatusLabel" styleClass="tree-text" text="Ready" />
                     </HBox>
