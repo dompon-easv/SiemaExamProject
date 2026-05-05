@@ -81,12 +81,6 @@ public class ScannerViewController implements ApplicationServicesAware {
             scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");
         });
 
-        scannerModel.selectedFileProperty().addListener((obs, oldFile, newFile) -> {
-            if (newFile != null) {
-                selectFileInTree(newFile);
-            }
-        });
-
         treeBuilder = new DocumentTreeBuilder();
 
         scannerModel.documentsProperty().addListener((obs, oldVal, newVal) -> rebuildTree());
@@ -192,6 +186,14 @@ public class ScannerViewController implements ApplicationServicesAware {
     private void rebuildTree() {
         TreeItem<TreeNode> root = treeBuilder.build(scannerModel.documentsProperty().get());
         documentTree.setRoot(root);
+        expandAll(root);
+    }
+
+    private void expandAll(TreeItem<?> item) {
+        item.setExpanded(true);
+        for(TreeItem<?> child : item.getChildren()) {
+            expandAll(child);
+        }
     }
 
     // ================= IMAGE ROTATION AND ZOOMING =================
