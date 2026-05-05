@@ -4,6 +4,7 @@ import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.be.enums.UserRole;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
+import dk.siema.siemaexamproject.dal.util.BytesConverter;
 
 import java.nio.ByteBuffer;
 import java.sql.*;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 public class UserDAO implements IUserDAO {
 
+
     //ADD
     @Override
     public User add(User user) throws SQLException {
@@ -21,7 +23,7 @@ public class UserDAO implements IUserDAO {
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setBytes(1, uuidToBytes(user.getId()));
+            stmt.setBytes(1, BytesConverter.uuidToBytes(user.getId()));
             stmt.setString(2, user.getUsername());
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getPasswordHash());
@@ -60,7 +62,7 @@ public class UserDAO implements IUserDAO {
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setBytes(1, uuidToBytes(id));
+            stmt.setBytes(1, BytesConverter.uuidToBytes(id));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -103,7 +105,7 @@ public class UserDAO implements IUserDAO {
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getRole().name());
-            stmt.setBytes(4, uuidToBytes(user.getId()));
+            stmt.setBytes(4, BytesConverter.uuidToBytes(user.getId()));
 
             stmt.executeUpdate();
         }
@@ -116,7 +118,7 @@ public class UserDAO implements IUserDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newHash);
-            stmt.setBytes(2, uuidToBytes(id));
+            stmt.setBytes(2, BytesConverter.uuidToBytes(id));
 
             stmt.executeUpdate();
         }
@@ -130,7 +132,7 @@ public class UserDAO implements IUserDAO {
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setBytes(1, uuidToBytes(id));
+            stmt.setBytes(1, BytesConverter.uuidToBytes(id));
             stmt.executeUpdate();
         }
     }
@@ -138,7 +140,7 @@ public class UserDAO implements IUserDAO {
     /* MAPPER */
     private User mapUser(ResultSet rs) throws SQLException {
 
-        UUID id = bytesToUUID(rs.getBytes("id"));
+        UUID id = BytesConverter.bytesToUUID(rs.getBytes("id"));
         String username = rs.getString("username");
         String email = rs.getString("email");
         String password = rs.getString("password_hash");
@@ -147,19 +149,5 @@ public class UserDAO implements IUserDAO {
         return new User(id, username, email, password, role);
     }
 
-    /* UUID → BINARY(16) */
-    private byte[] uuidToBytes(UUID uuid) {
-        ByteBuffer buffer = ByteBuffer.allocate(16);
-        buffer.putLong(uuid.getMostSignificantBits());
-        buffer.putLong(uuid.getLeastSignificantBits());
-        return buffer.array();
-    }
 
-    /* BINARY(16) → UUID */
-    private UUID bytesToUUID(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        long high = buffer.getLong();
-        long low = buffer.getLong();
-        return new UUID(high, low);
-    }
 }
