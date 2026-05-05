@@ -4,6 +4,7 @@ import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.Client;
 import dk.siema.siemaexamproject.be.ProfileSetting;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.Setting;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
@@ -15,6 +16,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddProfileController implements ApplicationServicesAware {
 
@@ -32,6 +36,10 @@ public class AddProfileController implements ApplicationServicesAware {
     private TableColumn<ProfileSetting, String> settingValueColumn;
     @FXML
     private TableView<ProfileSetting> profileSettingTableView;
+    @FXML
+    private TextField profileNameField;
+    @FXML
+    private TextField descriptionField;
 
 
     private SceneManager sceneManager;
@@ -159,6 +167,23 @@ public class AddProfileController implements ApplicationServicesAware {
     }
 
     public void handleSaveProfile(ActionEvent actionEvent) {
+        Client selectedClient = clientListView.getSelectionModel().getSelectedItem();
+        String name = profileNameField.getText();
+        String description = descriptionField.getText();
+        if (selectedClient == null || name.isEmpty() )
+        { AlertHelper.warning("Missing information", "Please choose the client and fill in the name");
+        return;}
+
+        List<ProfileSetting> settingsToSave = new ArrayList<>(model.getPendingSettings());
+        ScanningProfile newProfile = new ScanningProfile(selectedClient.getId(), name, description, settingsToSave);
+        try
+        {
+            model.saveNewProfile(newProfile);
+            model.clearPendingSetting();
+        } catch (ServiceException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void handleAddSetting(ActionEvent actionEvent) {

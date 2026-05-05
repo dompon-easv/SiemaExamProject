@@ -15,4 +15,8 @@ public class ProfileSetting {
     public String getValue() {
         return value;
     }
+
+    public void setSetting() {
+        this.setting = setting;
+    }
 }

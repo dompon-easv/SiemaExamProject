@@ -9,8 +9,7 @@ public class ScanningProfile {
     private String description;
     private List<ProfileSetting> profileSettings;
 
-    public ScanningProfile(int id, int clientId, String profileName, String description, List<ProfileSetting> profileSettings) {
-        this.id = id;
+    public ScanningProfile(int clientId, String profileName, String description, List<ProfileSetting> profileSettings) {
         this.clientId = clientId;
         this.profileName = profileName;
         this.description = description;

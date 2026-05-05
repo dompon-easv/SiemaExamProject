@@ -1,5 +1,6 @@
 package dk.siema.siemaexamproject.dal.dao;
 
+import dk.siema.siemaexamproject.be.ProfileSetting;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
@@ -12,27 +13,46 @@ public class ScanningProfileDAO implements IScanningProfileDAO {
 
     @Override
     public ScanningProfile add(ScanningProfile profile) throws SQLException {
-        String sql = "INSERT INTO dbo.ScanningProfiles (profile_name, client_id) VALUES (?,?)";
+        String sql = "INSERT INTO dbo.ScanningProfiles (client_id, profile_name, description) VALUES (?,?,?)";
+        String sql1 = "INSERT INTO dbo.ProfileSettings (profile_id, setting_id, value) VALUES (?,?,?)";
 
-        try (Connection conn = ConnectionManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        Connection conn = ConnectionManager.getConnection();
+        try {
+            conn.setAutoCommit(false);
+            int newProfileId = 0;
+            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                stmt.setInt(1, profile.getClientId());
+                stmt.setString(2, profile.getName());
+                stmt.setString(3, profile.getDescription());
+                stmt.executeUpdate();
 
-            stmt.setString(1, profile.getName());
-            stmt.setInt(2, profile.getClientId());
+                ResultSet rs = stmt.getGeneratedKeys();
 
-            stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int newId = generatedKeys.getInt(1);
-                    profile.setId(newId);
-
+                if (rs.next()) {
+                    newProfileId = rs.getInt(1);
+                    profile.setId(newProfileId);
                 }
-
             }
-        }
-        return profile;
+            try (PreparedStatement stmt1 = conn.prepareStatement(sql1)) {
+                for (ProfileSetting setting : profile.getProfileSettings()) {
+                    stmt1.setInt(1, newProfileId);
+                    stmt1.setInt(2, setting.getSetting().getId());
+                    stmt1.setString(3, setting.getValue());
 
+                    stmt1.addBatch();
+                }
+                stmt1.executeBatch();
+            }
+            conn.commit();
+            return profile;
+        } catch (
+                SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+            conn.close();
+        }
     }
 
 

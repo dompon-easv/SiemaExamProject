@@ -55,7 +55,7 @@ public class ClientProfileModel {
         return profiles;
     }
 
-    public void createProfile(ScanningProfile profile) throws ServiceException {
+    public void saveNewProfile(ScanningProfile profile) throws ServiceException {
         clientProfileService.createProfile(profile);
         profiles.add(profile);
     }
@@ -81,8 +81,5 @@ public class ClientProfileModel {
     public void clearPendingSetting() {
         pendingSettings.clear();
     }
-
-
-
 
 }
