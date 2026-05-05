@@ -9,6 +9,7 @@ import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
 import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
+import javafx.collections.ObservableList;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -62,14 +63,6 @@ public class ClientProfileService {
         }
     }
 
-    public List<ScanningProfile> getProfilesByClient(int clientId) throws ServiceException {
-        try {
-            return scanningProfileDAO.getProfilesbyClient(clientId);
-        } catch (SQLException e) {
-            throw new DataAccessException("Error fetching profiles", e);
-        }
-    }
-
     public ScanningProfile createProfile(ScanningProfile profile) throws ServiceException {
         if (profile.getName() == null || profile.getName().isBlank()) {
             throw new ValidationException("Profile name is required");
@@ -95,6 +88,14 @@ public class ClientProfileService {
            return settingDAO.getAllSettings();
         } catch (SQLException e){
             throw new DataAccessException("Error fetching settings", e);
+        }
+    }
+
+    public List<ScanningProfile> getAllProfiles() throws DataAccessException {
+        try {
+            return scanningProfileDAO.getAllProfiles();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error fetching clients", e);
         }
     }
 }

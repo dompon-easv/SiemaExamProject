@@ -1,25 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="dk.siema.siemaexamproject.gui.ScanningProfilesViewController"
       stylesheets="@helpers/app.css" styleClass="admin-content" spacing="18">
-    <HBox alignment="CENTER_LEFT">
+
+    <!-- Top Header Bar -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
         <Label text="Scanning Profiles" styleClass="section-title" />
+
+        <!-- Pushes everything after this to the right side -->
         <Region HBox.hgrow="ALWAYS" />
+
+        <!-- NEW FILTER SECTION -->
+        <HBox alignment="CENTER" spacing="8">
+            <Label text="Filter by Company:" styleClass="form-label" />
+            <ComboBox fx:id="companyFilterComboBox" promptText="All Companies" prefWidth="180" styleClass="profile-combo" />
+        </HBox>
+
         <Button text="＋ Add profile" styleClass="top-action-button" onAction="#showAddProfile" />
     </HBox>
 
-    <VBox styleClass="table-card">
-        <TableView fx:id="profilesTable" fixedCellSize="30">
+    <!-- Table Section -->
+    <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+        <TableView fx:id="profilesTable" fixedCellSize="30" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="profileNameColumn" text="Profile Name" prefWidth="180" />
                 <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="250" />

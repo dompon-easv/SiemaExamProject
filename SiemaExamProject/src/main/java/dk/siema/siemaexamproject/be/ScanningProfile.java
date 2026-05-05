@@ -35,4 +35,7 @@ public class ScanningProfile {
     public List<ProfileSetting> getProfileSettings() {
         return profileSettings;
     }
+    public void setSettings(List<ProfileSetting> profileSettings) {
+        this.profileSettings = profileSettings;
+    }
 }

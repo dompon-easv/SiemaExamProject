@@ -16,7 +16,11 @@ public class ProfileSetting {
         return value;
     }
 
-    public void setSetting() {
+    public void setSetting(Setting s) {
         this.setting = setting;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }
