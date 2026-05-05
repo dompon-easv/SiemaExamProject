@@ -7,13 +7,18 @@ import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
+import javafx.animation.RotateTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 
 public class ScannerViewController implements ApplicationServicesAware {
@@ -24,9 +29,16 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private Label scanStatusLabel;
     @FXML private Label pageInfoLbl;
 
+    @FXML private Slider rotationSlider;
+
 
     @FXML private TreeView<TreeNode> documentTree;
+    @FXML private StackPane previewContainer;
     @FXML private ScrollPane imageContainer;
+
+    private StackPane mockRectangleVisual;
+
+
 
     private static final double ZOOM_FACTOR = 1.2;
     private static final double MAX_ZOOM = 5.0;
@@ -51,14 +63,22 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML
     private void initialize() {
 
-        scannerModel.scanningProperty().addListener((obs, oldVal, newVal) -> {
-            scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");
+        //adding rectangle when click on box or document for rotation
+        createMockDocument();
+        previewContainer.getChildren().add(mockRectangleVisual);
+        mockRectangleVisual.setVisible(false);
+        imageContainer.setVisible(false);
+
+        mockRectangleVisual.setOnMouseClicked(event -> {
+            RotateTransition rt = new RotateTransition(Duration.millis(300), mockRectangleVisual);
+            rt.setByAngle(90);
+            rt.play();
         });
 
-        scannerModel.selectedFileProperty().addListener((obs, oldFile, newFile) -> {
-            if (newFile != null) {
-                selectFileInTree(newFile);
-            }
+        setupRotationSlider();
+
+        scannerModel.scanningProperty().addListener((obs, oldVal, newVal) -> {
+            scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");
         });
 
         treeBuilder = new DocumentTreeBuilder();
@@ -110,6 +130,19 @@ public class ScannerViewController implements ApplicationServicesAware {
                     scannerModel.selectNode(node.file(), node.documentIndex());
                     resetZoom();
 
+                    //view swapping for rectangle
+                    if (node.file() != null) {
+                        mockRectangleVisual.setVisible(false);
+                        imageContainer.setVisible(true);
+                        rotationSlider.setValue(node.file().getRotation());
+                    } else {
+                        imageContainer.setVisible(false);
+                        mockRectangleVisual.setVisible(true);
+                        mockRectangleVisual.setRotate(0);
+
+                        rotationSlider.setValue(0);
+                    }
+
                     fileNameLabel.setText(
                             node.file() != null
                                     ? new java.io.File(node.file().getFilePath()).getName()
@@ -133,6 +166,10 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     }
 
+
+
+
+
     // ================= SCAN =================
 
     @FXML
@@ -149,6 +186,14 @@ public class ScannerViewController implements ApplicationServicesAware {
     private void rebuildTree() {
         TreeItem<TreeNode> root = treeBuilder.build(scannerModel.documentsProperty().get());
         documentTree.setRoot(root);
+        expandAll(root);
+    }
+
+    private void expandAll(TreeItem<?> item) {
+        item.setExpanded(true);
+        for(TreeItem<?> child : item.getChildren()) {
+            expandAll(child);
+        }
     }
 
     // ================= IMAGE ROTATION AND ZOOMING =================
@@ -170,6 +215,45 @@ public class ScannerViewController implements ApplicationServicesAware {
     public void onPreviousPageAction(ActionEvent actionEvent) {scannerModel.goToPreviousPage();}
 
     public void onNextPageAction(ActionEvent actionEvent) {scannerModel.goToNextPage();}
+
+    private void createMockDocument() {
+
+        // 1. Make the paper
+        Rectangle paper = new Rectangle(150, 200);
+        paper.setFill(Color.WHITE);
+        paper.setStroke(Color.BLACK);
+        paper.setStrokeWidth(2);
+
+        // 2. Make the indicator
+        Label topIndicator = new Label("TOP ↑");
+        topIndicator.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
+        topIndicator.setTranslateY(10);
+        StackPane.setAlignment(topIndicator, Pos.TOP_CENTER);
+
+        mockRectangleVisual = new StackPane(paper, topIndicator);
+
+        mockRectangleVisual.setMaxSize(paper.getWidth(),paper.getHeight());
+    }
+
+    private void setupRotationSlider() {
+        rotationSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+
+            // Get the exact angle from the slider
+            double newAngle = newVal.doubleValue();
+
+            //visually spin the real image and the mock rectangle instantly
+
+            previewImageView.setRotate(newAngle);
+            if(mockRectangleVisual != null) {
+                mockRectangleVisual.setRotate(newAngle);
+            }
+
+            FileEntity file = scannerModel.selectedFileProperty().get();
+            if (file != null) {
+                file.setRotation((int) newAngle);
+            }
+        });
+    }
 
 
     @FXML
