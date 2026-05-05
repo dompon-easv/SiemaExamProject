@@ -2,8 +2,9 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
 <StackPane xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="dk.siema.siemaexamproject.gui.AddProfileController"
@@ -14,40 +15,77 @@
           alignment="CENTER">
 
         <!-- modal -->
-        <VBox styleClass="surface-card" spacing="12"
-              prefWidth="300">
+        <!-- Bumped prefWidth to 450 to fit the setting builder and table -->
+        <VBox styleClass="surface-card" spacing="12" prefWidth="450">
             <padding>
                 <Insets top="18" right="18" bottom="18" left="18"/>
             </padding>
 
             <Label text="Add Profile" styleClass="section-title"/>
 
+            <!-- NEW CLIENT SECTION -->
             <VBox spacing="6">
-                <Label text="Profile Name" styleClass="form-label"/>
-                <TextField promptText="Enter profile name"
-                           styleClass="text-input"/>
+                <Label text="Client" styleClass="form-label"/>
+                <HBox spacing="8">
+                    <!-- HBox.hgrow="ALWAYS" makes the list stretch to fill available space -->
+                    <ListView fx:id="clientListView" prefHeight="80" HBox.hgrow="ALWAYS" styleClass="client-list"/>
+                    <Button text="Manage Clients" onAction="#openClientManager" styleClass="secondary-button"/>
+                </HBox>
             </VBox>
 
+            <!-- PROFILE INFO SECTION -->
+            <HBox spacing="10">
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Profile Name" styleClass="form-label"/>
+                    <TextField fx:id="profileNameField" promptText="Enter profile name" styleClass="text-input"/>
+                </VBox>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Description" styleClass="form-label"/>
+                    <TextField fx:id="descriptionField" promptText="Enter description" styleClass="text-input"/>
+                </VBox>
+            </HBox>
+
+            <Separator/>
+
+            <!-- THE SETTING BUILDER SECTION -->
             <VBox spacing="6">
-                <Label text="Description" styleClass="form-label"/>
-                <TextField promptText="Enter description"
-                           styleClass="text-input"/>
+                <Label text="Configure Settings" styleClass="form-label"/>
+
+                <!-- The Input Row -->
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <!-- 1. Pick the Setting -->
+                    <ComboBox fx:id="settingNameComboBox" promptText="Select setting..." prefWidth="130" styleClass="profile-combo"/>
+
+                    <!-- 2. The Dynamic Input Area (StackPane) -->
+                    <StackPane HBox.hgrow="ALWAYS">
+                        <TextField fx:id="numericValueTextField" promptText="Enter value..." visible="false" styleClass="text-input"/>
+                        <ComboBox fx:id="choiceValueComboBox" promptText="Select value..." visible="false" maxWidth="Infinity" styleClass="profile-combo"/>
+                    </StackPane>
+
+                    <!-- 3. Add to Table Button -->
+                    <Button text="Add" onAction="#handleAddSetting" styleClass="secondary-button"/>
+                </HBox>
+
+                <!-- The Table Showing Added Settings -->
+                <TableView fx:id="profileSettingTableView" prefHeight="120" styleClass="settings-table">
+                    <columns>
+                        <TableColumn fx:id="settingNameColumn" text="Setting Name" prefWidth="150" />
+                        <TableColumn fx:id="settingValueColumn" text="Value" prefWidth="150" />
+                        <!-- Optional Delete Column could go here later -->
+                    </columns>
+                    <!-- Make the table fill the width -->
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
             </VBox>
 
-            <VBox spacing="6">
-                <Label text="Settings" styleClass="form-label"/>
-                <ComboBox promptText="Select settings"
-                          styleClass="profile-combo"/>
-            </VBox>
+            <Separator/>
 
+            <!-- ACTION BUTTONS -->
             <HBox spacing="12" alignment="CENTER_RIGHT">
-
-                <Button text="Cancel"
-                        styleClass="secondary-button"/>
-
-                <Button text="Save"
-                        styleClass="primary-button"/>
-
+                <Button text="Cancel" onAction="#handleCancel" styleClass="secondary-button"/>
+                <Button text="Save Profile" onAction="#handleSaveProfile" styleClass="primary-button"/>
             </HBox>
 
         </VBox>

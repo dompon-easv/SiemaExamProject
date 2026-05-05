@@ -34,6 +34,7 @@ public class SceneManager {
     public <T> LoadedView<T> load(ViewPath viewPath) {
         try {
             FXMLLoader loader = createLoader(viewPath);
+            System.out.println("Attempting to load URL: " + loader.getLocation());
             Parent root = loader.load();
             T controller = loader.getController();
             return new LoadedView<>(root, controller);
