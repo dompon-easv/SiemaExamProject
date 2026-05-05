@@ -1,8 +1,6 @@
 package dk.siema.siemaexamproject.gui.models;
 
-import dk.siema.siemaexamproject.be.Client;
-import dk.siema.siemaexamproject.be.ScanningProfile;
-import dk.siema.siemaexamproject.be.User;
+import dk.siema.siemaexamproject.be.*;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
 import javafx.collections.FXCollections;
@@ -14,6 +12,8 @@ public class ClientProfileModel {
 
     private final ObservableList<Client> clients = FXCollections.observableArrayList();
     private final ObservableList<ScanningProfile> profiles = FXCollections.observableArrayList();
+    private final ObservableList<Setting> settings = FXCollections.observableArrayList();
+    private final ObservableList<ProfileSetting> pendingSettings = FXCollections.observableArrayList();
 
     public ClientProfileModel(ClientProfileService clientProfileService) {
         this.clientProfileService = clientProfileService;
@@ -63,6 +63,23 @@ public class ClientProfileModel {
     public void deleteProfile(ScanningProfile profile) throws ServiceException {
         clientProfileService.deleteProfile(profile);
         profiles.remove(profile);
+    }
+
+    public void loadAllSettings() throws ServiceException {
+        settings.setAll(clientProfileService.getAllSettings());
+    }
+    public ObservableList<Setting> getAllSettings() {
+        return settings;
+    }
+
+    public ObservableList<ProfileSetting> getPendingSettings() {
+        return pendingSettings;
+    }
+    public void addPendingSetting(ProfileSetting setting) throws ServiceException {
+        pendingSettings.add(setting);
+    }
+    public void clearPendingSetting() {
+        pendingSettings.clear();
     }
 
 

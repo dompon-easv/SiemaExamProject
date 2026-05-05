@@ -2,11 +2,13 @@ package dk.siema.siemaexamproject.bll.service;
 
 import dk.siema.siemaexamproject.be.Client;
 import dk.siema.siemaexamproject.be.ScanningProfile;
+import dk.siema.siemaexamproject.be.Setting;
 import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
+import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -15,10 +17,12 @@ public class ClientProfileService {
 
     private final IClientDAO clientDAO;
     private final IScanningProfileDAO scanningProfileDAO;
+    private final ISettingDAO settingDAO;
 
-    public ClientProfileService(IClientDAO clientDAO,  IScanningProfileDAO scanningProfileDAO) {
+    public ClientProfileService(IClientDAO clientDAO, IScanningProfileDAO scanningProfileDAO, ISettingDAO settingDAO) {
         this.clientDAO = clientDAO;
         this.scanningProfileDAO = scanningProfileDAO;
+        this.settingDAO = settingDAO;
     }
 
     public List<Client> getAllClients() throws ServiceException {
@@ -83,6 +87,14 @@ public class ClientProfileService {
             scanningProfileDAO.deleteProfile(profile);
         } catch (SQLException e) {
             throw new DataAccessException("Error deleting profile", e);
+        }
+    }
+
+    public List<Setting> getAllSettings() throws ServiceException {
+        try{
+           return settingDAO.getAllSettings();
+        } catch (SQLException e){
+            throw new DataAccessException("Error fetching settings", e);
         }
     }
 }

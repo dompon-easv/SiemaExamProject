@@ -4,8 +4,10 @@ import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
 import dk.siema.siemaexamproject.dal.dao.ClientDAO;
 import dk.siema.siemaexamproject.dal.dao.ScanningProfileDAO;
+import dk.siema.siemaexamproject.dal.dao.SettingDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
+import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
@@ -70,7 +72,8 @@ public class ApplicationServices {
 
         IClientDAO clientDAO = new ClientDAO();
         IScanningProfileDAO scanningProfileDAO = new ScanningProfileDAO();
-        this.clientProfileService = new ClientProfileService(clientDAO, scanningProfileDAO);
+        ISettingDAO settingDAO = new SettingDAO();
+        this.clientProfileService = new ClientProfileService(clientDAO, scanningProfileDAO, settingDAO);
 
 
 

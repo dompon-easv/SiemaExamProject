@@ -90,8 +90,10 @@ public class ScanningProfileDAO implements IScanningProfileDAO {
         int id = rs.getInt("id");
         String name = rs.getString("profile_name");
         int clientId = rs.getInt("client_id");
+        String description = rs.getString("description");
+        return null;
 
-        return new ScanningProfile(id, clientId, name);
+        //return new ScanningProfile(id, clientId, name);
     }
 
 }
