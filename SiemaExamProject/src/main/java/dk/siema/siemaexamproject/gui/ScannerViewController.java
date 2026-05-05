@@ -82,7 +82,7 @@ public class ScannerViewController implements ApplicationServicesAware {
 
         totalFilesLabel.textProperty().bind(scannerModel.totalInfoProperty());
 
-        rotationValueLbl.textProperty().bind(rotationSlider.valueProperty().asString("%.0f°;"));
+        rotationValueLbl.textProperty().bind(rotationSlider.valueProperty().asString("%.0f°"));
 
         scannerModel.scanningProperty().addListener((obs, oldVal, newVal) -> {
             scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");
