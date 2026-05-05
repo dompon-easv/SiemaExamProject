@@ -53,6 +53,22 @@ public class ClientManagementController implements ApplicationServicesAware {
         if (model != null) {
             setupClientList();
         }
+
+        clientListView.setOnKeyPressed(event -> {
+            String letter = event.getText().toLowerCase();
+
+            if (!letter.isEmpty()) {
+                for (Client client : clientListView.getItems()) {
+                    if (client.getName().toLowerCase().startsWith(letter)) {
+                        // Select the client
+                        clientListView.getSelectionModel().select(client);
+                        // Make sure the list actually scrolls down to show it
+                        clientListView.scrollTo(client);
+                        break; // Stop searching once we find the first match
+                    }
+                }
+            }
+        });
     }
 
     @FXML

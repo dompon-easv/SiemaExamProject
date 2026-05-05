@@ -1,6 +1,7 @@
 package dk.siema.siemaexamproject.gui.models;
 
 import dk.siema.siemaexamproject.be.Client;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
@@ -12,6 +13,7 @@ public class ClientProfileModel {
     private ClientProfileService clientProfileService;
 
     private final ObservableList<Client> clients = FXCollections.observableArrayList();
+    private final ObservableList<ScanningProfile> profiles = FXCollections.observableArrayList();
 
     public ClientProfileModel(ClientProfileService clientProfileService) {
         this.clientProfileService = clientProfileService;
@@ -41,4 +43,29 @@ public class ClientProfileModel {
             clients.set(index, client);
         }
     }
+
+    public void loadProfilesByClient(int clientId) throws ServiceException {
+        if(clientId > 0){
+        profiles.setAll(clientProfileService.getProfilesByClient(clientId));
+    } else{
+        profiles.clear();}
+    }
+
+    public ObservableList<ScanningProfile> getProfiles() throws ServiceException {
+        return profiles;
+    }
+
+    public void createProfile(ScanningProfile profile) throws ServiceException {
+        clientProfileService.createProfile(profile);
+        profiles.add(profile);
+    }
+
+    public void deleteProfile(ScanningProfile profile) throws ServiceException {
+        clientProfileService.deleteProfile(profile);
+        profiles.remove(profile);
+    }
+
+
+
+
 }

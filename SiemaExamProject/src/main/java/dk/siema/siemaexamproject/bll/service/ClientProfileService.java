@@ -1,10 +1,12 @@
 package dk.siema.siemaexamproject.bll.service;
 
 import dk.siema.siemaexamproject.be.Client;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
+import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -12,9 +14,11 @@ import java.util.List;
 public class ClientProfileService {
 
     private final IClientDAO clientDAO;
+    private final IScanningProfileDAO scanningProfileDAO;
 
-    public ClientProfileService(IClientDAO clientDAO) {
+    public ClientProfileService(IClientDAO clientDAO,  IScanningProfileDAO scanningProfileDAO) {
         this.clientDAO = clientDAO;
+        this.scanningProfileDAO = scanningProfileDAO;
     }
 
     public List<Client> getAllClients() throws ServiceException {
@@ -51,6 +55,34 @@ public class ClientProfileService {
         }catch (SQLException e)
         {
             throw new DataAccessException("Error updating client", e);
+        }
+    }
+
+    public List<ScanningProfile> getProfilesByClient(int clientId) throws ServiceException {
+        try {
+            return scanningProfileDAO.getProfilesbyClient(clientId);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error fetching profiles", e);
+        }
+    }
+
+    public ScanningProfile createProfile(ScanningProfile profile) throws ServiceException {
+        if (profile.getName() == null || profile.getName().isBlank()) {
+            throw new ValidationException("Profile name is required");
+        }
+        try {
+            return scanningProfileDAO.add(profile);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error creating profile", e);
+        }
+
+    }
+
+    public void deleteProfile(ScanningProfile profile) throws ServiceException {
+        try {
+            scanningProfileDAO.deleteProfile(profile);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error deleting profile", e);
         }
     }
 }
