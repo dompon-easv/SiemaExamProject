@@ -26,6 +26,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     private ScannerModel scannerModel;
 
     @FXML private Label fileNameLabel;
+    @FXML private Label totalFilesLabel;
     @FXML private Label scanStatusLabel;
     @FXML private Label pageInfoLbl;
 
@@ -76,6 +77,8 @@ public class ScannerViewController implements ApplicationServicesAware {
         });
 
         setupRotationSlider();
+
+        totalFilesLabel.textProperty().bind(scannerModel.totalInfoProperty());
 
         scannerModel.scanningProperty().addListener((obs, oldVal, newVal) -> {
             scanStatusLabel.setText(newVal ? "Scanning..." : "Scan complete");

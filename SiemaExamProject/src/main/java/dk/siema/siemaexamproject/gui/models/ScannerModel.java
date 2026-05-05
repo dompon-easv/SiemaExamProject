@@ -26,6 +26,7 @@ public class ScannerModel {
     private final ObjectProperty<FileEntity> selectedFile = new SimpleObjectProperty<>();
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
     private final StringProperty pageCountInfo = new SimpleStringProperty("0 / 0");
+    private final StringProperty totalScanInfo = new SimpleStringProperty("Total scanned files: 0");
 
     //private List<File> files; getalltiffs
     //private int currentIndex = 0; getalltiffs
@@ -59,6 +60,10 @@ public class ScannerModel {
 
     // ================= SCAN =================
 
+    public StringProperty totalInfoProperty() {
+        return totalScanInfo;
+    }
+
     public void scanNext() {
 
         Task<DocumentBuilderService.PageResult> task = new Task<>() {
@@ -86,6 +91,7 @@ public class ScannerModel {
                 Platform.runLater(() -> {
                     documents.setAll(updateDocs);
                     setSelectedFile(page.entity());
+                    updateTotalScannedFiles();
                 });
             }
 
@@ -213,6 +219,17 @@ public class ScannerModel {
             flatList.addAll(doc.getPages());
         }
         return flatList;
+    }
+
+    private void updateTotalScannedFiles() {
+
+        int totalFiles = 0;
+
+        for (Document doc : documents) {
+            totalFiles += doc.getPages().size();
+        }
+
+        totalScanInfo.set("Total scanned files: " + totalFiles);
     }
 
     private void updatePageCountInfo() {
