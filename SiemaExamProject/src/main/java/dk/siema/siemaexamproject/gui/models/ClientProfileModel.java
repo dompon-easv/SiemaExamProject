@@ -47,12 +47,6 @@ public class ClientProfileModel {
         }
     }
 
-    public void getAllProfiles() throws ServiceException {
-    List<ScanningProfile> profiles = clientProfileService.getAllProfiles();
-    this.allProfiles.clear();
-    this.allProfiles.addAll(profiles);
-    }
-
     public void saveNewProfile(ScanningProfile profile) throws ServiceException {
         clientProfileService.createProfile(profile);
         allProfiles.add(profile);
@@ -89,7 +83,12 @@ public class ClientProfileModel {
 
     }
 
-    public List<ScanningProfile> getAllProfilesList() {
-        return new ArrayList<>(allProfiles);
+    public ObservableList<ScanningProfile> getAllProfiles() {
+        return allProfiles;
+    }
+
+    public void loadAllProfilesFromService () throws ServiceException {
+        List<ScanningProfile> profiles = clientProfileService.getAllProfiles();
+        this.allProfiles.setAll(profiles);
     }
 }

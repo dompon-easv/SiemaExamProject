@@ -43,6 +43,7 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
 
     @FXML
     public void initialize() {
+        // Column setup
         profileNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         descriptionColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDescription()));
         actionsColumn.setCellValueFactory(data -> new SimpleStringProperty("✎  🗑"));
@@ -50,23 +51,30 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
         settingsColumn.setCellValueFactory(data -> {
             ScanningProfile profile = data.getValue();
             StringBuilder settingText = new StringBuilder();
-            for(ProfileSetting profileSettings: profile.getProfileSettings()) {
-                settingText.append(profileSettings.getSetting().getName()).append(": ").append(profileSettings.getValue()).append(" | ");
+            for(ProfileSetting profileSettings : profile.getProfileSettings()) {
+                settingText.append(profileSettings.getSetting().getName())
+                        .append(": ").append(profileSettings.getValue()).append(" | ");
             }
             return new SimpleStringProperty(settingText.toString());
         });
 
+        // observable list
+        profilesTable.setItems(model.getAllProfiles());
+
+        // loading clients
         companyFilterComboBox.setItems(model.getClients());
-        try{
+        try {
             model.loadAllClients();
             Client showAll = new Client(-1, "Show All");
-            //showAll.setName("Show All");
-           // showAll.setId(-1);
-            model.getClients().add(0, showAll);
-        } catch (Exception e){
+            if (!model.getClients().isEmpty() && !model.getClients().get(0).getName().equals("Show All")) {
+                model.getClients().add(0, showAll);
+            }
+            companyFilterComboBox.getSelectionModel().select(showAll);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
+        // loading data
         loadAllProfiles();
 
         setupShortcutsListener();
@@ -74,14 +82,12 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
     }
 
     private void loadAllProfiles() {
-        try{
-            model.getAllProfiles();
-            List<ScanningProfile> allProfiles = model.getAllProfilesList();
-            profilesTable.getItems().setAll(allProfiles);
-        }catch (ServiceException e)
-        {e.printStackTrace();}
+        try {
+            model.loadAllProfilesFromService();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+        }
     }
-
     private void setupComboboxListener() {
         companyFilterComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal == null || newVal.getName().equals("Show All")) {

@@ -164,6 +164,8 @@ public class AddProfileController implements ApplicationServicesAware {
     }
 
     public void handleCancel(ActionEvent actionEvent) {
+        Stage stage = (Stage) clientListView.getScene().getWindow();
+        stage.close();
     }
 
     public void handleSaveProfile(ActionEvent actionEvent) {
@@ -184,6 +186,7 @@ public class AddProfileController implements ApplicationServicesAware {
         {
             e.printStackTrace();
         }
+        handleCancel(actionEvent);
     }
 
     public void handleAddSetting(ActionEvent actionEvent) {
