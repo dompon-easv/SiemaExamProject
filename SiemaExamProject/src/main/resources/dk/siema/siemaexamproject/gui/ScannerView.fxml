@@ -65,6 +65,7 @@
 
                     <!-- PUSH CENTER -->
                     <Region HBox.hgrow="ALWAYS" />
+               <Label fx:id="rotationValueLbl" text="0°" />
                <Slider fx:id="rotationSlider" max="360.0" />
 
                      <Button onAction="#onRotateAction" styleClass="tool-button" text="↻" />
