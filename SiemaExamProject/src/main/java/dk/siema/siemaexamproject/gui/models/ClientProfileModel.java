@@ -6,12 +6,15 @@ import dk.siema.siemaexamproject.bll.service.ClientProfileService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClientProfileModel {
 
     private ClientProfileService clientProfileService;
 
     private final ObservableList<Client> clients = FXCollections.observableArrayList();
-    private final ObservableList<ScanningProfile> profiles = FXCollections.observableArrayList();
+    private final ObservableList<ScanningProfile> allProfiles = FXCollections.observableArrayList();
     private final ObservableList<Setting> settings = FXCollections.observableArrayList();
     private final ObservableList<ProfileSetting> pendingSettings = FXCollections.observableArrayList();
 
@@ -44,25 +47,15 @@ public class ClientProfileModel {
         }
     }
 
-    public void loadProfilesByClient(int clientId) throws ServiceException {
-        if(clientId > 0){
-        profiles.setAll(clientProfileService.getProfilesByClient(clientId));
-    } else{
-        profiles.clear();}
-    }
-
-    public ObservableList<ScanningProfile> getProfiles() throws ServiceException {
-        return profiles;
-    }
-
-    public void createProfile(ScanningProfile profile) throws ServiceException {
+    public void saveNewProfile(ScanningProfile profile) throws ServiceException {
         clientProfileService.createProfile(profile);
-        profiles.add(profile);
+        allProfiles.add(profile);
     }
 
     public void deleteProfile(ScanningProfile profile) throws ServiceException {
         clientProfileService.deleteProfile(profile);
-        profiles.remove(profile);
+        masterProfiles.remove(profile);
+        allProfiles.remove(profile);
     }
 
     public void loadAllSettings() throws ServiceException {
@@ -82,7 +75,45 @@ public class ClientProfileModel {
         pendingSettings.clear();
     }
 
+    public List<ScanningProfile> getProfilesForClient(int clientId) {
+        List<ScanningProfile> filteredProfiles = new ArrayList<>();
+        for(ScanningProfile profile: allProfiles)
+        {if(profile.getClientId() == clientId) filteredProfiles.add(profile);}
+
+        return filteredProfiles;
+
+    }
+
+    public ObservableList<ScanningProfile> getAllProfiles() {
+        return allProfiles;
+    }
+    List<ScanningProfile> profiles = new ArrayList<>();
+    List<ScanningProfile> masterProfiles = new ArrayList<>();
 
 
+    public void loadAllProfilesFromService () throws ServiceException {
+        this.masterProfiles = clientProfileService.getAllProfiles();
+        this.allProfiles.setAll(this.masterProfiles);
+    }
 
+    public void filterByClient(int clientId) throws ServiceException {
+        List<ScanningProfile> filteredProfiles = new ArrayList<>();
+        for(ScanningProfile profile: masterProfiles)
+        {
+            if(profile.getClientId() == clientId) filteredProfiles.add(profile);
+        }
+        this.allProfiles.setAll(filteredProfiles);
+    }
+
+    public void updateProfile(ScanningProfile profileToEdit) throws ServiceException {
+        clientProfileService.updateProfile(profileToEdit);
+
+        for (int i = 0; i < masterProfiles.size(); i++) {
+            if (masterProfiles.get(i).getId() == profileToEdit.getId()) {
+                masterProfiles.set(i, profileToEdit);
+                break;
+            }
+    }
+        allProfiles.setAll(masterProfiles);
+}
 }

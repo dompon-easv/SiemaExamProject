@@ -15,4 +15,12 @@ public class ProfileSetting {
     public String getValue() {
         return value;
     }
+
+    public void setSetting(Setting s) {
+        this.setting = setting;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

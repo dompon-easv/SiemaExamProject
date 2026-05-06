@@ -2,6 +2,7 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.be.enums.UserRole;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
@@ -103,4 +104,5 @@ public class AddEditUserController implements ApplicationServicesAware {
     private void closeWindow() {
         usernameField.getScene().getWindow().hide();
     }
+
 }

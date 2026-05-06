@@ -45,14 +45,32 @@ public class SceneManager {
 
     // --- Replace scene on an existing stage ---
     public <T> LoadedView<T> setScene(Stage stage, ViewPath viewPath, String title) {
+
         LoadedView<T> loaded = load(viewPath);
 
-        Scene scene = new Scene(loaded.root(), 1200, 800);
+        Scene scene;
 
-        stage.setScene(scene);
+        /* Login Window*/
+        if (viewPath == ViewPath.LOGIN) {
+
+            scene = new Scene(loaded.root());
+
+            stage.setScene(scene);
+            stage.sizeToScene();
+            stage.setResizable(false);
+
+        }
+        /* Main APP Windows*/
+        else {
+
+            scene = new Scene(loaded.root(), 1200, 800);
+            stage.setScene(scene);
+            stage.setResizable(true);
+        }
+
         stage.setTitle(title);
-
-        return loaded; // ← IMPORTANT
+        stage.centerOnScreen();
+        return loaded;
     }
 
 

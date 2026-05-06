@@ -11,6 +11,10 @@ public class Setting {
         this.name = name;
         this.defaultValue = defaultValue;
     }
+    public Setting(int id, String name) {
+        this(id, name, "");
+    }
+
     public int getId() {
         return id;
     }

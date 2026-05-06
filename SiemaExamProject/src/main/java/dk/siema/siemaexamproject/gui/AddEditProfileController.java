@@ -4,6 +4,7 @@ import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.Client;
 import dk.siema.siemaexamproject.be.ProfileSetting;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.Setting;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
@@ -16,7 +17,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-public class AddProfileController implements ApplicationServicesAware {
+import java.util.ArrayList;
+import java.util.List;
+
+public class AddEditProfileController implements ApplicationServicesAware {
 
     @FXML
     private ListView<Client> clientListView ;
@@ -32,10 +36,17 @@ public class AddProfileController implements ApplicationServicesAware {
     private TableColumn<ProfileSetting, String> settingValueColumn;
     @FXML
     private TableView<ProfileSetting> profileSettingTableView;
+    @FXML
+    private TextField profileNameField;
+    @FXML
+    private TextField descriptionField;
 
 
     private SceneManager sceneManager;
     private ClientProfileModel model;
+
+    private ScanningProfile profileToEdit;
+    private boolean isEditMode = false;
 
     @Override
     public void setApplicationServices(ApplicationServices services) {
@@ -97,6 +108,7 @@ public class AddProfileController implements ApplicationServicesAware {
         // Break down listeners into their own methods so this block stays clean
         setupClientSearchListener();
         setupSettingSelectionListener();
+        setupTableDoubleClickListener();
     }
 
     private void setupClientSearchListener() {
@@ -129,6 +141,32 @@ public class AddProfileController implements ApplicationServicesAware {
         });
     }
 
+    private void setupTableDoubleClickListener() {
+        profileSettingTableView.setRowFactory(tv -> {
+            TableRow<ProfileSetting> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                // Check for double click AND ensure they didn't click an empty row
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    ProfileSetting clickedSetting = row.getItem();
+                    loadSettingForEditing(clickedSetting);
+                }
+            });
+            return row;
+        });
+    }
+
+    private void loadSettingForEditing(ProfileSetting clickedSetting) {
+        model.getPendingSettings().remove(clickedSetting);
+        settingNameComboBox.getSelectionModel().select(clickedSetting.getSetting());
+
+        String value = clickedSetting.getValue();
+        if(clickedSetting.getSetting().getName().equals("Colour Scale")) {
+            choiceValueComboBox.getSelectionModel().select(value);
+        } else if(clickedSetting.getSetting().getName().equals("Rotation")) {
+            numericValueTextField.setText(value);
+        }
+    }
+
 // --- UI STATE MANAGERS ---
 
     private void hideDynamicInputs() {
@@ -156,10 +194,42 @@ public class AddProfileController implements ApplicationServicesAware {
     }
 
     public void handleCancel(ActionEvent actionEvent) {
+        Stage stage = (Stage) clientListView.getScene().getWindow();
+        stage.close();
     }
 
     public void handleSaveProfile(ActionEvent actionEvent) {
-    }
+        Client selectedClient = clientListView.getSelectionModel().getSelectedItem();
+        String name = profileNameField.getText();
+        String description = descriptionField.getText();
+
+        if (selectedClient == null || name.isEmpty() )
+        { AlertHelper.warning("Missing information", "Please choose the client and fill in the name");
+            return;
+        }
+
+        List<ProfileSetting> settingsToSave = new ArrayList<>(model.getPendingSettings());
+        try {
+            if (isEditMode) {
+                profileToEdit.setName(name);
+                profileToEdit.setDescription(description);
+                profileToEdit.setClient(selectedClient.getId());
+                profileToEdit.setSettings(settingsToSave);
+                model.updateProfile(profileToEdit);
+            } else {
+                ScanningProfile newProfile = new ScanningProfile(selectedClient.getId(), name, description, settingsToSave);
+                model.saveNewProfile(newProfile);
+            }
+
+            model.clearPendingSetting();
+            handleCancel(actionEvent);
+        } catch (ServiceException e)
+        {
+            e.printStackTrace();
+            AlertHelper.error("database error", "Something went wrong while saving your profile!");
+
+            handleCancel(actionEvent);
+    }}
 
     public void handleAddSetting(ActionEvent actionEvent) {
         Setting selectedSetting = settingNameComboBox.getValue();
@@ -186,5 +256,34 @@ public class AddProfileController implements ApplicationServicesAware {
         }
         settingNameComboBox.getSelectionModel().clearSelection();
         numericValueTextField.clear();
+    }
+
+    public void setProfileToEdit(ScanningProfile profileToEdit) {
+        this.profileToEdit = profileToEdit;
+        this.isEditMode = true;
+
+        profileNameField.setText(profileToEdit.getName());
+        descriptionField.setText(profileToEdit.getDescription());
+        for (Client client : clientListView.getItems()) {
+            if(client.getId() == profileToEdit.getClientId())
+            {
+                clientListView.getSelectionModel().select(client);
+                clientListView.scrollTo(client);
+                break;
+            }
+        }
+        model.clearPendingSetting();
+        if(profileToEdit.getProfileSettings() != null)
+        {
+            for(ProfileSetting setting : profileToEdit.getProfileSettings()) {
+                try{
+                    model.addPendingSetting(setting);
+                } catch (ServiceException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        clientListView.getSelectionModel().select(profileToEdit.getClientId());
+        profileSettingTableView.setItems(model.getPendingSettings());
     }
 }
