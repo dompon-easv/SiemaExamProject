@@ -1,4 +1,4 @@
-package dk.siema.siemaexamproject.dal.util;
+package dk.siema.siemaexamproject.gui.util;
 
 import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.gui.ScannerViewController;
