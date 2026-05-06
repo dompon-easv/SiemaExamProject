@@ -98,4 +98,13 @@ public class ClientProfileService {
             throw new DataAccessException("Error fetching clients", e);
         }
     }
+
+    public void updateProfile(ScanningProfile profileToEdit) throws DataAccessException {
+        try{
+            scanningProfileDAO.updateProfile(profileToEdit);
+        }catch (SQLException e)
+        {
+            throw new DataAccessException("Error updating client", e);
+        }
+    }
 }

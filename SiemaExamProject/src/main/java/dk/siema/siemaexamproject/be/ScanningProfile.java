@@ -38,4 +38,14 @@ public class ScanningProfile {
     public void setSettings(List<ProfileSetting> profileSettings) {
         this.profileSettings = profileSettings;
     }
+
+    public void setName(String name) {
+        this.profileName = name;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public void setClient(int clientId) {
+        this.clientId = clientId;
+    }
 }

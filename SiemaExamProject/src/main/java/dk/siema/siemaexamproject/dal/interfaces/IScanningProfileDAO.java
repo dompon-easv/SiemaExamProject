@@ -18,4 +18,6 @@ public interface IScanningProfileDAO {
     void deleteProfile(ScanningProfile profile) throws SQLException;
 
     List<ScanningProfile> getAllProfiles() throws SQLException;
+
+    void updateProfile(ScanningProfile profileToEdit) throws SQLException;
 }

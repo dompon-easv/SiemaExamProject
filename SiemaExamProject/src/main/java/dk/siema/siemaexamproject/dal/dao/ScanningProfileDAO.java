@@ -129,6 +129,45 @@ public class ScanningProfileDAO implements IScanningProfileDAO {
         return allProfiles;
     }
 
+    @Override
+    public void updateProfile(ScanningProfile profileToEdit) throws SQLException {
+        String sql = "UPDATE dbo.ScanningProfiles SET client_id = ?, profile_name = ?, description = ? WHERE id = ?";
+        String sql2 = "INSERT INTO dbo.ProfileSettings (profile_id, setting_id, value) VALUES (?,?,?)";
+        String sql1 = "DELETE FROM dbo.ProfileSettings  WHERE profile_id = ?";
+
+        try (Connection conn = ConnectionManager.getConnection()) {
+            try {
+                conn.setAutoCommit(false);
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    stmt.setInt(1, profileToEdit.getClientId());
+                    stmt.setString(2, profileToEdit.getName());
+                    stmt.setString(3, profileToEdit.getDescription());
+                    stmt.setInt(4, profileToEdit.getId());
+                    stmt.executeUpdate();
+                }
+                try (PreparedStatement stmt1 = conn.prepareStatement(sql1)) {
+                    stmt1.setInt(1, profileToEdit.getId());
+                    stmt1.executeUpdate();
+                }
+                try (PreparedStatement stmt2 = conn.prepareStatement(sql2)) {
+                    for (ProfileSetting setting : profileToEdit.getProfileSettings()) {
+                        stmt2.setInt(1, profileToEdit.getId());
+                        stmt2.setInt(2, setting.getSetting().getId());
+                        stmt2.setString(3, setting.getValue());
+                        stmt2.addBatch();
+                    }
+                    stmt2.executeBatch();
+                }
+                conn.commit();
+            } catch (
+                    SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
     private List<ProfileSetting> getSettingsForProfile(int id, Connection conn) throws SQLException {
         List<ProfileSetting> settings = new ArrayList<>();
         String sql = "SELECT ps.setting_id, ps.value, s.name " +
@@ -166,8 +205,8 @@ public class ScanningProfileDAO implements IScanningProfileDAO {
         profile.setId(id);
         return profile;
     }
-
 }
+
 
 
 

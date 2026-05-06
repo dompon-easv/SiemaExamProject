@@ -8,24 +8,19 @@ import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
+import dk.siema.siemaexamproject.gui.util.LoadedView;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewPath;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.util.List;
 
 public class ScanningProfilesViewController implements ApplicationServicesAware {
-    @FXML
-    private TableView<ScanningProfile> profilesTable;
+    @FXML private TableView<ScanningProfile> profilesTable;
     @FXML private TableColumn<ScanningProfile, String> profileNameColumn;
     @FXML private TableColumn<ScanningProfile, String> descriptionColumn;
     @FXML private TableColumn<ScanningProfile, String> settingsColumn;
@@ -34,6 +29,8 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
 
     private SceneManager sceneManager;
     private ClientProfileModel model;
+    private ApplicationServices services;
+
     @Override
     public void setApplicationServices(ApplicationServices services) {
         this.sceneManager = services.getSceneManager();
@@ -46,7 +43,6 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
         // Column setup
         profileNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         descriptionColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDescription()));
-        actionsColumn.setCellValueFactory(data -> new SimpleStringProperty("✎  🗑"));
 
         settingsColumn.setCellValueFactory(data -> {
             ScanningProfile profile = data.getValue();
@@ -57,6 +53,8 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
             }
             return new SimpleStringProperty(settingText.toString());
         });
+
+       setupActionsColumn();
 
         // observable list
         profilesTable.setItems(model.getAllProfiles());
@@ -76,9 +74,70 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
 
         // loading data
         loadAllProfiles();
-
         setupShortcutsListener();
         setupComboboxListener();
+    }
+
+    private void setupActionsColumn() {
+        actionsColumn.setCellFactory(col -> new TableCell<ScanningProfile, String>() {
+            private final Button editBtn = new Button("✎");
+            private final Button deleteBtn = new Button("🗑");
+            private final HBox box = new HBox(10, editBtn, deleteBtn);
+
+            {
+                editBtn.getStyleClass().add("table-action-button");
+                deleteBtn.getStyleClass().addAll("table-action-button", "table-action-delete");
+
+                editBtn.setOnAction(e -> {
+                    ScanningProfile profile = getTableView().getItems().get(getIndex());
+                    editProfile(profile);
+                });
+
+                deleteBtn.setOnAction(e -> {
+                    ScanningProfile profile = getTableView().getItems().get(getIndex());
+                    deleteProfile(profile);
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(box);
+                }
+            }
+        });
+    }
+
+    private void deleteProfile(ScanningProfile profile) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Profile");
+        alert.setHeaderText("Confirm Deletion");
+        alert.setContentText("Are you sure you want to delete: " + profile.getName() + "?");
+
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            try {
+                model.deleteProfile(profile);
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                // Show error alert if DB delete fails
+            }
+        }
+    }
+
+    private void editProfile(ScanningProfile profile) {
+        Stage stage = (Stage) profilesTable.getScene().getWindow();
+
+        LoadedView<AddEditProfileController> loaded =
+                sceneManager
+                        .openDialog(ViewPath.ADDPROFILEVIEW, "Edit Profile", stage);
+
+        if (loaded != null && loaded.controller() != null) {
+            loaded.controller().setProfileToEdit(profile);
+        }
+
     }
 
     private void loadAllProfiles() {
@@ -88,15 +147,21 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
             e.printStackTrace();
         }
     }
+
     private void setupComboboxListener() {
         companyFilterComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal == null || newVal.getName().equals("Show All")) {
+            if (newVal == null || "Show All".equals(newVal.getName())) {
                 loadAllProfiles();}
             else{
-                loadProfilesForClient(newVal); // Run the method we wrote earlier!
+                try {
+                    model.filterByClient(newVal.getId());
+                } catch (ServiceException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
+
 
     private void setupShortcutsListener() {
         profilesTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
@@ -112,14 +177,5 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
 
         sceneManager.openDialog(ViewPath.ADDPROFILEVIEW, "Add Profile", owner);
     }
-
-    private void loadProfilesForClient(Client client) {
-        try{
-            List<ScanningProfile> profiles = model.getProfilesForClient(client.getId());
-            profilesTable.getItems().setAll(profiles);
-        } catch (Exception e)
-        { e.printStackTrace(); }
-    }
-
 }
 

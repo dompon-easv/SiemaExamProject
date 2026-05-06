@@ -54,6 +54,7 @@ public class ClientProfileModel {
 
     public void deleteProfile(ScanningProfile profile) throws ServiceException {
         clientProfileService.deleteProfile(profile);
+        masterProfiles.remove(profile);
         allProfiles.remove(profile);
     }
 
@@ -75,20 +76,44 @@ public class ClientProfileModel {
     }
 
     public List<ScanningProfile> getProfilesForClient(int clientId) {
-        List<ScanningProfile> profiles = new ArrayList<>();
+        List<ScanningProfile> filteredProfiles = new ArrayList<>();
         for(ScanningProfile profile: allProfiles)
-        {if(profile.getClientId() == clientId) profiles.add(profile);}
+        {if(profile.getClientId() == clientId) filteredProfiles.add(profile);}
 
-        return profiles;
+        return filteredProfiles;
 
     }
 
     public ObservableList<ScanningProfile> getAllProfiles() {
         return allProfiles;
     }
+    List<ScanningProfile> profiles = new ArrayList<>();
+    List<ScanningProfile> masterProfiles = new ArrayList<>();
+
 
     public void loadAllProfilesFromService () throws ServiceException {
-        List<ScanningProfile> profiles = clientProfileService.getAllProfiles();
-        this.allProfiles.setAll(profiles);
+        this.masterProfiles = clientProfileService.getAllProfiles();
+        this.allProfiles.setAll(this.masterProfiles);
     }
+
+    public void filterByClient(int clientId) throws ServiceException {
+        List<ScanningProfile> filteredProfiles = new ArrayList<>();
+        for(ScanningProfile profile: masterProfiles)
+        {
+            if(profile.getClientId() == clientId) filteredProfiles.add(profile);
+        }
+        this.allProfiles.setAll(filteredProfiles);
+    }
+
+    public void updateProfile(ScanningProfile profileToEdit) throws ServiceException {
+        clientProfileService.updateProfile(profileToEdit);
+
+        for (int i = 0; i < masterProfiles.size(); i++) {
+            if (masterProfiles.get(i).getId() == profileToEdit.getId()) {
+                masterProfiles.set(i, profileToEdit);
+                break;
+            }
+    }
+        allProfiles.setAll(masterProfiles);
+}
 }
