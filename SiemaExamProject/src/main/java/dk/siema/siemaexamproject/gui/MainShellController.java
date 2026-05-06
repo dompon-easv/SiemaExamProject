@@ -2,8 +2,8 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
-import dk.siema.siemaexamproject.app.SessionManager;
 import dk.siema.siemaexamproject.be.enums.UserRole;
+import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
@@ -15,8 +15,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
 import java.util.Map;
+import dk.siema.siemaexamproject.be.User;
 
 public class MainShellController implements ApplicationServicesAware {
 
@@ -29,14 +29,21 @@ public class MainShellController implements ApplicationServicesAware {
 
     private ApplicationServices applicationServices;
     private SceneManager sceneManager;
+    private MainModel mainModel;
 
     @Override
     public void setApplicationServices(ApplicationServices services) {
-      this.sceneManager = services.getSceneManager();
+
+        this.applicationServices = services;
+        this.sceneManager = services.getSceneManager();
+        this.mainModel = services.getMainModel();
+
+
     }
 
     @FXML
     private void initialize() {
+        configureRoleUI();
         viewToggleGroup = new ToggleGroup();
         scannerButton.setToggleGroup(viewToggleGroup);
         adminButton.setToggleGroup(viewToggleGroup);
@@ -51,38 +58,102 @@ public class MainShellController implements ApplicationServicesAware {
             }
         });
         }
+       /*(showDefaultView) we used before when bypassing i´ll leave it here just in case */
 
     public void showDefaultView() {
         sceneManager.setContent(contentContainer, ViewPath.SCANNERVIEW);
     }
 
+
+    private void configureRoleUI() {
+
+        if (mainModel == null || mainModel.getCurrentUser() == null) {
+            return;
+        }
+
+        User currentUser = mainModel.getCurrentUser();
+
+        /* --- ADMIN ---*/
+        if (mainModel.isAdmin()) {
+
+            scannerButton.setDisable(true);
+            scannerButton.setVisible(false);
+            scannerButton.setManaged(false);
+
+            adminButton.setDisable(false);
+            adminButton.setVisible(true);
+            adminButton.setManaged(true);
+
+            showAdminView();
+
+        }
+
+        /* --- EMPLOYEE ---*/
+        else {
+
+            adminButton.setDisable(true);
+            adminButton.setVisible(false);
+            adminButton.setManaged(false);
+
+            scannerButton.setDisable(false);
+            scannerButton.setVisible(true);
+            scannerButton.setManaged(true);
+
+            showScannerView();
+        }
+    }
     @FXML
     private void showScannerView() {
-        scannerButton.getStyleClass().add("header-chip-selected");
+
+        scannerButton.setSelected(true);
+        adminButton.setSelected(false);
+
+        scannerButton.getStyleClass().remove("header-chip");
+        if (!scannerButton.getStyleClass().contains("header-chip-selected")) {
+            scannerButton.getStyleClass().add("header-chip-selected");
+        }
+
         adminButton.getStyleClass().remove("header-chip-selected");
+        if (!adminButton.getStyleClass().contains("header-chip")) {
+            adminButton.getStyleClass().add("header-chip");
+        }
+
         sceneManager.setContent(contentContainer, ViewPath.SCANNERVIEW);
     }
 
     @FXML
     public void showAdminView() {
-        adminButton.getStyleClass().add("header-chip-selected");
+
+        adminButton.setSelected(true);
+        scannerButton.setSelected(false);
+
+        adminButton.getStyleClass().remove("header-chip");
+        if (!adminButton.getStyleClass().contains("header-chip-selected")) {
+            adminButton.getStyleClass().add("header-chip-selected");
+        }
+
         scannerButton.getStyleClass().remove("header-chip-selected");
+        if (!scannerButton.getStyleClass().contains("header-chip")) {
+            scannerButton.getStyleClass().add("header-chip");
+        }
 
         AdminShellController controller =
                 sceneManager.loadInto(contentContainer, ViewPath.ADMINSHELL);
+
         controller.showDefaultView();
     }
 
     @FXML
     public void logout() {
+        mainModel.logout();
         Stage currentStage = (Stage) contentContainer.getScene().getWindow();
         sceneManager.setScene(currentStage, ViewPath.LOGIN, "Login");
     }
 
     public void showHelpAction() {
-       // UserRole currentRole = SessionManager.getCurrentUser().getRole();
 
-        UserRole currentRole = UserRole.ADMIN;
+        UserRole currentRole =
+                mainModel.getCurrentUser().getRole();
 
         Map<UserRole, String> shortcuts = KeyBindingHelper.getShortcutInfo();
         StringBuilder helpText = new StringBuilder();

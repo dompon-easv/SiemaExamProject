@@ -53,4 +53,9 @@ public class AdminModel {
     public void updatePassword(User user, String newPassword) throws ServiceException {
         userService.updatePassword(user.getId(), newPassword);
     }
+    public User authenticate(String username, String password)
+            throws ServiceException {
+
+        return userService.authenticate(username, password);
+    }
 }
