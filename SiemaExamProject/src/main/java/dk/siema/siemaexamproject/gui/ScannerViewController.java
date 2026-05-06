@@ -29,7 +29,6 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     private ScannerModel scannerModel;
 
-    @FXML private Label fileNameLabel;
     @FXML private Label totalFilesLabel;
     @FXML private Label scanStatusLabel;
     @FXML private Label pageInfoLbl;
@@ -130,7 +129,6 @@ public class ScannerViewController implements ApplicationServicesAware {
 
                     if (node == null) {
                         scannerModel.selectNode(null, -1);
-                        fileNameLabel.setText("");
                         imageContainer.setVisible(false);
                         mockRectangleVisual.setVisible(false);
                         return;
@@ -161,12 +159,6 @@ public class ScannerViewController implements ApplicationServicesAware {
                     }
                     //unlock the slider
                     isUpdatingSliderFromTree = false;
-
-                    fileNameLabel.setText(
-                            node.file() != null
-                                    ? new java.io.File(node.file().getFilePath()).getName()
-                                    : node.label()
-                    );
                 }
         );
 
