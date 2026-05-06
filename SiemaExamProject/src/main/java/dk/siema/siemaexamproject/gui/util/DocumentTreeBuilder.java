@@ -22,7 +22,7 @@ public class DocumentTreeBuilder {
         nodeMap.clear();
 
         TreeItem<TreeNode> root =
-                new TreeItem<>(new TreeNode("BOX", null, -1));
+                new TreeItem<>(new TreeNode("📦 Box", null, -1));
 
         root.setExpanded(true);
 
@@ -31,15 +31,17 @@ public class DocumentTreeBuilder {
             Document doc = documents.get(d);
 
             TreeItem<TreeNode> docNode =
-                    new TreeItem<>(new TreeNode("Document " + (d + 1), null, d));
+                    new TreeItem<>(new TreeNode("📁 Document " + (d + 1), null, d));
 
             for (int f = 0; f < doc.getPages().size(); f++) {
 
                 FileEntity file = doc.getPages().get(f);
 
-                String label = "File " + (f + 1);
+                String fileName = new java.io.File(file.getFilePath()).getName();
+
+                String label = "🧾 " + String.format("%02d - %s", f + 1, fileName);
                 if (file.isBarcode()) {
-                    label += " (BARCODE)";
+                    label += " 🔍";
                 }
 
                 TreeItem<TreeNode> fileNode =
