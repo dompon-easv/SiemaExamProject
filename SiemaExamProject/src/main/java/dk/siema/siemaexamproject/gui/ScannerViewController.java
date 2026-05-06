@@ -320,7 +320,6 @@ public class ScannerViewController implements ApplicationServicesAware {
     // ================= EXPORT ====================
 
     @FXML private void onExportAction(ActionEvent actionEvent) {
-        scannerModel.exportDocuments();
         System.out.println("Export has started");
     }
 
