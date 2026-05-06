@@ -271,4 +271,19 @@ public class ScannerModel {
 
     public void exportDocuments() {
     }
+
+
+    //updates the rotation only for currently selected file
+    public void updateRotationForCurrentFile(int newAngle) {
+        FileEntity current = selectedFile.get();
+        if (current == null) {
+            current.setRotation(newAngle);
+        }
+    }
+
+    public void updateRotationForFiles(List<FileEntity> filesToRotate, int newAngle) {
+        for (FileEntity file : filesToRotate) {
+            file.setRotation(newAngle);
+        }
+    }
 }
