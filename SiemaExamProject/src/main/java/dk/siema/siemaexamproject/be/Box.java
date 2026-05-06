@@ -7,12 +7,12 @@ public class Box {
     private String profileId;
     private List<Document> documents;
 
-    public Box(String boxReference) {
-        this.profileId = boxReference;
+    public Box() {
     }
     public int getId() {return id;}
     public void setId(int generatedId) {this.id = generatedId;}
     public String getProfileId() {return profileId;}
+    public void setProfileId(String profileId) {this.profileId = profileId;}
 
 
     public List<Document> getDocuments() {return documents;}

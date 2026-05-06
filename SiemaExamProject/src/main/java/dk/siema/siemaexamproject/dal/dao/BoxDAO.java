@@ -5,11 +5,12 @@ import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.bll.exceptions.DalException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
+import dk.siema.siemaexamproject.dal.interfaces.IBoxDAO;
 import dk.siema.siemaexamproject.dal.util.BytesConverter;
 
 import java.sql.*;
 
-public class BoxDAO {
+public class BoxDAO implements IBoxDAO {
 
     public void saveBoxHierarchy(Box box) throws DalException {
         String insertBox = "INSERT INTO Boxes (ProfileId) VALUES (?)";

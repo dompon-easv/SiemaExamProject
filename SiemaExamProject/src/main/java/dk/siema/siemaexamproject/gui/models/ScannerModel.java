@@ -4,11 +4,14 @@ import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
+import dk.siema.siemaexamproject.bll.service.ExportService;
+import dk.siema.siemaexamproject.gui.ScannerViewController;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
@@ -33,13 +36,15 @@ public class ScannerModel {
 
     private final ScannerService scannerService;
     private final ExecutorService ioExecutor;
+    private final ExportService exportService;
 
     // Simple in-memory cache for loaded images (key = file path)
     private final Map<String, Image> imageCache = new ConcurrentHashMap<>();
 
-    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService) {
+    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService, ExportService exportService) {
         this.ioExecutor = ioExecutor;
         this.scannerService = scannerService;
+        this.exportService = exportService;
     }
 
     public ReadOnlyBooleanProperty scanningProperty() {
@@ -269,7 +274,15 @@ public class ScannerModel {
 
     // ================= EXPORT ========================
 
-    public void exportDocuments() {
+    public void exportDocuments(TreeItem<ScannerViewController.TreeNode> root, File targetDir, boolean isMultiPage) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                exportService.processExport(root,targetDir,isMultiPage);
+                return null;
+            }
+        };
+        ioExecutor.submit(task);
     }
 
 

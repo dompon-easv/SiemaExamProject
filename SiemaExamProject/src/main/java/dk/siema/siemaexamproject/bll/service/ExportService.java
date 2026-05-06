@@ -2,13 +2,20 @@ package dk.siema.siemaexamproject.bll.service;
 
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.dal.interfaces.IBoxDAO;
 
 import java.io.File;
 import java.util.List;
 
 public class ExportService {
 
-    public void exportBatch(List<Document> documents){
+    private final IBoxDAO boxDAO;
+
+    public ExportService(IBoxDAO boxDAO) {
+        this.boxDAO = boxDAO;
+    }
+
+    public void processExport (){
         for (Document doc : documents) {
 
             // 1. DATABASE: Save the Document and File records

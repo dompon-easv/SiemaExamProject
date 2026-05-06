@@ -2,12 +2,9 @@ package dk.siema.siemaexamproject.app;
 
 import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
-import dk.siema.siemaexamproject.dal.dao.ClientDAO;
-import dk.siema.siemaexamproject.dal.dao.ScanningProfileDAO;
-import dk.siema.siemaexamproject.dal.dao.SettingDAO;
-import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
-import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
-import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
+import dk.siema.siemaexamproject.bll.service.ExportService;
+import dk.siema.siemaexamproject.dal.dao.*;
+import dk.siema.siemaexamproject.dal.interfaces.*;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
@@ -15,8 +12,6 @@ import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewFactory;
 import dk.siema.siemaexamproject.bll.service.UserService;
-import dk.siema.siemaexamproject.dal.dao.UserDAO;
-import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.TiffService;
@@ -36,6 +31,7 @@ public class ApplicationServices {
     private final TiffService tiffService;
     private final DocumentBuilderService documentBuilderService;
     private final ScannerService scannerService;
+    private final ExportService exportService;
 
 
     private final MainModel mainModel;
@@ -65,6 +61,8 @@ public class ApplicationServices {
         this.tiffService = new TiffService();
         this.documentBuilderService = new DocumentBuilderService();
         this.scannerService = new ScannerService(tiffService, documentBuilderService, cpuExecutor);
+        IBoxDAO boxDAO = new BoxDAO();
+        this.exportService = new ExportService(boxDAO);
 
         /* User task*/
         IUserDAO userDAO = new UserDAO();
@@ -80,7 +78,7 @@ public class ApplicationServices {
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel(userService);
-        this.scannerModel = new ScannerModel(ioExecutor, scannerService);
+        this.scannerModel = new ScannerModel(ioExecutor, scannerService,exportService);
         this.clientProfileModel = new ClientProfileModel(clientProfileService);
     }
 
