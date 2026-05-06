@@ -267,6 +267,86 @@ public class ScannerModel {
         file.setRotation(newRotation);
     }
 
+    // ================= MOVING FILES ========================
+
+    public FileEntity findFileByPath(String path) {
+        for (Document doc : documents) {
+            for (FileEntity file : doc.getPages()) {
+                if (file.getFilePath().equals(path)) {
+                    return file;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void moveFileBefore(FileEntity file, int targetDocIndex, FileEntity targetFile) {
+
+        if (file == null) return;
+
+        Document source = findDocument(file);
+        Document target = documents.get(targetDocIndex);
+
+        if (source == null || target == null) return;
+
+        source.getPages().remove(file);
+
+        List<FileEntity> list = target.getPages();
+        int index = list.indexOf(targetFile);
+
+        if (index < 0) list.add(file);
+        else list.add(index, file);
+
+        documents.setAll(new ArrayList<>(documents));
+    }
+
+    public void moveFileToDocument(FileEntity file, int targetDocIndex) {
+
+        if (file == null) return;
+
+        Document source = findDocument(file);
+        Document target = documents.get(targetDocIndex);
+
+        if (source == null || target == null) return;
+
+        source.getPages().remove(file);
+        target.getPages().add(file);
+
+        documents.setAll(new ArrayList<>(documents));
+    }
+
+    public void moveFileToLastDocument(FileEntity file) {
+        if (documents.isEmpty()) return;
+        moveFileToDocument(file, documents.size() - 1);
+    }
+
+    private Document findDocument(FileEntity file) {
+        for (Document doc : documents) {
+            if (doc.getPages().contains(file)) return doc;
+        }
+        return null;
+    }
+
+    public void handleMove(FileEntity file, int targetDocIndex, FileEntity targetFile) {
+
+        if (file == null) return;
+
+        // FILE → insert before file
+        if (targetFile != null) {
+            moveFileBefore(file, targetDocIndex, targetFile);
+            return;
+        }
+
+        // DOCUMENT → append to document
+        if (targetDocIndex >= 0) {
+            moveFileToDocument(file, targetDocIndex);
+            return;
+        }
+
+        // BOX → last document
+        moveFileToLastDocument(file);
+    }
+
     // ================= EXPORT ========================
 
     public void exportDocuments() {

@@ -2,26 +2,26 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
-import dk.siema.siemaexamproject.dal.util.TreeSelectionHelper;
+import dk.siema.siemaexamproject.gui.util.TreeSelectionHelper;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
-import javafx.animation.RotateTransition;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -29,7 +29,6 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     private ScannerModel scannerModel;
 
-    @FXML private Label fileNameLabel;
     @FXML private Label totalFilesLabel;
     @FXML private Label scanStatusLabel;
     @FXML private Label pageInfoLbl;
@@ -56,6 +55,10 @@ public class ScannerViewController implements ApplicationServicesAware {
     private DocumentTreeBuilder treeBuilder;
 
     public record TreeNode(String label, FileEntity file, int documentIndex) {
+        public boolean isFile() {return file != null;}
+        public boolean isDocument() {return file == null && documentIndex >= 0;}
+        public boolean isBox() {return file == null && documentIndex < 0;}
+
         @Override
         public String toString() {
             return label;
@@ -94,6 +97,80 @@ public class ScannerViewController implements ApplicationServicesAware {
 
         rebuildTree();
 
+        documentTree.setCellFactory(tv -> new TreeCell<>() {
+
+            @Override
+            protected void updateItem(TreeNode item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(empty || item == null ? null : item.toString());
+                setGraphic(null);
+
+                if (item == null || empty) {
+                    setStyle("");
+                    return;
+                }
+
+                // selection highlight
+                if (isSelected()) {
+                    setStyle("-fx-background-color: #3a7afe; -fx-text-fill: white;");
+                } else {
+                    setStyle("");
+                }
+
+                // ================= DRAG START =================
+                setOnDragDetected(event -> {
+                    if (item.file() == null) return;
+
+                    Dragboard db = startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(item.file().getFilePath());
+                    db.setContent(content);
+                    event.consume();
+                });
+
+                // ================= DRAG OVER =================
+                setOnDragOver(event -> {
+                    if (event.getDragboard().hasString()) {
+                        event.acceptTransferModes(TransferMode.MOVE);
+                    }
+                    event.consume();
+                });
+
+                // ================= DRAG ENTER =================
+                setOnDragEntered(event -> {
+                    if (event.getDragboard().hasString()) {
+                        setStyle("-fx-background-color: lightgreen;");
+                    }
+                });
+
+                // ================= DRAG EXIT =================
+                setOnDragExited(event -> {
+                    if (isSelected()) {
+                        setStyle("-fx-background-color: #3a7afe; -fx-text-fill: white;");
+                    } else {
+                        setStyle("");
+                    }
+                });
+
+                // ================= DROP =================
+                setOnDragDropped(event -> {
+
+                    String path = event.getDragboard().getString();
+                    FileEntity dragged = scannerModel.findFileByPath(path);
+
+                    if (dragged != null && item != null) {
+                        handleDrop(dragged, item);
+                        event.setDropCompleted(true);
+                    } else {
+                        event.setDropCompleted(false);
+                    }
+
+                    event.consume();
+                });
+            }
+        });
+
         previewImageView = new ImageView();
         previewImageView.setFitHeight(500);
         previewImageView.setPreserveRatio(true);
@@ -130,7 +207,6 @@ public class ScannerViewController implements ApplicationServicesAware {
 
                     if (node == null) {
                         scannerModel.selectNode(null, -1);
-                        fileNameLabel.setText("");
                         imageContainer.setVisible(false);
                         mockRectangleVisual.setVisible(false);
                         return;
@@ -161,12 +237,6 @@ public class ScannerViewController implements ApplicationServicesAware {
                     }
                     //unlock the slider
                     isUpdatingSliderFromTree = false;
-
-                    fileNameLabel.setText(
-                            node.file() != null
-                                    ? new java.io.File(node.file().getFilePath()).getName()
-                                    : node.label()
-                    );
                 }
         );
 
@@ -319,6 +389,17 @@ public class ScannerViewController implements ApplicationServicesAware {
             documentTree.getSelectionModel().select(item);
             documentTree.scrollTo(documentTree.getRow(item));
         }
+    }
+
+    // ============ MOVING FILES ============
+
+    private void handleDrop(FileEntity dragged, TreeNode targetNode) {
+
+        if (dragged == null || targetNode == null) return;
+
+        scannerModel.handleMove(dragged, targetNode.documentIndex(), targetNode.file());
+
+        selectFileInTree(dragged);
     }
 
     // ================= EXPORT ====================

@@ -55,9 +55,7 @@
 
                     <!-- LEFT SIDE -->
                     <HBox alignment="CENTER_LEFT" spacing="12">
-
-                        <Label fx:id="fileNameLabel" styleClass="page-title" text="Awaiting selection" />
-
+                        
                         <Label fx:id="totalFilesLabel" styleClass="badge" text="Total scanned files: " />
 
                         <Label fx:id="scanStatusLabel" styleClass="tree-text" text="Ready" />
