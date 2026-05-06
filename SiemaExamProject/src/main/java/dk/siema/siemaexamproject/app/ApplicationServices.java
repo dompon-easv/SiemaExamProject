@@ -104,12 +104,12 @@ public class ApplicationServices {
         ioExecutor.shutdown();
 
     }
-    public UserService getUserService() {return userService;
-    }
-    public AdminModel getAdminModel() {return adminModel;
-    }
+    public UserService getUserService() {return userService;}
 
     public ClientProfileModel getClientProfileModel() {
         return clientProfileModel;
     }
+    public AdminModel getAdminModel() {return adminModel;}
+
+    public MainModel getMainModel() { return mainModel;}
 }
