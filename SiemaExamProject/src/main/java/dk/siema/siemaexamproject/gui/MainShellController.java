@@ -17,6 +17,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.util.Map;
 import dk.siema.siemaexamproject.be.User;
+import javafx.scene.control.Label;
 
 public class MainShellController implements ApplicationServicesAware {
 
@@ -24,6 +25,9 @@ public class MainShellController implements ApplicationServicesAware {
     private StackPane contentContainer;
     @FXML private ToggleButton scannerButton;
     @FXML private ToggleButton adminButton;
+    @FXML private Label avatarLabel;
+    @FXML private Label userNameLabel;
+    @FXML private Label userRoleLabel;
 
     private ToggleGroup viewToggleGroup;
 
@@ -44,6 +48,7 @@ public class MainShellController implements ApplicationServicesAware {
     @FXML
     private void initialize() {
         configureRoleUI();
+        configureUserInfo();
         viewToggleGroup = new ToggleGroup();
         scannerButton.setToggleGroup(viewToggleGroup);
         adminButton.setToggleGroup(viewToggleGroup);
@@ -170,5 +175,31 @@ public class MainShellController implements ApplicationServicesAware {
         }
 
         AlertHelper.information("Shortcut list",  helpText.toString());
+    }
+    private void configureUserInfo() {
+
+        User currentUser = mainModel.getCurrentUser();
+
+        if (currentUser == null) {
+            return;
+        }
+
+        userNameLabel.setText(currentUser.getUsername());
+        userRoleLabel.setText(currentUser.getRole().name());
+        String username = currentUser.getUsername();
+
+        if (!username.isBlank()) {
+
+            String initials;
+            String[] parts = username.trim().split("\\s+");
+
+            if (parts.length >= 2) {
+                initials = ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+            } else {
+                initials = username.substring(0, Math.min(2, username.length())).toUpperCase();
+            }
+
+            avatarLabel.setText(initials);
+        }
     }
 }
