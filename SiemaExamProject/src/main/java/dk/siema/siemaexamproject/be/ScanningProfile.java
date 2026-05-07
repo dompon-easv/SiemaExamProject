@@ -48,4 +48,8 @@ public class ScanningProfile {
     public void setClient(int clientId) {
         this.clientId = clientId;
     }
+    @Override
+    public String toString() {
+        return profileName;
+    }
 }
