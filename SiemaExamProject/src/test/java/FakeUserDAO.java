@@ -1,3 +1,4 @@
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 
@@ -40,6 +41,21 @@ public class FakeUserDAO implements IUserDAO {
 
     @Override
     public void updatePassword(UUID id, String newHash) throws SQLException {
+
+    }
+
+    @Override
+    public List<ScanningProfile> getProfilesForUser(UUID id) throws SQLException {
+        return List.of();
+    }
+
+    @Override
+    public void assignProfilesForUser(UUID id, int profileId) throws SQLException {
+
+    }
+
+    @Override
+    public void deleteProfilesFromUser(UUID id, int profileId) throws SQLException {
 
     }
 }

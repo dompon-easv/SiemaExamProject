@@ -1,16 +1,21 @@
 package dk.siema.siemaexamproject.gui.models;
 
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.List;
+import java.util.UUID;
+
 public class AdminModel {
 
     private final UserService userService;
 
     private final ObservableList<User> users = FXCollections.observableArrayList();
+    private final ObservableList<ScanningProfile> profilesForUser = FXCollections.observableArrayList();
 
     public AdminModel(UserService userService) {
         this.userService = userService;
@@ -57,5 +62,22 @@ public class AdminModel {
             throws ServiceException {
 
         return userService.authenticate(username, password);
+    }
+
+    public void loadProfilesForUser(UUID id) throws ServiceException {
+        profilesForUser.clear();
+        profilesForUser.setAll(userService.getProfilesForUser(id));
+    }
+
+    public ObservableList<ScanningProfile> getProfilesForUser() throws ServiceException {
+        return profilesForUser;
+    }
+
+    public void assignProfilesForUser(UUID id, int profileID) throws ServiceException {
+        userService.assignProfilesForUser(id, profileID);
+    }
+
+    public void deleteProfilesForUser(UUID id, int profileID) throws ServiceException {
+        userService.deleteProfilesFromUser(id, profileID);
     }
 }

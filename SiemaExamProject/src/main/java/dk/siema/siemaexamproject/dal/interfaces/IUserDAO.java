@@ -1,5 +1,6 @@
 package dk.siema.siemaexamproject.dal.interfaces;
 
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import java.sql.SQLException;
 import java.util.List;
@@ -20,4 +21,10 @@ public interface IUserDAO {
     User getByUsername(String username) throws SQLException;
 
     void updatePassword(UUID id, String newHash) throws SQLException;
+
+    List<ScanningProfile> getProfilesForUser(UUID id) throws SQLException;
+
+    void assignProfilesForUser(UUID id, int profileId) throws SQLException;
+
+    void deleteProfilesFromUser(UUID id, int profileId) throws SQLException;
 }

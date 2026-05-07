@@ -127,8 +127,10 @@ public class UserManagementController implements ApplicationServicesAware {
                 .getScene()
                 .getWindow();
 
-        services.getSceneManager()
+       LoadedView<AddEditUserController> loaded = services.getSceneManager()
                 .openDialog(ViewPath.ADDUSERVIEW, "Add User", owner);
+
+       loaded.controller().setUser(null);
     }
 
     private void openEditUser(User user) {
