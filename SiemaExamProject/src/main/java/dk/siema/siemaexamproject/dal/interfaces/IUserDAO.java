@@ -2,29 +2,31 @@ package dk.siema.siemaexamproject.dal.interfaces;
 
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
+import dk.siema.siemaexamproject.bll.exceptions.DalException;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
 public interface IUserDAO {
 
-    User add(User entity) throws SQLException;
+    User add(User entity) throws DalException;
 
-    void update(User entity) throws SQLException;
+    void update(User entity) throws DalException;
 
-    void delete(UUID id) throws SQLException;
+    void delete(UUID id) throws DalException;
 
-    User getById(UUID id) throws SQLException;
+    User getById(UUID id) throws DalException;
 
-    List<User> getAll() throws SQLException;
+    List<User> getAll() throws DalException;
 
-    User getByUsername(String username) throws SQLException;
+    User getByUsername(String username) throws DalException;
 
-    void updatePassword(UUID id, String newHash) throws SQLException;
+    void updatePassword(UUID id, String newHash) throws DalException;
 
-    List<ScanningProfile> getProfilesForUser(UUID id) throws SQLException;
+    List<ScanningProfile> getProfilesForUser(UUID id) throws DalException;
 
-    void assignProfilesForUser(UUID id, int profileId) throws SQLException;
+    void assignProfilesForUser(UUID id, int profileId) throws DalException;
 
-    void deleteProfilesFromUser(UUID id, int profileId) throws SQLException;
+    void deleteProfilesFromUser(UUID id, int profileId) throws DalException;
 }

@@ -1,6 +1,8 @@
 package dk.siema.siemaexamproject.dal.dao;
 
+import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.siema.siemaexamproject.be.Client;
+import dk.siema.siemaexamproject.bll.exceptions.DalException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
 
@@ -11,7 +13,7 @@ import java.util.List;
 public class ClientDAO implements IClientDAO {
 
     @Override
-    public Client add(Client client) throws SQLException {
+    public Client add(Client client) throws DalException {
         String sql = "INSERT INTO dbo.Clients (name) VALUES (?)";
 
         try (Connection conn = ConnectionManager.getConnection();
@@ -29,12 +31,14 @@ public class ClientDAO implements IClientDAO {
 
                 return client;
             }
+        } catch (SQLException e) {
+            throw new DalException("Error inserting new client", e);
         }
     }
 
 
     @Override
-    public List<Client> getAllClients() throws SQLException {
+    public List<Client> getAllClients() throws DalException {
         String sql = "SELECT * FROM dbo.Clients";
 
         List<Client> clients = new ArrayList<>();
@@ -46,13 +50,15 @@ public class ClientDAO implements IClientDAO {
                     while (rs.next()) {
                         clients.add(mapClient(rs));
                     }
+                } catch (SQLException e) {
+                    throw new DalException("Error fetching all clients", e);
                 }
 
-                return clients;
+        return clients;
             }
 
     @Override
-    public Client getByClientName(String name) throws SQLException {
+    public Client getByClientName(String name) throws DalException {
         String sql = "SELECT * FROM dbo.Client WHERE name = ?";
 
         try (Connection conn = ConnectionManager.getConnection();
@@ -65,38 +71,42 @@ public class ClientDAO implements IClientDAO {
                     return mapClient(rs);
                 }
             }
+        } catch (SQLException e) {
+            throw new DalException("Error fetching Client",e);
         }
 
         return null;
     }
 
     @Override
-    public void deleteClient(Client client) throws SQLException {
+    public void deleteClient(Client client) throws DalException {
         String sql = "DELETE FROM dbo.Clients WHERE id = ?";
         try (Connection conn = ConnectionManager.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, client.getId());
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DalException("Error deleting Client",e);
         }
 
     }
 
     @Override
-    public void updateClient(Client client) throws SQLException {
+    public void updateClient(Client client) throws DalException {
         String sql = "UPDATE dbo.Clients SET name = ? WHERE id = ?";
         try (Connection conn = ConnectionManager.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, client.getName());
             stmt.setInt(2, client.getId());
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DalException("Error updating Client",e);
         }
     }
 
     private Client mapClient(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String name = rs.getString("name");
-
-        System.out.println("DEBUG MAPPING: Successfully read Client '" + name + "' with ID " + id);
 
         return new Client(id, name);
     }

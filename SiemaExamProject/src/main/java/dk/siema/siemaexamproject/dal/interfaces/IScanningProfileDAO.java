@@ -2,6 +2,7 @@ package dk.siema.siemaexamproject.dal.interfaces;
 
 import dk.siema.siemaexamproject.be.Client;
 import dk.siema.siemaexamproject.be.ScanningProfile;
+import dk.siema.siemaexamproject.bll.exceptions.DalException;
 import javafx.collections.ObservableList;
 
 import java.sql.SQLException;
@@ -9,15 +10,15 @@ import java.util.List;
 
 public interface IScanningProfileDAO {
 
-    ScanningProfile add(ScanningProfile profile) throws SQLException;
+    ScanningProfile add(ScanningProfile profile) throws DalException;
 
-    List<ScanningProfile> getProfilesbyClient(int clientId) throws SQLException;
+    List<ScanningProfile> getProfilesbyClient(int clientId) throws DalException;
 
-    ScanningProfile getByProfileName(String name) throws SQLException;
+    ScanningProfile getByProfileName(String name) throws DalException;
 
-    void deleteProfile(ScanningProfile profile) throws SQLException;
+    void deleteProfile(ScanningProfile profile) throws DalException;
 
-    List<ScanningProfile> getAllProfiles() throws SQLException;
+    List<ScanningProfile> getAllProfiles() throws DalException;
 
-    void updateProfile(ScanningProfile profileToEdit) throws SQLException;
+    void updateProfile(ScanningProfile profileToEdit) throws DalException;
 }

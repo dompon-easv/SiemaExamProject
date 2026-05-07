@@ -3,6 +3,7 @@ package dk.siema.siemaexamproject.bll.service;
 import dk.siema.siemaexamproject.be.Client;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.Setting;
+import dk.siema.siemaexamproject.bll.exceptions.DalException;
 import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
@@ -29,7 +30,7 @@ public class ClientProfileService {
     public List<Client> getAllClients() throws ServiceException {
         try {
             return clientDAO.getAllClients();
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error fetching clients", e);
         }
     }
@@ -40,7 +41,7 @@ public class ClientProfileService {
         }
         try {
             return clientDAO.add(client);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error creating client", e);
         }
 
@@ -49,7 +50,7 @@ public class ClientProfileService {
     public void deleteClient(Client client) throws ServiceException {
         try {
             clientDAO.deleteClient(client);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error deleting client", e);
         }
     }
@@ -57,7 +58,7 @@ public class ClientProfileService {
     public void updateClient(Client client) throws ServiceException {
         try{
             clientDAO.updateClient(client);
-        }catch (SQLException e)
+        }catch (DalException e)
         {
             throw new DataAccessException("Error updating client", e);
         }
@@ -69,7 +70,7 @@ public class ClientProfileService {
         }
         try {
             return scanningProfileDAO.add(profile);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error creating profile", e);
         }
 
@@ -78,15 +79,15 @@ public class ClientProfileService {
     public void deleteProfile(ScanningProfile profile) throws ServiceException {
         try {
             scanningProfileDAO.deleteProfile(profile);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error deleting profile", e);
         }
     }
 
-    public List<Setting> getAllSettings() throws ServiceException {
+    public List<Setting> getAllSettings() throws DataAccessException {
         try{
            return settingDAO.getAllSettings();
-        } catch (SQLException e){
+        } catch (DalException e){
             throw new DataAccessException("Error fetching settings", e);
         }
     }
@@ -94,7 +95,7 @@ public class ClientProfileService {
     public List<ScanningProfile> getAllProfiles() throws DataAccessException {
         try {
             return scanningProfileDAO.getAllProfiles();
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error fetching clients", e);
         }
     }
@@ -102,7 +103,7 @@ public class ClientProfileService {
     public void updateProfile(ScanningProfile profileToEdit) throws DataAccessException {
         try{
             scanningProfileDAO.updateProfile(profileToEdit);
-        }catch (SQLException e)
+        }catch (DalException e)
         {
             throw new DataAccessException("Error updating client", e);
         }
