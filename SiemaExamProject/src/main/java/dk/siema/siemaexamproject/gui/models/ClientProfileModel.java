@@ -1,6 +1,7 @@
 package dk.siema.siemaexamproject.gui.models;
 
 import dk.siema.siemaexamproject.be.*;
+import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
 import javafx.collections.FXCollections;
@@ -58,7 +59,7 @@ public class ClientProfileModel {
         allProfiles.remove(profile);
     }
 
-    public void loadAllSettings() throws ServiceException {
+    public void loadAllSettings() throws DataAccessException {
         settings.setAll(clientProfileService.getAllSettings());
     }
     public ObservableList<Setting> getAllSettings() {

@@ -1,6 +1,9 @@
 package dk.siema.siemaexamproject.dal.dao;
 
+import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.siema.siemaexamproject.be.Setting;
+import dk.siema.siemaexamproject.bll.exceptions.DalException;
+import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
 
@@ -13,7 +16,7 @@ import java.util.List;
 
 public class SettingDAO implements ISettingDAO {
     @Override
-    public List<Setting> getAllSettings() throws SQLException {
+    public List<Setting> getAllSettings() throws DalException {
         String sql = "SELECT * FROM settings";
         List<Setting> settings = new ArrayList<>();
 
@@ -29,6 +32,8 @@ public class SettingDAO implements ISettingDAO {
                 settings.add(new Setting(id, name, defaultValue));
             }
 
+        } catch (SQLException e) {
+            throw new DalException(e.getMessage());
         }
         return settings;
     }

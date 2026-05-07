@@ -3,10 +3,7 @@ package dk.siema.siemaexamproject.bll.service;
 import com.github.f4b6a3.uuid.UuidCreator;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
-import dk.siema.siemaexamproject.bll.exceptions.AuthenticationException;
-import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
-import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
-import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
+import dk.siema.siemaexamproject.bll.exceptions.*;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 import dk.siema.siemaexamproject.bll.util.PasswordUtil;
 
@@ -47,7 +44,7 @@ try {
 
         try {
             return userDAO.add(user);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error creating user", e);
         }
     }
@@ -56,7 +53,7 @@ try {
     public List<User> getAllUsers() throws ServiceException {
         try {
             return userDAO.getAll();
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error fetching users", e);
         }
     }
@@ -64,7 +61,7 @@ try {
     public User getUserById(UUID id) throws ServiceException {
         try {
             return userDAO.getById(id);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error fetching user", e);
         }
     }
@@ -78,7 +75,7 @@ try {
 
         try {
             userDAO.update(user);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error updating user", e);
         }
     }
@@ -92,7 +89,7 @@ try {
 
         try {
             userDAO.delete(id);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error deleting user", e);
         }
     }
@@ -115,7 +112,7 @@ try {
 
         try {
             userDAO.updatePassword(id, hashed);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error updating password", e);
         }
     }
@@ -151,7 +148,7 @@ try {
 
             return user;
 
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error during authentication", e);
         }
     }
@@ -159,7 +156,7 @@ try {
     public List<ScanningProfile> getProfilesForUser(UUID id) throws ServiceException {
         try {
             return userDAO.getProfilesForUser(id);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error fetching profiles", e);
         }
     }
@@ -172,7 +169,7 @@ try {
         }
        try{
            userDAO.assignProfilesForUser(id, profileId);
-       }catch(SQLException e)
+       }catch(DalException e)
        { throw new ServiceException("Error assigning profiles", e);}
     }
     public void deleteProfilesFromUser(UUID id, int profileId) throws ServiceException {
@@ -184,7 +181,7 @@ try {
         }
         try{
             userDAO.deleteProfilesFromUser(id, profileId);
-        } catch (SQLException e) {
+        } catch (DalException e) {
             throw new DataAccessException("Error deleting profiles", e);
         }
     }

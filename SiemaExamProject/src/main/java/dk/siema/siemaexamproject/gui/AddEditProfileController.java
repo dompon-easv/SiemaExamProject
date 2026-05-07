@@ -6,6 +6,7 @@ import dk.siema.siemaexamproject.be.Client;
 import dk.siema.siemaexamproject.be.ProfileSetting;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.Setting;
+import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
@@ -71,8 +72,8 @@ public class AddEditProfileController implements ApplicationServicesAware {
         settingNameComboBox.setItems(model.getAllSettings());
         try {
             model.loadAllSettings();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (DataAccessException e) {
+            AlertHelper.error("Failed to load settings", e.getMessage());
         }
     }
 
