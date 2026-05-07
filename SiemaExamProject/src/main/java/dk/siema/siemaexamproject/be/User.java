@@ -10,6 +10,7 @@ public class User {
     private String email;
     private String passwordHash; // holds HASH, not raw password
     private UserRole role;
+    private String profileNames;
 
     //Constructor (without id - for creation)
     public User(String username, String email, String password, UserRole role) {
@@ -43,6 +44,11 @@ public class User {
 
     public UserRole getRole() { return role; }
     public void changeRole(UserRole role) {this.role = role;}
+
+    public String getProfileNames() {
+        if(profileNames == null) profileNames="No profiles assigned";
+        return profileNames; }
+    public void setProfileNames(String profileNames) { this.profileNames = profileNames; }
 
     /* controlled changes/hybrid ... IkwIm*/
 }

@@ -14,11 +14,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import java.util.List;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class AddEditUserController implements ApplicationServicesAware {
 
@@ -210,6 +207,13 @@ public class AddEditUserController implements ApplicationServicesAware {
                 model.deleteProfilesForUser(userId, profileId);
             }
         }
+        List<String> updatedNames = new ArrayList<>();
+        for (ScanningProfile p : clientProfileModel.getAllProfiles()) {
+            if (selectedProfileIds.contains(p.getId())) {
+                updatedNames.add(p.getName());
+            }
+        }
+        currentUser.setProfileNames(String.join(", ", updatedNames));
     }
 
     @FXML

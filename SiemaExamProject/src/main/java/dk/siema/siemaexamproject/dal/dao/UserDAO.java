@@ -40,7 +40,13 @@ public class UserDAO implements IUserDAO {
     //GETTERS
     @Override
     public List<User> getAll() throws SQLException {
-        String sql = "SELECT * FROM dbo.Users";
+        // This single query fetches the user AND a comma-separated string of their profiles!
+        String sql = "SELECT u.*, " +
+                "(SELECT STRING_AGG(sp.profile_name, ', ') " +
+                " FROM dbo.UserProfiles up " +
+                " JOIN dbo.ScanningProfiles sp ON up.profile_id = sp.id " +
+                " WHERE up.user_id = u.id) AS assigned_profiles " +
+                "FROM dbo.Users u";
 
         List<User> users = new ArrayList<>();
 
@@ -49,10 +55,14 @@ public class UserDAO implements IUserDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                users.add(mapUser(rs));
+                User user = mapUser(rs);
+
+                String profiles = rs.getString("assigned_profiles");
+                user.setProfileNames(profiles != null ? profiles : "None");
+
+                users.add(user);
             }
         }
-
         return users;
     }
 

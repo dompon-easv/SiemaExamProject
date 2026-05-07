@@ -54,7 +54,7 @@ public class UserManagementController implements ApplicationServicesAware {
                 new SimpleStringProperty(data.getValue().getRole().name()));
 
         profileAccessColumn.setCellValueFactory(data ->
-                new SimpleStringProperty("N/A"));
+                new SimpleStringProperty(data.getValue().getProfileNames()));
 
         setupActionsColumn();
 
