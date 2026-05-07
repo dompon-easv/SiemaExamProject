@@ -1,12 +1,14 @@
 package dk.siema.siemaexamproject.dal.dao;
 
+import com.microsoft.sqlserver.jdbc.SQLServerException;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.be.enums.UserRole;
+import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 import dk.siema.siemaexamproject.dal.util.BytesConverter;
 
-import java.nio.ByteBuffer;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,13 @@ public class UserDAO implements IUserDAO {
     //GETTERS
     @Override
     public List<User> getAll() throws SQLException {
-        String sql = "SELECT * FROM dbo.Users";
+        // This single query fetches the user AND a comma-separated string of their profiles!
+        String sql = "SELECT u.*, " +
+                "(SELECT STRING_AGG(sp.profile_name, ', ') " +
+                " FROM dbo.UserProfiles up " +
+                " JOIN dbo.ScanningProfiles sp ON up.profile_id = sp.id " +
+                " WHERE up.user_id = u.id) AS assigned_profiles " +
+                "FROM dbo.Users u";
 
         List<User> users = new ArrayList<>();
 
@@ -47,10 +55,14 @@ public class UserDAO implements IUserDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                users.add(mapUser(rs));
+                User user = mapUser(rs);
+
+                String profiles = rs.getString("assigned_profiles");
+                user.setProfileNames(profiles != null ? profiles : "None");
+
+                users.add(user);
             }
         }
-
         return users;
     }
 
@@ -149,5 +161,51 @@ public class UserDAO implements IUserDAO {
         return new User(id, username, email, password, role);
     }
 
+    public List<ScanningProfile> getProfilesForUser(UUID id) throws SQLException {
+        List<ScanningProfile> assignedProfiles = new ArrayList<>();
 
+        String sql = "SELECT sp.* FROM dbo.ScanningProfiles sp " +
+                "JOIN dbo.UserProfiles up ON sp.id = up.profile_id "
+                + "WHERE up.user_id = ?";
+
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBytes(1, BytesConverter.uuidToBytes(id));
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                ScanningProfile profile = new ScanningProfile(
+                        rs.getInt("client_id"),
+                        rs.getString("profile_name"),
+                        rs.getString("description"),
+                        new ArrayList<>()
+                );
+                profile.setId(rs.getInt("id"));
+                assignedProfiles.add(profile);
+            }
+            return assignedProfiles;
+        }
+    }
+
+    @Override
+    public void assignProfilesForUser(UUID id, int profileId) throws SQLException {
+        String sql = "INSERT INTO dbo.UserProfiles (user_id, profile_id) VALUES (?, ?)";
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBytes(1, BytesConverter.uuidToBytes(id));
+            stmt.setInt(2, profileId);
+            stmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void deleteProfilesFromUser(UUID id, int profileId) throws SQLException {
+        String sql = "DELETE FROM dbo.UserProfiles WHERE user_id = ? AND profile_id = ?";
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBytes(1, BytesConverter.uuidToBytes(id));
+            stmt.setInt(2, profileId);
+            stmt.executeUpdate();
+        }
+    }
 }

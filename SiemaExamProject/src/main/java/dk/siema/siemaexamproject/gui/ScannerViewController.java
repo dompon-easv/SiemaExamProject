@@ -4,6 +4,10 @@ import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
+import dk.siema.siemaexamproject.gui.models.AdminModel;
+import dk.siema.siemaexamproject.gui.models.MainModel;
+import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.gui.util.TreeSelectionHelper;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
@@ -28,6 +32,8 @@ import java.util.List;
 public class ScannerViewController implements ApplicationServicesAware {
 
     private ScannerModel scannerModel;
+    private AdminModel adminModel;
+    private MainModel mainModel;
 
     @FXML private Label totalFilesLabel;
     @FXML private Label scanStatusLabel;
@@ -41,6 +47,9 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private StackPane previewContainer;
     @FXML private ScrollPane imageContainer;
 
+    @FXML private ComboBox profileComboBox;
+    @FXML private Label profileDescriptionLabel;
+    
     private StackPane mockRectangleVisual;
 
 
@@ -68,10 +77,14 @@ public class ScannerViewController implements ApplicationServicesAware {
     @Override
     public void setApplicationServices(ApplicationServices services) {
         this.scannerModel = services.getScannerModel();
+        this.adminModel = services.getAdminModel();
+        this.mainModel = services.getMainModel();
     }
 
     @FXML
     private void initialize() {
+
+        setProfiles();
 
         //adding rectangle when click on box or document for rotation
         createMockDocument();
@@ -255,8 +268,14 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     }
 
-
-
+    private void setProfiles() {
+        try {
+            adminModel.loadProfilesForUser(mainModel.getCurrentUser().getId());
+            profileComboBox.setItems(adminModel.getProfilesForUser());
+        } catch (Exception e) {
+            AlertHelper.error("Error", "Unable to load profiles for user " + mainModel.getCurrentUser().getId());
+        }
+    }
 
 
     // ================= SCAN =================

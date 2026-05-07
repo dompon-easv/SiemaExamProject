@@ -54,7 +54,7 @@ public class UserManagementController implements ApplicationServicesAware {
                 new SimpleStringProperty(data.getValue().getRole().name()));
 
         profileAccessColumn.setCellValueFactory(data ->
-                new SimpleStringProperty("N/A"));
+                new SimpleStringProperty(data.getValue().getProfileNames()));
 
         setupActionsColumn();
 
@@ -127,8 +127,10 @@ public class UserManagementController implements ApplicationServicesAware {
                 .getScene()
                 .getWindow();
 
-        services.getSceneManager()
+       LoadedView<AddEditUserController> loaded = services.getSceneManager()
                 .openDialog(ViewPath.ADDUSERVIEW, "Add User", owner);
+
+       loaded.controller().setUser(null);
     }
 
     private void openEditUser(User user) {

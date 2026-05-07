@@ -77,8 +77,9 @@ public class ClientProfileModel {
 
     public List<ScanningProfile> getProfilesForClient(int clientId) {
         List<ScanningProfile> filteredProfiles = new ArrayList<>();
-        for(ScanningProfile profile: allProfiles)
-        {if(profile.getClientId() == clientId) filteredProfiles.add(profile);}
+        for(ScanningProfile profile: masterProfiles)
+        {
+            if(profile.getClientId() == clientId) filteredProfiles.add(profile);}
 
         return filteredProfiles;
 

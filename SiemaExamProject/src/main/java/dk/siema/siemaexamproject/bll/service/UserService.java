@@ -1,6 +1,7 @@
 package dk.siema.siemaexamproject.bll.service;
 
 import com.github.f4b6a3.uuid.UuidCreator;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.AuthenticationException;
 import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
@@ -140,7 +141,9 @@ try {
             boolean valid;
             try {
                 valid = PasswordUtil.verifyPassword(password, user.getPasswordHash());
-            } catch (Exception e) {throw new ServiceException("Error verifying password", e);}
+            } catch (Exception e) {
+                throw new ServiceException("Error verifying password", e);
+            }
 
             if (!valid) {
                 throw new AuthenticationException("Invalid password");
@@ -150,6 +153,39 @@ try {
 
         } catch (SQLException e) {
             throw new DataAccessException("Error during authentication", e);
+        }
+    }
+
+    public List<ScanningProfile> getProfilesForUser(UUID id) throws ServiceException {
+        try {
+            return userDAO.getProfilesForUser(id);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error fetching profiles", e);
+        }
+    }
+    public void assignProfilesForUser(UUID id, int profileId) throws ServiceException {
+        if (id == null) {
+            throw new ValidationException("User ID is required");
+        }
+        if (profileId == 0) {
+            throw new ValidationException("Profile ID is required");
+        }
+       try{
+           userDAO.assignProfilesForUser(id, profileId);
+       }catch(SQLException e)
+       { throw new ServiceException("Error assigning profiles", e);}
+    }
+    public void deleteProfilesFromUser(UUID id, int profileId) throws ServiceException {
+        if (id == null) {
+            throw new ValidationException("Nothing to delete");
+        }
+        if (profileId == 0) {
+            throw new ValidationException("Profile ID is required");
+        }
+        try{
+            userDAO.deleteProfilesFromUser(id, profileId);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error deleting profiles", e);
         }
     }
 }
