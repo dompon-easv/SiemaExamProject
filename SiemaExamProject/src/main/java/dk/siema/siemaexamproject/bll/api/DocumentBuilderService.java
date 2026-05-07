@@ -24,6 +24,8 @@ public class DocumentBuilderService {
 
         boolean isBarcode = barcodeReader.readBarcode(image) != null;
 
+        image.flush();
+
         UUID referenceId = UuidCreator.getTimeOrderedEpoch();
 
         FileEntity entity = new FileEntity(

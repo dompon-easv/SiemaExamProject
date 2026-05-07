@@ -25,11 +25,14 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.DirectoryChooser;
 
+import java.io.File;
 import java.util.List;
 
 
 public class ScannerViewController implements ApplicationServicesAware {
+
 
     private ScannerModel scannerModel;
     private AdminModel adminModel;
@@ -41,6 +44,8 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @FXML private Slider rotationSlider;
     @FXML private Label rotationValueLbl;
+
+    @FXML private CheckBox multiPageCheckBox;
 
 
     @FXML private TreeView<TreeNode> documentTree;
@@ -424,7 +429,17 @@ public class ScannerViewController implements ApplicationServicesAware {
     // ================= EXPORT ====================
 
     @FXML private void onExportAction(ActionEvent actionEvent) {
+        boolean isMultiPage = multiPageCheckBox.isSelected();
+
+        DirectoryChooser dc = new DirectoryChooser();
+
         System.out.println("Export has started");
+        dc.setTitle("Select Export Directory");
+        File selectedDir = dc.showDialog(documentTree.getScene().getWindow());
+
+        if (selectedDir != null) {
+
+        }
     }
 
 }
