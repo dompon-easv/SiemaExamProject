@@ -158,8 +158,6 @@ public class UserManagementController implements ApplicationServicesAware {
         } catch (ValidationException e) {
             AlertHelper.warning("Invalid Input", e.getMessage());
 
-        } catch (DataAccessException e) {
-            AlertHelper.error("Database Error", e.getMessage());
 
         } catch (ServiceException e) {
             AlertHelper.error("Error", e.getMessage());

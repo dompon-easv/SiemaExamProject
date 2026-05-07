@@ -1,10 +1,8 @@
 package dk.siema.siemaexamproject.dal.interfaces;
 
 import dk.siema.siemaexamproject.be.Client;
-import dk.siema.siemaexamproject.be.User;
-import dk.siema.siemaexamproject.bll.exceptions.DalException;
+import dk.siema.siemaexamproject.dal.exception.DalException;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public interface IClientDAO {

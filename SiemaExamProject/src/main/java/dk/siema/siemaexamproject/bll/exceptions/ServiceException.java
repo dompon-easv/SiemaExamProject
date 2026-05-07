@@ -1,6 +1,6 @@
 package dk.siema.siemaexamproject.bll.exceptions;
 
-public class ServiceException extends Exception {
+public class ServiceException extends RuntimeException {
 
     public ServiceException(String message) {
         super(message);

@@ -3,7 +3,7 @@ package dk.siema.siemaexamproject.dal.dao;
 import dk.siema.siemaexamproject.be.Box;
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
-import dk.siema.siemaexamproject.bll.exceptions.DalException;
+import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.IBoxDAO;
 import dk.siema.siemaexamproject.dal.util.BytesConverter;

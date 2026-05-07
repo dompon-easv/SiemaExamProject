@@ -1,9 +1,7 @@
 package dk.siema.siemaexamproject.dal.dao;
 
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.siema.siemaexamproject.be.Setting;
-import dk.siema.siemaexamproject.bll.exceptions.DalException;
-import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
+import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
 

@@ -27,18 +27,18 @@ public class AdminModel {
     }
 
     /*load all users*/
-    public void loadUsers() throws ServiceException {
+    public void loadUsers()  {
         users.setAll(userService.getAllUsers());
     }
 
     // create user
-    public void createUser(User user) throws ServiceException {
+    public void createUser(User user)  {
         userService.createUser(user);
         users.add(user); // immediate UI update (no reload)
     }
 
     /*update user*/
-    public void updateUser(User user) throws ServiceException {
+    public void updateUser(User user)  {
         userService.updateUser(user);
 
         // force UI refresh (JavaFX needs this sometimes)
@@ -49,35 +49,35 @@ public class AdminModel {
     }
 
     /*delete user*/
-    public void deleteUser(User user) throws ServiceException {
+    public void deleteUser(User user)  {
         userService.deleteUser(user.getId());
         users.remove(user);
     }
 
     /*update password*/
-    public void updatePassword(User user, String newPassword) throws ServiceException {
+    public void updatePassword(User user, String newPassword) {
         userService.updatePassword(user.getId(), newPassword);
     }
     public User authenticate(String username, String password)
-            throws ServiceException {
+    {
 
         return userService.authenticate(username, password);
     }
 
-    public void loadProfilesForUser(UUID id) throws ServiceException {
+    public void loadProfilesForUser(UUID id)  {
         profilesForUser.clear();
         profilesForUser.setAll(userService.getProfilesForUser(id));
     }
 
-    public ObservableList<ScanningProfile> getProfilesForUser() throws ServiceException {
+    public ObservableList<ScanningProfile> getProfilesForUser()  {
         return profilesForUser;
     }
 
-    public void assignProfilesForUser(UUID id, int profileID) throws ServiceException {
+    public void assignProfilesForUser(UUID id, int profileID)  {
         userService.assignProfilesForUser(id, profileID);
     }
 
-    public void deleteProfilesForUser(UUID id, int profileID) throws ServiceException {
+    public void deleteProfilesForUser(UUID id, int profileID)  {
         userService.deleteProfilesFromUser(id, profileID);
     }
 }

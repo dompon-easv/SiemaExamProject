@@ -4,10 +4,10 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.*;
+import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 import dk.siema.siemaexamproject.bll.util.PasswordUtil;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class UserService {
     }
 
     // CREATE
-    public User createUser(User user) throws ServiceException {
+    public User createUser(User user) throws BackendFailureException {
 
         if (user.getUsername() == null || user.getUsername().isBlank()) {
             throw new ValidationException("Username is required");
@@ -39,35 +39,35 @@ public class UserService {
 try {
     String hashed = PasswordUtil.hashPassword(user.getPasswordHash());
     user.changePassword(hashed);
-} catch (Exception e) {throw new ServiceException("Error processing password", e);
+} catch (Exception e) {throw new ValidationException("Error processing password");
 }
 
         try {
             return userDAO.add(user);
         } catch (DalException e) {
-            throw new DataAccessException("Error creating user", e);
+            throw new BackendFailureException("Error creating user");
         }
     }
 
     // READ
-    public List<User> getAllUsers() throws ServiceException {
+    public List<User> getAllUsers() throws BackendFailureException {
         try {
             return userDAO.getAll();
         } catch (DalException e) {
-            throw new DataAccessException("Error fetching users", e);
+            throw new BackendFailureException("Error fetching users");
         }
     }
 
-    public User getUserById(UUID id) throws ServiceException {
+    public User getUserById(UUID id) throws BackendFailureException {
         try {
             return userDAO.getById(id);
         } catch (DalException e) {
-            throw new DataAccessException("Error fetching user", e);
+            throw new BackendFailureException("Error fetching user");
         }
     }
 
     // UPDATE (non-sensitive fields)
-    public void updateUser(User user) throws ServiceException {
+    public void updateUser(User user) throws BackendFailureException {
 
         if (user.getId() == null) {
             throw new ValidationException("User ID is required");
@@ -76,12 +76,12 @@ try {
         try {
             userDAO.update(user);
         } catch (DalException e) {
-            throw new DataAccessException("Error updating user", e);
+            throw new BackendFailureException("Error updating user");
         }
     }
 
     // DELETE
-    public void deleteUser(UUID id) throws ServiceException {
+    public void deleteUser(UUID id) throws BackendFailureException {
 
         if (id == null) {
             throw new ValidationException("Invalid user ID");
@@ -90,12 +90,12 @@ try {
         try {
             userDAO.delete(id);
         } catch (DalException e) {
-            throw new DataAccessException("Error deleting user", e);
+            throw new BackendFailureException("Error deleting user");
         }
     }
 
     // PASSWORD UPDATE IKWIM
-    public void updatePassword(UUID id, String newPassword) throws ServiceException {
+    public void updatePassword(UUID id, String newPassword) throws BackendFailureException {
 
         if (id == null) {
             throw new ValidationException("User ID is required");
@@ -113,12 +113,12 @@ try {
         try {
             userDAO.updatePassword(id, hashed);
         } catch (DalException e) {
-            throw new DataAccessException("Error updating password", e);
+            throw new BackendFailureException("Error updating password");
         }
     }
 
     // AUTHENTICATION
-    public User authenticate(String username, String password) throws ServiceException {
+    public User authenticate(String username, String password) throws BackendFailureException {
 
         if (username == null || username.isBlank()) {
             throw new ValidationException("Username is required");
@@ -139,7 +139,7 @@ try {
             try {
                 valid = PasswordUtil.verifyPassword(password, user.getPasswordHash());
             } catch (Exception e) {
-                throw new ServiceException("Error verifying password", e);
+                throw new BackendFailureException("Error verifying password");
             }
 
             if (!valid) {
@@ -149,18 +149,18 @@ try {
             return user;
 
         } catch (DalException e) {
-            throw new DataAccessException("Error during authentication", e);
+            throw new BackendFailureException("Error during authentication");
         }
     }
 
-    public List<ScanningProfile> getProfilesForUser(UUID id) throws ServiceException {
+    public List<ScanningProfile> getProfilesForUser(UUID id) throws BackendFailureException {
         try {
             return userDAO.getProfilesForUser(id);
         } catch (DalException e) {
-            throw new DataAccessException("Error fetching profiles", e);
+            throw new BackendFailureException("Error fetching profiles");
         }
     }
-    public void assignProfilesForUser(UUID id, int profileId) throws ServiceException {
+    public void assignProfilesForUser(UUID id, int profileId) throws BackendFailureException {
         if (id == null) {
             throw new ValidationException("User ID is required");
         }
@@ -170,9 +170,9 @@ try {
        try{
            userDAO.assignProfilesForUser(id, profileId);
        }catch(DalException e)
-       { throw new ServiceException("Error assigning profiles", e);}
+       { throw new BackendFailureException("Error assigning profiles");}
     }
-    public void deleteProfilesFromUser(UUID id, int profileId) throws ServiceException {
+    public void deleteProfilesFromUser(UUID id, int profileId) throws BackendFailureException {
         if (id == null) {
             throw new ValidationException("Nothing to delete");
         }
@@ -182,7 +182,7 @@ try {
         try{
             userDAO.deleteProfilesFromUser(id, profileId);
         } catch (DalException e) {
-            throw new DataAccessException("Error deleting profiles", e);
+            throw new BackendFailureException("Error deleting profiles");
         }
     }
 }
