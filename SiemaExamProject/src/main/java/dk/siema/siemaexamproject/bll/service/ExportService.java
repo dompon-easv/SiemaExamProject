@@ -15,7 +15,7 @@ public class ExportService {
         this.boxDAO = boxDAO;
     }
 
-    public void processExport (){
+    public void processExport (List<Document> documents) {
         for (Document doc : documents) {
 
             // 1. DATABASE: Save the Document and File records

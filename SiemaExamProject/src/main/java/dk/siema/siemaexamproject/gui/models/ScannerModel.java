@@ -354,16 +354,6 @@ public class ScannerModel {
 
     // ================= EXPORT ========================
 
-    public void exportDocuments(TreeItem<ScannerViewController.TreeNode> root, File targetDir, boolean isMultiPage) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                exportService.processExport(root,targetDir,isMultiPage);
-                return null;
-            }
-        };
-        ioExecutor.submit(task);
-    }
 
 
     //updates the rotation only for currently selected file
