@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.TextField?>
 <BorderPane styleClass="scanner-root" stylesheets="@helpers/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.siema.siemaexamproject.gui.ScannerViewController">
 
     <!-- ================= LEFT SIDEBAR ================= -->
@@ -29,8 +30,8 @@
 
                 <ComboBox fx:id="profileComboBox" maxWidth="1.7976931348623157E308" styleClass="profile-combo" />
 
-                <Label fx:id="profileDescriptionLabel" styleClass="sidebar-subtext" text="Standard invoice documents" wrapText="true" />
-            </VBox>
+                <Label text="Select Box ID: " />
+                <TextField fx:id="selectBoxId" prefWidth="70.0" />            </VBox>
 
             <Region styleClass="sidebar-divider" />
 

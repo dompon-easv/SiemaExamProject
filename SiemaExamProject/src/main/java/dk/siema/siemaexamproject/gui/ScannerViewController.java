@@ -42,7 +42,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private Slider rotationSlider;
     @FXML private Label rotationValueLbl;
 
-
+    @FXML private TextField selectBoxId;
     @FXML private TreeView<TreeNode> documentTree;
     @FXML private StackPane previewContainer;
     @FXML private ScrollPane imageContainer;
@@ -52,7 +52,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     
     private StackPane mockRectangleVisual;
 
-
+    private static final String DRAG_OVER_CLASS = "tree-cell-drag-over";
 
     private static final double ZOOM_FACTOR = 1.2;
     private static final double MAX_ZOOM = 5.0;
@@ -120,15 +120,8 @@ public class ScannerViewController implements ApplicationServicesAware {
                 setGraphic(null);
 
                 if (item == null || empty) {
-                    setStyle("");
+                    getStyleClass().remove(DRAG_OVER_CLASS);
                     return;
-                }
-
-                // selection highlight
-                if (isSelected()) {
-                    setStyle("-fx-background-color: #3a7afe; -fx-text-fill: white;");
-                } else {
-                    setStyle("");
                 }
 
                 // ================= DRAG START =================
@@ -152,22 +145,21 @@ public class ScannerViewController implements ApplicationServicesAware {
 
                 // ================= DRAG ENTER =================
                 setOnDragEntered(event -> {
-                    if (event.getDragboard().hasString()) {
-                        setStyle("-fx-background-color: lightgreen;");
+                    if (!event.getDragboard().hasString()) return;
+
+                    if (!getStyleClass().contains(DRAG_OVER_CLASS)) {
+                        getStyleClass().add(DRAG_OVER_CLASS);
                     }
                 });
 
                 // ================= DRAG EXIT =================
                 setOnDragExited(event -> {
-                    if (isSelected()) {
-                        setStyle("-fx-background-color: #3a7afe; -fx-text-fill: white;");
-                    } else {
-                        setStyle("");
-                    }
+                        getStyleClass().remove(DRAG_OVER_CLASS);
                 });
 
                 // ================= DROP =================
                 setOnDragDropped(event -> {
+                    getStyleClass().remove(DRAG_OVER_CLASS);
 
                     String path = event.getDragboard().getString();
                     FileEntity dragged = scannerModel.findFileByPath(path);
@@ -286,13 +278,26 @@ public class ScannerViewController implements ApplicationServicesAware {
     }
 
     public void startNewScan() {
+
+        String boxId = selectBoxId.getText();
+
+        if (boxId == null || boxId.isBlank()) {
+            AlertHelper.error("Missing Box ID", "Please enter a Box ID before scanning.");
+            return;
+        }
+
+        scannerModel.setCurrentBoxId(boxId);
+
         scannerModel.scanNext();
     }
 
     // ================= TREE UPDATES =================
 
     private void rebuildTree() {
-        TreeItem<TreeNode> root = treeBuilder.build(scannerModel.documentsProperty().get());
+        TreeItem<TreeNode> root = treeBuilder.build(
+                scannerModel.documentsProperty().get(),
+                scannerModel.getCurrentBoxId()
+        );
         documentTree.setRoot(root);
         expandAll(root);
     }
