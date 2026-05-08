@@ -39,9 +39,9 @@ public class DocumentTreeBuilder {
             TreeItem<TreeNode> docNode =
                     new TreeItem<>(new TreeNode("📁 Document " + (d + 1), null, d));
 
-            for (int f = 0; f < doc.getPages().size(); f++) {
+            for (int f = 0; f < doc.getFiles().size(); f++) {
 
-                FileEntity file = doc.getPages().get(f);
+                FileEntity file = doc.getFiles().get(f);
 
                 String fileName = new java.io.File(file.getFilePath()).getName();
 

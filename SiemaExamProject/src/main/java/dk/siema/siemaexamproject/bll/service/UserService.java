@@ -7,6 +7,7 @@ import dk.siema.siemaexamproject.bll.exceptions.*;
 import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 import dk.siema.siemaexamproject.bll.util.PasswordUtil;
+import dk.siema.siemaexamproject.gui.util.AlertHelper;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +21,7 @@ public class UserService {
     }
 
     // CREATE
-    public User createUser(User user) throws BackendFailureException {
+    public User createUser(User user) throws BackendFailureException, ValidationException {
 
         if (user.getUsername() == null || user.getUsername().isBlank()) {
             throw new ValidationException("Username is required");
@@ -67,10 +68,10 @@ try {
     }
 
     // UPDATE (non-sensitive fields)
-    public void updateUser(User user) throws BackendFailureException {
+    public void updateUser(User user) throws BackendFailureException, ValidationException {
 
         if (user.getId() == null) {
-            throw new ValidationException("User ID is required");
+             throw new ValidationException ("User ID is required");
         }
 
         try {
@@ -81,7 +82,7 @@ try {
     }
 
     // DELETE
-    public void deleteUser(UUID id) throws BackendFailureException {
+    public void deleteUser(UUID id) throws BackendFailureException, ValidationException {
 
         if (id == null) {
             throw new ValidationException("Invalid user ID");
@@ -95,7 +96,7 @@ try {
     }
 
     // PASSWORD UPDATE IKWIM
-    public void updatePassword(UUID id, String newPassword) throws BackendFailureException {
+    public void updatePassword(UUID id, String newPassword) throws ServiceException {
 
         if (id == null) {
             throw new ValidationException("User ID is required");
@@ -118,7 +119,7 @@ try {
     }
 
     // AUTHENTICATION
-    public User authenticate(String username, String password) throws BackendFailureException {
+    public User authenticate(String username, String password) throws BackendFailureException, ValidationException,AuthenticationException {
 
         if (username == null || username.isBlank()) {
             throw new ValidationException("Username is required");
@@ -160,7 +161,7 @@ try {
             throw new BackendFailureException("Error fetching profiles");
         }
     }
-    public void assignProfilesForUser(UUID id, int profileId) throws BackendFailureException {
+    public void assignProfilesForUser(UUID id, int profileId) throws BackendFailureException, ValidationException {
         if (id == null) {
             throw new ValidationException("User ID is required");
         }
@@ -172,7 +173,7 @@ try {
        }catch(DalException e)
        { throw new BackendFailureException("Error assigning profiles");}
     }
-    public void deleteProfilesFromUser(UUID id, int profileId) throws BackendFailureException {
+    public void deleteProfilesFromUser(UUID id, int profileId) throws BackendFailureException, ValidationException {
         if (id == null) {
             throw new ValidationException("Nothing to delete");
         }

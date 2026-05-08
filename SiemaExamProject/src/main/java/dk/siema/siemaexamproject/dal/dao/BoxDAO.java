@@ -12,10 +12,10 @@ import java.sql.*;
 
 public class BoxDAO implements IBoxDAO {
 
-    public void saveBoxHierarchy(Box box) throws DalException {
-        String insertBox = "INSERT INTO Boxes (ProfileId) VALUES (?)";
-        String insertDoc = "INSERT INTO Documents (BoxId, Status) VALUES (?, ?)";
-        String insertFile = "INSERT INTO Files (DocumentId, ReferenceId, SortOrder, FilePath, Rotation, IsBarcode) VALUES (?, ?, ?, ?, ?, ?)";
+    public void saveBox(Box box) throws DalException {
+        String insertBox = "INSERT INTO Boxes (profile_id) VALUES (?)";
+        String insertDoc = "INSERT INTO Documents (box_id) VALUES (?)";
+        String insertFile = "INSERT INTO FileEntities (document_id, reference_id, sort_order, rotation, is_barcode, file_data) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionManager.getConnection()) {
 
@@ -34,22 +34,23 @@ public class BoxDAO implements IBoxDAO {
                     // 2. Save Documents
                     for (Document doc : box.getDocuments()) {
                         docStmt.setInt(1, box.getId());
-                        docStmt.setString(2, doc.getStatus());
                         docStmt.executeUpdate();
                         doc.setId(getGeneratedId(docStmt));
 
                         // 3. Save Files
-                        for (FileEntity file : doc.getPages()) {
+                        for (FileEntity file : doc.getFiles()) {
                             fileStmt.setInt(1, doc.getId());
                             fileStmt.setBytes(2, BytesConverter.uuidToBytes(file.getReferenceId()));
                             fileStmt.setInt(3, file.getSortOrder());
-                            fileStmt.setString(4, file.getFilePath());
-                            fileStmt.setInt(5, file.getRotation());
-                            fileStmt.setBoolean(6, file.isBarcode());
-                            fileStmt.executeUpdate();
+                            fileStmt.setInt(4, file.getRotation());
+                            fileStmt.setBoolean(5, file.isBarcode());
+                            fileStmt.setBytes(6, file.getFileData());
+                            fileStmt.addBatch(); // add to the bucket instead of sending immediately
                         }
+                        fileStmt.executeBatch(); //send the whole bucket at once
+                        conn.commit(); // COMMIT TRANSACTION
                     }
-                    conn.commit(); // COMMIT TRANSACTION
+
 
                 }
             } catch (SQLException e) {

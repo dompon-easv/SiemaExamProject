@@ -2,17 +2,20 @@ package dk.siema.siemaexamproject.gui;
 
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
-import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
-import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
+import dk.siema.siemaexamproject.be.ScanningProfile;
+
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.MainModel;
+import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.gui.util.TreeSelectionHelper;
-import dk.siema.siemaexamproject.gui.models.ScannerModel;
+
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -44,6 +47,9 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @FXML private Slider rotationSlider;
     @FXML private Label rotationValueLbl;
+
+    @FXML private ProgressBar exportProgressBar;
+
 
     @FXML private CheckBox multiPageCheckBox;
 
@@ -91,6 +97,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     private void initialize() {
 
         setProfiles();
+
 
         //adding rectangle when click on box or document for rotation
         createMockDocument();
@@ -232,7 +239,6 @@ public class ScannerViewController implements ApplicationServicesAware {
                     if (node.file() != null) {
                         mockRectangleVisual.setVisible(false);
                         imageContainer.setVisible(true);
-                        rotationSlider.setValue(node.file().getRotation());
                         previewImageView.setRotate(node.file().getRotation());
                     } else {
                         //box or document is clicked
@@ -260,6 +266,7 @@ public class ScannerViewController implements ApplicationServicesAware {
                         this::zoomIn,
                         this::zoomOut,
                         this::doRotate
+
                 );
             }
         });
@@ -435,17 +442,34 @@ public class ScannerViewController implements ApplicationServicesAware {
     // ================= EXPORT ====================
 
     @FXML private void onExportAction(ActionEvent actionEvent) {
-        boolean isMultiPage = multiPageCheckBox.isSelected();
+
+        ScanningProfile selectedProfile = (ScanningProfile) profileComboBox.getValue();
+        if (selectedProfile == null)
+            AlertHelper.error("Profile not selected", "Select a profile");
+
+        String boxIdInput = selectBoxId.getText().trim();
+        String exportName = selectedProfile.getName() + "_" + boxIdInput;
 
         DirectoryChooser dc = new DirectoryChooser();
-
-        System.out.println("Export has started");
         dc.setTitle("Select Export Directory");
         File selectedDir = dc.showDialog(documentTree.getScene().getWindow());
 
         if (selectedDir != null) {
+            boolean isMultiPage = multiPageCheckBox.isSelected();
 
-        }
+            Task<Void> task = scannerModel.exportDocument(selectedDir,isMultiPage,exportName);
+
+            //show the bar
+                exportProgressBar.setVisible(true);
+                exportProgressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+
+            scannerModel.exportDocument(selectedDir, isMultiPage, exportName);
+
+            scannerModel.isExportingProperty().addListener((obs, wasExportingl, isNowExporting) -> {
+                if(!isNowExporting){
+                    Platform.runLater(() -> {exportProgressBar.setVisible(false);});
+                }
+            });
+            }
     }
-
 }

@@ -7,6 +7,7 @@ import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.be.enums.UserRole;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
+import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
 import javafx.collections.FXCollections;
@@ -135,7 +136,7 @@ public class AddEditUserController implements ApplicationServicesAware {
                     profileIds.add(p.getId());
                     selectedProfileIds.add(p.getId());
                 }
-            } catch (ServiceException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {

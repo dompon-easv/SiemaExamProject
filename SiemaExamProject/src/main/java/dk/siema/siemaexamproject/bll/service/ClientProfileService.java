@@ -33,7 +33,7 @@ public class ClientProfileService {
         }
     }
 
-    public Client createClient(Client client) throws BackendFailureException {
+    public Client createClient(Client client) throws BackendFailureException, ValidationException {
         if (client.getName() == null || client.getName().isBlank()) {
             throw new ValidationException("Client name is required");
         }
@@ -62,7 +62,7 @@ public class ClientProfileService {
         }
     }
 
-    public ScanningProfile createProfile(ScanningProfile profile) throws BackendFailureException {
+    public ScanningProfile createProfile(ScanningProfile profile) throws BackendFailureException, ValidationException {
         if (profile.getName() == null || profile.getName().isBlank()) {
             throw new ValidationException("Profile name is required");
         }

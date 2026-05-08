@@ -7,25 +7,21 @@ public class Document {
     private int id;
     private String boxId;
     private String status;
-    private List<FileEntity> files;
+    private List<FileEntity> files = new ArrayList<>();
 
-    public Document(){
-        files = new ArrayList<>();
-        this.status = "In Progress";
-    }
+    public Document(){}
 
-    public void addPage(FileEntity page){
-        this.files.add(page);
+    public void addFile(FileEntity file){
+        this.files.add(file);
     }
 
     public int getId(){return id;}
     public void setId(int id){this.id = id;}
 
+    public List<FileEntity> getFiles() {return files;}
+    public void setFiles(List<FileEntity> files) {this.files = files;}
     public String getBoxId() { return boxId; }
     public void setBoxId(String boxId) { this.boxId = boxId; }
-
-    public List<FileEntity> getPages() {return files;}
-    public void setPages(List<FileEntity> pages) {this.files = pages;}
 
     public String getStatus() {return status;}
     public void setStatus(String status) {this.status = status;}

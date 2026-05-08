@@ -3,6 +3,7 @@ package dk.siema.siemaexamproject.gui;
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.Client;
+import dk.siema.siemaexamproject.bll.exceptions.BackendFailureException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
@@ -84,7 +85,7 @@ public class ClientManagementController implements ApplicationServicesAware {
             model.deleteClient(selected);
             // Tip: You can show a success message or just let the list update automatically
 
-        } catch (ValidationException e) {
+        } catch (BackendFailureException e) {
             // Most specific first!
             AlertHelper.warning("Invalid Input", e.getMessage());
 

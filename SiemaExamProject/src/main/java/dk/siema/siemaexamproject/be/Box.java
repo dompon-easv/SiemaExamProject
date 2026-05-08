@@ -1,15 +1,15 @@
 package dk.siema.siemaexamproject.be;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Box {
     private int id;
     private String profileId;
     private String boxId;
-    private List<Document> documents;
+    private List<Document> documents = new ArrayList<>();
 
-    public Box(String boxId) {
-        this.boxId = boxId;}
+    public Box() {}
 
     public int getId() {return id;}
     public void setId(int generatedId) {this.id = generatedId;}

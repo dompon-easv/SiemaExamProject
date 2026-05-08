@@ -65,7 +65,7 @@ public class ScannerService {
             documents.add(currentDocument);
         }
 
-        currentDocument.addPage(page.entity());
+        currentDocument.addFile(page.entity());
 
         return documents;
     }

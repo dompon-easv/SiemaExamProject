@@ -8,17 +8,17 @@ public class FileEntity {
     private UUID referenceId;
     private int documentId;//fetched from API
     private int sortOrder;  //order after sorting
-    private String filePath; // path to TIFF file
+    private String filePath;// path to TIFF file
     private int rotation; // 0,90,180,270
     private boolean isBarcode;
+    private byte[] fileData;
 
     //constructor for existing files
-    public FileEntity(int id, UUID referenceId,int documentId, int sortOrder, String filePath, int rotation, boolean isBarcode) {
+    public FileEntity(int id, UUID referenceId,int documentId, int sortOrder,  int rotation, boolean isBarcode) {
         this.id = id;
         this.referenceId = referenceId;
         this.documentId = documentId;
         this.sortOrder = sortOrder;
-        this.filePath = filePath;
         this.rotation = rotation;
         this.isBarcode = isBarcode;
     }
@@ -51,4 +51,7 @@ public class FileEntity {
     public File toFile() {
         return new File(filePath);
     }
+
+    public byte[] getFileData() {return fileData;}
+    public void setFileData(byte[] fileData) {this.fileData = fileData;}
 }
