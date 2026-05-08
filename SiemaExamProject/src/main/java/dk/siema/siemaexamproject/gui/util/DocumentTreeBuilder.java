@@ -17,12 +17,18 @@ public class DocumentTreeBuilder {
         return (file == null) ? null : nodeMap.get(file.getFilePath());
     }
 
-    public TreeItem<TreeNode> build(List<Document> documents) {
+    public TreeItem<TreeNode> build(List<Document> documents, String boxId) {
 
         nodeMap.clear();
 
+        String rootLabel = "📦 Box";
+
+        if (boxId != null && !boxId.isBlank()) {
+            rootLabel += " - " + boxId;
+        }
+
         TreeItem<TreeNode> root =
-                new TreeItem<>(new TreeNode("📦 Box", null, -1));
+                new TreeItem<>(new TreeNode(rootLabel, null, -1));
 
         root.setExpanded(true);
 

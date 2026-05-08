@@ -42,7 +42,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private Slider rotationSlider;
     @FXML private Label rotationValueLbl;
 
-
+    @FXML private TextField selectBoxId;
     @FXML private TreeView<TreeNode> documentTree;
     @FXML private StackPane previewContainer;
     @FXML private ScrollPane imageContainer;
@@ -278,13 +278,26 @@ public class ScannerViewController implements ApplicationServicesAware {
     }
 
     public void startNewScan() {
+
+        String boxId = selectBoxId.getText();
+
+        if (boxId == null || boxId.isBlank()) {
+            AlertHelper.error("Missing Box ID", "Please enter a Box ID before scanning.");
+            return;
+        }
+
+        scannerModel.setCurrentBoxId(boxId);
+
         scannerModel.scanNext();
     }
 
     // ================= TREE UPDATES =================
 
     private void rebuildTree() {
-        TreeItem<TreeNode> root = treeBuilder.build(scannerModel.documentsProperty().get());
+        TreeItem<TreeNode> root = treeBuilder.build(
+                scannerModel.documentsProperty().get(),
+                scannerModel.getCurrentBoxId()
+        );
         documentTree.setRoot(root);
         expandAll(root);
     }

@@ -13,6 +13,7 @@ public class ScannerService {
     private final DocumentBuilderService documentBuilderService;
     private final ExecutorService cpuExecutor;
 
+    private String currentBoxId;
     private Document currentDocument = null;
     private int docId = 1;
     private final List<Document> documents = new ArrayList<>();
@@ -38,18 +39,28 @@ public class ScannerService {
         return documentBuilderService.processFile(file);
     }
 
+    public void setCurrentBoxId(String currentBoxId) {
+        this.currentBoxId = currentBoxId;
+    }
+
+    public String getCurrentBoxId() {
+        return currentBoxId;
+    }
+
     public List<Document> handlePage(DocumentBuilderService.PageResult page) {
 
         if (page == null) return documents;
 
         if (page.barcode()) {
             currentDocument = new Document();
+            currentDocument.setBoxId(currentBoxId);
             currentDocument.setId(docId++);
             documents.add(currentDocument);
         }
 
         if (currentDocument == null) {
             currentDocument = new Document();
+            currentDocument.setBoxId(currentBoxId);
             currentDocument.setId(docId++);
             documents.add(currentDocument);
         }
