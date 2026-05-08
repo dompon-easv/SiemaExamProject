@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Document {
     private int id;
+    private String boxId;
     private String status;
     private List<FileEntity> files;
 
@@ -19,6 +20,9 @@ public class Document {
 
     public int getId(){return id;}
     public void setId(int id){this.id = id;}
+
+    public String getBoxId() { return boxId; }
+    public void setBoxId(String boxId) { this.boxId = boxId; }
 
     public List<FileEntity> getPages() {return files;}
     public void setPages(List<FileEntity> pages) {this.files = pages;}

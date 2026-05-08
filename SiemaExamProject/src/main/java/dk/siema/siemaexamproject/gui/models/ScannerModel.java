@@ -30,6 +30,7 @@ public class ScannerModel {
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
     private final StringProperty pageCountInfo = new SimpleStringProperty("0 / 0");
     private final StringProperty totalScanInfo = new SimpleStringProperty("Total scanned files: 0");
+    private final StringProperty currentBoxId = new SimpleStringProperty();
 
     //private List<File> files; getalltiffs
     //private int currentIndex = 0; getalltiffs
@@ -61,6 +62,21 @@ public class ScannerModel {
 
     public ObjectProperty<Image> currentPreviewImageProperty() {
         return currentPreviewImage;
+    }
+
+    // ================= BOX ID =================
+
+    public String getCurrentBoxId() {
+        return currentBoxId.get();
+    }
+
+    public void setCurrentBoxId(String boxId) {
+        currentBoxId.set(boxId);
+        scannerService.setCurrentBoxId(boxId);
+    }
+
+    public StringProperty currentBoxIdProperty() {
+        return currentBoxId;
     }
 
     // ================= SCAN =================
