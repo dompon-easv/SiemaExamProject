@@ -26,7 +26,7 @@ public class ExportService {
 
 
         //Create the physical folder: profileName_boxId
-        File mainFolder =new File(targetDir,box.getProfileId());
+        File mainFolder =new File(targetDir, box.getExportName());
         if (!mainFolder.exists()) mainFolder.mkdirs();
 
         for (Document doc : box.getDocuments()) {

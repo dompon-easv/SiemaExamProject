@@ -14,13 +14,14 @@ public class FileEntity {
     private byte[] fileData;
 
     //constructor for existing files
-    public FileEntity(int id, UUID referenceId,int documentId, int sortOrder,  int rotation, boolean isBarcode) {
+    public FileEntity(int id, UUID referenceId,int documentId, int sortOrder,  int rotation, boolean isBarcode, byte[] fileData) {
         this.id = id;
         this.referenceId = referenceId;
         this.documentId = documentId;
         this.sortOrder = sortOrder;
         this.rotation = rotation;
         this.isBarcode = isBarcode;
+        this.fileData = fileData;
     }
     //constructor for API
     public FileEntity(UUID referenceId, int sortOrder, String filePath, int rotation, boolean isBarcode) {

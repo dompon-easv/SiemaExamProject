@@ -5,7 +5,8 @@ import java.util.List;
 
 public class Box {
     private int id;
-    private String profileId;
+    private String exportName;
+    private int profileId;
     private String boxId;
     private List<Document> documents = new ArrayList<>();
 
@@ -13,8 +14,11 @@ public class Box {
 
     public int getId() {return id;}
     public void setId(int generatedId) {this.id = generatedId;}
-    public String getProfileId() {return profileId;}
-    public void setProfileId(String profileId) {this.profileId = profileId;}
+    public int getProfileId() {return profileId;}
+    public void setProfileId(int profileId) {this.profileId = profileId;}
+
+    public String getExportName() {return exportName;}
+    public void setExportName(String exportName) {this.exportName = exportName;}
 
     public String getBoxId() {return boxId;}
     public void setBoxId(String boxId) {this.boxId = boxId;}

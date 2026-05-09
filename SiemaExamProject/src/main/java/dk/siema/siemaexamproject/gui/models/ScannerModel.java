@@ -373,7 +373,7 @@ public class ScannerModel {
 
     // ================= EXPORT ========================
 
-    public Task<Void> exportDocument(File targetDir, boolean isMultiPage, String exportName) {
+    public Task<Void> exportDocument(File targetDir, boolean isMultiPage, String exportName, int profileId) {
         if (isExporting.get()) return null;
         isExporting.set(true);
 
@@ -382,7 +382,8 @@ public class ScannerModel {
             protected Void call() throws Exception {
 
                 Box exportedBox = new Box();
-                exportedBox.setProfileId(exportName);
+                exportedBox.setExportName(exportName);
+                exportedBox.setProfileId(profileId);
 
                 //Fix the Sort Order and relationships based on current state of TreeView/List state
 
@@ -394,6 +395,7 @@ public class ScannerModel {
                     }
                 }
                 exportedBox.getDocuments().addAll(currentTreeView);
+
 
                 exportService.processExport(exportedBox, targetDir, isMultiPage, this);
                 return null;

@@ -23,21 +23,29 @@ public class ApplicationServices {
 
     private final ViewFactory viewFactory;
     private final SceneManager sceneManager;
-    private final UserService userService;
-    private final ClientProfileService clientProfileService;
 
+
+
+    //services
     private final ExecutorService cpuExecutor;
     private final ExecutorService ioExecutor;
     private final TiffService tiffService;
     private final DocumentBuilderService documentBuilderService;
     private final ScannerService scannerService;
     private final ExportService exportService;
+    private final UserService userService;
+    private final ClientProfileService clientProfileService;
 
 
+    //Models
     private final MainModel mainModel;
     private final AdminModel adminModel;
     private final ScannerModel scannerModel;
     private final ClientProfileModel clientProfileModel;
+
+    //DAOs
+    IBoxDAO boxDAO = new BoxDAO();
+    IUserDAO userDAO = new UserDAO();
 
 
 
@@ -59,13 +67,13 @@ public class ApplicationServices {
         this.ioExecutor = Executors.newCachedThreadPool();
 
         this.tiffService = new TiffService();
-        this.documentBuilderService = new DocumentBuilderService();
+        this.documentBuilderService = new DocumentBuilderService(boxDAO);
         this.scannerService = new ScannerService(tiffService, documentBuilderService, cpuExecutor);
-        IBoxDAO boxDAO = new BoxDAO();
+
         this.exportService = new ExportService(boxDAO);
 
         /* User task*/
-        IUserDAO userDAO = new UserDAO();
+
         this.userService = new UserService(userDAO);
 
         IClientDAO clientDAO = new ClientDAO();

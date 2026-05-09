@@ -444,6 +444,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private void onExportAction(ActionEvent actionEvent) {
 
         ScanningProfile selectedProfile = (ScanningProfile) profileComboBox.getValue();
+        int profileId = selectedProfile.getId();
         if (selectedProfile == null)
             AlertHelper.error("Profile not selected", "Select a profile");
 
@@ -457,13 +458,13 @@ public class ScannerViewController implements ApplicationServicesAware {
         if (selectedDir != null) {
             boolean isMultiPage = multiPageCheckBox.isSelected();
 
-            Task<Void> task = scannerModel.exportDocument(selectedDir,isMultiPage,exportName);
+            Task<Void> task = scannerModel.exportDocument(selectedDir,isMultiPage,exportName, selectedProfile.getId());
 
             //show the bar
                 exportProgressBar.setVisible(true);
                 exportProgressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
 
-            scannerModel.exportDocument(selectedDir, isMultiPage, exportName);
+            scannerModel.exportDocument(selectedDir, isMultiPage, exportName,profileId);
 
             scannerModel.isExportingProperty().addListener((obs, wasExportingl, isNowExporting) -> {
                 if(!isNowExporting){
