@@ -1,6 +1,10 @@
 package dk.siema.siemaexamproject.bll.api;
 
 import dk.siema.siemaexamproject.be.Document;
+import dk.siema.siemaexamproject.be.Profile;
+import dk.siema.siemaexamproject.be.ProfileSetting;
+import dk.siema.siemaexamproject.be.ScanningProfile;
+import dk.siema.siemaexamproject.be.enums.ColorMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,8 +39,8 @@ public class ScannerService {
         return tiffService.getAllTiffs();
     }
 
-    public DocumentBuilderService.PageResult processFile(File file) throws Exception {
-        return documentBuilderService.processFile(file);
+    public DocumentBuilderService.PageResult processFile(File file, Profile profile) throws Exception {
+        return documentBuilderService.processFile(file, profile);
     }
 
     public void setCurrentBoxId(String currentBoxId) {
@@ -68,5 +72,33 @@ public class ScannerService {
         currentDocument.addPage(page.entity());
 
         return documents;
+    }
+
+    private Profile convert(ScanningProfile sp) {
+
+        int rotation = 0;
+        ColorMode colorMode = ColorMode.COLOR;
+
+        if (sp.getProfileSettings() != null) {
+            for (ProfileSetting ps : sp.getProfileSettings()) {
+
+                String name = ps.getSetting().getName().toLowerCase();
+                String value = ps.getValue().toLowerCase();
+
+                if (name.contains("rotation")) {
+                    rotation = Integer.parseInt(value);
+                }
+
+                if (name.contains("color")) {
+                    colorMode = switch (value) {
+                        case "grayscale" -> ColorMode.GRAYSCALE;
+                        case "black_white", "bw" -> ColorMode.BLACK_WHITE;
+                        default -> ColorMode.COLOR;
+                    };
+                }
+            }
+        }
+
+        return new Profile(rotation, colorMode);
     }
 }

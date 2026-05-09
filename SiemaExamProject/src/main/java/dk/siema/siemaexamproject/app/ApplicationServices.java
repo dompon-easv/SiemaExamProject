@@ -68,13 +68,13 @@ public class ApplicationServices {
 
         /* User task*/
         IUserDAO userDAO = new UserDAO();
-        this.userService = new UserService(userDAO);
 
         IClientDAO clientDAO = new ClientDAO();
         IScanningProfileDAO scanningProfileDAO = new ScanningProfileDAO();
         ISettingDAO settingDAO = new SettingDAO();
         this.clientProfileService = new ClientProfileService(clientDAO, scanningProfileDAO, settingDAO);
 
+        this.userService = new UserService(userDAO, clientProfileService);
 
 
 

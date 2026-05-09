@@ -1,9 +1,11 @@
 package dk.siema.siemaexamproject.gui.models;
 
 import dk.siema.siemaexamproject.be.*;
+import dk.siema.siemaexamproject.bll.exceptions.DalException;
 import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
+import dk.siema.siemaexamproject.dal.dao.SettingDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

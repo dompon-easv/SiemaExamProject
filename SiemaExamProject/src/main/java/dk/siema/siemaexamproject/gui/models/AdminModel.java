@@ -1,5 +1,6 @@
 package dk.siema.siemaexamproject.gui.models;
 
+import dk.siema.siemaexamproject.be.ProfileSetting;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
@@ -66,7 +67,15 @@ public class AdminModel {
 
     public void loadProfilesForUser(UUID id) throws ServiceException {
         profilesForUser.clear();
-        profilesForUser.setAll(userService.getProfilesForUser(id));
+        List<ScanningProfile> profiles = userService.getProfilesForUser(id);
+        // Settings are already loaded by UserService now
+        profilesForUser.setAll(profiles);
+
+        // Debug output
+        for (ScanningProfile profile : profiles) {
+            System.out.println("Profile: " + profile.getName() +
+                    ", Settings loaded: " + (profile.getProfileSettings() != null ? profile.getProfileSettings().size() : 0));
+        }
     }
 
     public ObservableList<ScanningProfile> getProfilesForUser() throws ServiceException {

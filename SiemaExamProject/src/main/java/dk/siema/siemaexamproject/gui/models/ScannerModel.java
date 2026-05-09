@@ -2,8 +2,11 @@ package dk.siema.siemaexamproject.gui.models;
 
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.be.Profile;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
+import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -12,10 +15,12 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
@@ -59,6 +64,69 @@ public class ScannerModel {
         return currentPreviewImage;
     }
 
+    // ============ SCANNING PROFILES ============
+
+    private final ObjectProperty<Profile> selectedProfile = new SimpleObjectProperty<>();
+
+    public ObjectProperty<Profile> selectedProfileProperty() {
+        return selectedProfile;
+    }
+
+    public Profile getSelectedProfile() {
+        return selectedProfile.get();
+    }
+
+    public void setSelectedProfile(Profile profile) {
+        selectedProfile.set(profile);
+    }
+
+    private BufferedImage applyColorMode(BufferedImage img, String colorMode) {
+        if (colorMode == null || colorMode.equals("COLOR")) return img;
+
+        switch (colorMode) {
+            case "GRAYSCALE": {
+                BufferedImage gray = new BufferedImage(
+                        img.getWidth(),
+                        img.getHeight(),
+                        BufferedImage.TYPE_BYTE_GRAY
+                );
+                Graphics g = gray.getGraphics();
+                g.drawImage(img, 0, 0, null);
+                g.dispose();
+                return gray;
+            }
+            case "BLACK_WHITE": {
+                BufferedImage bw = new BufferedImage(
+                        img.getWidth(),
+                        img.getHeight(),
+                        BufferedImage.TYPE_BYTE_BINARY
+                );
+                Graphics g = bw.getGraphics();
+                g.drawImage(img, 0, 0, null);
+                g.dispose();
+                return bw;
+            }
+            default:
+                return img;
+        }
+    }
+
+    private BufferedImage rotateImage(BufferedImage img, int angle) {
+        if (angle == 0) return img;
+
+        double r = Math.toRadians(angle);
+        int w = img.getWidth();
+        int h = img.getHeight();
+
+        BufferedImage result = new BufferedImage(w, h, img.getType());
+        Graphics2D g = result.createGraphics();
+        g.rotate(r, w / 2.0, h / 2.0);
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+
+        return result;
+    }
+
     // ================= BOX ID =================
 
     public String getCurrentBoxId() {
@@ -82,12 +150,25 @@ public class ScannerModel {
 
     public void scanNext() {
 
+        Profile profile = selectedProfile.get();
+        System.out.println("scanNext called with profile: " + profile);
+        if (profile == null) {
+            System.out.println("ERROR: No profile selected!");
+            Platform.runLater(() -> {
+                AlertHelper.warning("No Profile Selected", "Please select a scanning profile before starting.");
+            });
+            return;
+        }
+        System.out.println("Using profile - Rotation: " + profile.getRotation() +
+                ", ColorMode: " + profile.getColorMode());
+
         Task<DocumentBuilderService.PageResult> task = new Task<>() {
             @Override
             protected DocumentBuilderService.PageResult call() throws Exception {
                 File file = scannerService.getRandomFile();
                 if (file == null) return null;
-                return scannerService.processFile(file);
+
+                return scannerService.processFile(file, profile);
             }
 
             @Override
@@ -179,9 +260,12 @@ public class ScannerModel {
             try {
                 BufferedImage img = ImageIO.read(file.toFile());
 
-                Image fxImage = (img != null)
-                        ? SwingFXUtils.toFXImage(img, null)
-                        : null;
+                // Apply color mode
+                if (file.getColorMode() != null && !file.getColorMode().equals("COLOR")) {
+                    img = applyColorMode(img, file.getColorMode());
+                }
+
+                Image fxImage = (img != null) ? SwingFXUtils.toFXImage(img, null) : null;
 
                 Platform.runLater(() -> {
                     imageCache.put(file.getFilePath(), fxImage);
@@ -372,7 +456,7 @@ public class ScannerModel {
     //updates the rotation only for currently selected file
     public void updateRotationForCurrentFile(int newAngle) {
         FileEntity current = selectedFile.get();
-        if (current == null) {
+        if (current != null) {
             current.setRotation(newAngle);
         }
     }
