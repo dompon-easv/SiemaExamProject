@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.util.Properties;
 
 public class ConnectionManager {
-    private static final String PROP_FILE = "config/config.settings";
+    private static final String PROP_FILE = System.getProperty("user.dir") + File.separator + "config/config.settings";
     private static SQLServerDataSource dataSource = new SQLServerDataSource();
 
     static {
