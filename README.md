@@ -1,26 +1,59 @@
 # Siema Exam Project
 
 ## 📖 Overview
-**Siema Exam Project** is a robust JavaFX desktop application developed as part of an academic examination (SEA). The system is designed to handle user management and the archival of physical documents into a digital format. It provides a secure, high-performance architecture for processing scanned files, managing document boxes, and handling concurrent data ingestion.
+**Siema Exam Project** is a robust JavaFX desktop application developed as part of an academic examination. The system handles user management and the archival of physical documents into a digital format, providing a secure, high-performance architecture for processing scanned files and managing document boxes.
 
 ## ✨ Key Features
-* **User Management System:** Securely add, edit, and manage system users using unique UUID identifiers to prevent enumeration attacks.
-* **Document & Box Archiving:** Organize scanned files into Documents, and group Documents into physical Boxes for perfect digital-to-physical tracking.
-* **In-Memory Image Manipulation:** Users can rotate scanned files (0°, 90°, 180°, 270°) using a visual UI. Changes are held securely in memory (Presentation Model) and only committed to the database upon user confirmation.
-* **High-Speed File Processing:** Capable of handling rapid, multi-threaded file ingestion from scanning APIs without losing chronological sorting order.
+* **User Management System:** Secure management of users using unique UUID identifiers and hashed passwords.
+* **Document & Box Archiving:** Digital-to-physical tracking by organizing scanned files into Documents and Documents into Boxes.
+* **In-Memory Image Manipulation:** Visual rotation of scanned files (0°, 90°, 180°, 270°) with a Presentation Model that only commits changes upon confirmation.
+* **High-Speed File Processing:** Multi-threaded file ingestion from scanning APIs while maintaining chronological order.
 
 ## 🛠️ Technology Stack
-* **Frontend:** JavaFX, FXML, CSS
-* **Backend:** Java (JDK 17+)
+* **Language:** Java 25 (JDK)
+* **Frontend:** JavaFX 21, FXML, CSS
 * **Database:** Microsoft SQL Server (MSSQL) via JDBC
-* **Architecture:** MVC (Model-View-Controller) with strict Separation of Concerns.
+* **Build Tool:** Maven
 
-## 🏗️ Architectural Highlights
+## 🏗️ Architecture & Design
 
-### 1. Advanced UI Routing (`SceneManager`)
-The application implements a custom `SceneManager` service to completely decouple the View transitions from the Business Logic Layer. Controllers handle explicit UI logic (e.g., opening dialogs), while GUI Models (Presentation Models) manage `ObservableList` data and communicate with background services.
+### Layered Architecture
+The project follows a strict separation of concerns to ensure maintainability and testability:
+* **BE (Business Entities):** Pure POJOs representing the core data models.
+* **BLL (Business Logic Layer):** Encapsulates business rules, validation, and security (e.g., `UserService`, `ClientProfileService`).
+* **DAL (Data Access Layer):** Handles all database interactions using the **DAO Pattern** (`IUserDAO` $\rightarrow$ `UserDAO`).
+* **GUI (Graphical User Interface):** Implements an **MVC/MVVM** approach using JavaFX controllers and dedicated Models to manage UI state.
 
-### 2. Dual-ID Database Strategy
-To resolve concurrency issues during parallel file scanning while maintaining rapid SQL `JOIN` performance, the application utilizes a hybrid database key pattern:
-* **`Id` (INT IDENTITY):** Used as the internal database Primary Key for efficient Foreign Key mapping between Users, Boxes, Documents, and Files.
-* **`ReferenceId` (BINARY(16)):** A Time-Ordered UUID (v7) generated instantly by the Java API. This guarantees thread-safe chronological sorting and captures the exact "Scanned At" timestamp without requiring additional database columns.
+### Design Patterns Used
+* **DAO (Data Access Object):** Abstracts database logic from business logic.
+* **Service Layer:** Acts as a facade between the GUI and the data layer.
+* **Presentation Model:** Separates the raw data entities from the data required by the UI (e.g., `AdminModel`).
+* **Dependency Injection:** Manual injection of services via `ApplicationServices` for better modularity.
+
+### Advanced Architectural Highlights
+* **Custom UI Routing:** A `SceneManager` decouples view transitions from business logic.
+* **Dual-ID Database Strategy:** Uses a hybrid approach with `INT IDENTITY` for internal performance and `BINARY(16)` Time-Ordered UUIDs (v7) for thread-safe chronological sorting.
+
+## 🚀 Getting Started
+
+### Prerequisites
+* Java 25 SDK
+* Maven
+* Microsoft SQL Server
+
+### Configuration
+1. Navigate to the `config/` folder.
+2. Edit `config.settings` with your database credentials:
+   ```properties
+   Server=your_server
+   Database=your_db
+   User=your_user
+   Password=your_password
+   Port=1433
+   ```
+
+### Running the Application
+Using Maven:
+```bash
+mvn clean compile exec:java -Dexec.mainClass="dk.siema.siemaexamproject.app.Launcher"
+```
