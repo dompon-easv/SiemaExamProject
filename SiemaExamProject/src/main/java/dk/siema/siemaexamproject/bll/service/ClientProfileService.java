@@ -108,11 +108,11 @@ public class ClientProfileService {
         }
     }
 
-    public List<ProfileSetting> getSettingsForProfile(int profileId) throws DataAccessException {
+    public List<ProfileSetting> getSettingsForProfile(int profileId) throws BackendFailureException {
         try {
             return settingDAO.getSettingsForProfile(profileId);
         } catch (DalException e) {
-            throw new DataAccessException("Error loading settings for profile", e);
+            throw new BackendFailureException("Error loading settings for profile");
         }
     }
 }

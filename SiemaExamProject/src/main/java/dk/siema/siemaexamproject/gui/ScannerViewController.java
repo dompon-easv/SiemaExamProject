@@ -549,19 +549,51 @@ public class ScannerViewController implements ApplicationServicesAware {
         if (selectedDir != null) {
             boolean isMultiPage = multiPageCheckBox.isSelected();
 
-            Task<Void> task = scannerModel.exportDocument(selectedDir,isMultiPage,exportName, selectedProfile.getId());
+            Task<Void> task = scannerModel.exportDocument(selectedDir, isMultiPage, exportName, selectedProfile.getId());
 
             //show the bar
-                exportProgressBar.setVisible(true);
-                exportProgressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            exportProgressBar.setVisible(true);
+            exportProgressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
 
-            scannerModel.exportDocument(selectedDir, isMultiPage, exportName,profileId);
-
-            scannerModel.isExportingProperty().addListener((obs, wasExportingl, isNowExporting) -> {
-                if(!isNowExporting){
-                    Platform.runLater(() -> {exportProgressBar.setVisible(false);});
-                }
+            //setup SUCCESS handler
+            task.setOnSucceeded(event -> {
+                Platform.runLater(() -> {
+                    exportProgressBar.setVisible(false);
+                    resetUI();
+                    AlertHelper.information("Export Successful", "Data saved and workspace cleared.");
+                });
             });
-            }
+
+            //setup FAILURE handler
+            task.setOnFailed(event -> {
+                Platform.runLater(() -> {
+                    exportProgressBar.setVisible(false);
+                    AlertHelper.error("Export Failed", "The database or file system returned an error. Data was not cleared");
+                });
+            });
+        }}
+
+
+    private void resetUI() {
+        //clear the id in the model
+        scannerModel.setCurrentBoxId("");
+
+        //clear the model data
+        scannerModel.resetState();
+
+        //clear UI specific controls
+        selectBoxId.clear();
+        profileComboBox.getSelectionModel().clearSelection();
+
+        //hide the preview and reset slider
+        imageContainer.setVisible(false);
+        mockRectangleVisual.setVisible(false);
+        rotationSlider.setValue(0);
+
+        //force a tree refresh
+        rebuildTree();
+
+        TreeSelectionHelper.clearCache();
+
     }
 }

@@ -495,6 +495,21 @@ public class ScannerModel {
         return exportTask;
     }
 
+    public void resetState(){
+        //clear the observable list
+        documents.clear();
+        //reset selection properties
+        selectedFile.set(null);
+        currentPreviewImage.set(null);
+
+        //clear the image cache to free up memory
+        imageCache.clear();
+
+        //reset counter strings
+        updateTotalScannedFiles();
+
+    }
+
 
     //updates the rotation only for currently selected file
     public void updateRotationForCurrentFile(int newAngle) {
