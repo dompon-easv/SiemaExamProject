@@ -10,6 +10,7 @@ public class FileEntity {
     private int sortOrder;  //order after sorting
     private String filePath;// path to TIFF file
     private int rotation; // 0,90,180,270
+    private String colorMode; // "COLOR", "GRAYSCALE", "BLACK_WHITE"
     private boolean isBarcode;
     private byte[] fileData;
 
@@ -21,6 +22,7 @@ public class FileEntity {
         this.sortOrder = sortOrder;
         this.rotation = rotation;
         this.isBarcode = isBarcode;
+        this.colorMode = "COLOR";
         this.fileData = fileData;
     }
     //constructor for API
@@ -47,6 +49,9 @@ public class FileEntity {
 
     public int getRotation() {return rotation;}
     public void setRotation(int rotation) {this.rotation = rotation;}
+
+    public String getColorMode() { return colorMode; }
+    public void setColorMode(String colorMode) { this.colorMode = colorMode; }
 
     public boolean isBarcode() {return isBarcode;}
     public File toFile() {

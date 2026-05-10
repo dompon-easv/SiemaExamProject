@@ -12,6 +12,8 @@ import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewFactory;
 import dk.siema.siemaexamproject.bll.service.UserService;
+import dk.siema.siemaexamproject.dal.dao.UserDAO;
+import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.TiffService;
@@ -74,13 +76,13 @@ public class ApplicationServices {
 
         /* User task*/
 
-        this.userService = new UserService(userDAO);
 
         IClientDAO clientDAO = new ClientDAO();
         IScanningProfileDAO scanningProfileDAO = new ScanningProfileDAO();
         ISettingDAO settingDAO = new SettingDAO();
         this.clientProfileService = new ClientProfileService(clientDAO, scanningProfileDAO, settingDAO);
 
+        this.userService = new UserService(userDAO, clientProfileService);
 
 
 

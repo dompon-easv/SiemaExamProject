@@ -5,6 +5,7 @@ import dk.siema.siemaexamproject.bll.exceptions.BackendFailureException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
+import dk.siema.siemaexamproject.dal.dao.SettingDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

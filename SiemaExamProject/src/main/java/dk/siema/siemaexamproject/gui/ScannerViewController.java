@@ -5,6 +5,9 @@ import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 
+import dk.siema.siemaexamproject.be.*;
+import dk.siema.siemaexamproject.be.enums.ColorMode;
+import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
@@ -14,6 +17,7 @@ import dk.siema.siemaexamproject.gui.util.TreeSelectionHelper;
 import dk.siema.siemaexamproject.gui.util.DocumentTreeBuilder;
 
 import dk.siema.siemaexamproject.gui.util.KeyBindingHelper;
+import javafx.collections.ObservableList;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -35,7 +39,6 @@ import java.util.List;
 
 
 public class ScannerViewController implements ApplicationServicesAware {
-
 
     private ScannerModel scannerModel;
     private AdminModel adminModel;
@@ -59,7 +62,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private StackPane previewContainer;
     @FXML private ScrollPane imageContainer;
 
-    @FXML private ComboBox profileComboBox;
+    @FXML private ComboBox<ScanningProfile> profileComboBox;
     @FXML private Label profileDescriptionLabel;
     
     private StackPane mockRectangleVisual;
@@ -97,7 +100,6 @@ public class ScannerViewController implements ApplicationServicesAware {
     private void initialize() {
 
         setProfiles();
-
 
         //adding rectangle when click on box or document for rotation
         createMockDocument();
@@ -239,6 +241,7 @@ public class ScannerViewController implements ApplicationServicesAware {
                     if (node.file() != null) {
                         mockRectangleVisual.setVisible(false);
                         imageContainer.setVisible(true);
+                        rotationSlider.setValue(node.file().getRotation());
                         previewImageView.setRotate(node.file().getRotation());
                     } else {
                         //box or document is clicked
@@ -266,7 +269,6 @@ public class ScannerViewController implements ApplicationServicesAware {
                         this::zoomIn,
                         this::zoomOut,
                         this::doRotate
-
                 );
             }
         });
@@ -276,12 +278,101 @@ public class ScannerViewController implements ApplicationServicesAware {
     private void setProfiles() {
         try {
             adminModel.loadProfilesForUser(mainModel.getCurrentUser().getId());
-            profileComboBox.setItems(adminModel.getProfilesForUser());
+            ObservableList<ScanningProfile> profiles = adminModel.getProfilesForUser();
+            System.out.println("Loaded " + profiles.size() + " profiles for user");
+
+            for (ScanningProfile p : profiles) {
+                System.out.println("Profile: " + p.getName() + ", Settings: " +
+                        (p.getProfileSettings() != null ? p.getProfileSettings().size() : 0));
+            }
+
+            profileComboBox.setItems(profiles);
+
+            // Add a value factory to display profile names correctly
+            profileComboBox.setCellFactory(lv -> new ListCell<ScanningProfile>() {
+                @Override
+                protected void updateItem(ScanningProfile item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? null : item.getName());
+                }
+            });
+
+            profileComboBox.setButtonCell(new ListCell<ScanningProfile>() {
+                @Override
+                protected void updateItem(ScanningProfile item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? null : item.getName());
+                }
+            });
+
+            // Add listener to update selected profile in ScannerModel
+            profileComboBox.getSelectionModel().selectedItemProperty().addListener(
+                    (obs, oldVal, newVal) -> {
+                        System.out.println("Selection changed! Old: " + (oldVal != null ? oldVal.getName() : "null") +
+                                ", New: " + (newVal != null ? newVal.getName() : "null"));
+                        if (newVal != null) {
+                            System.out.println("Converting profile: " + newVal.getName());
+                            System.out.println("Profile settings count: " +
+                                    (newVal.getProfileSettings() != null ? newVal.getProfileSettings().size() : 0));
+
+                            Profile runtimeProfile = convertScanningProfileToRuntimeProfile(newVal);
+                            System.out.println("Runtime profile created - Rotation: " + runtimeProfile.getRotation() +
+                                    ", ColorMode: " + runtimeProfile.getColorMode());
+
+                            scannerModel.setSelectedProfile(runtimeProfile);
+                            //profileDescriptionLabel.setText(newVal.getDescription());
+
+                            System.out.println("Profile set in scannerModel. Current selectedProfile: " +
+                                    scannerModel.getSelectedProfile());
+                        }
+                    }
+            );
+
+            // Also try selecting the first profile programmatically if available
+            if (!profiles.isEmpty()) {
+                System.out.println("Selecting first profile automatically: " + profiles.get(0).getName());
+                profileComboBox.getSelectionModel().select(0);
+            }
+
         } catch (Exception e) {
+            e.printStackTrace();
             AlertHelper.error("Error", "Unable to load profiles for user " + mainModel.getCurrentUser().getId());
         }
     }
 
+    private Profile convertScanningProfileToRuntimeProfile(ScanningProfile sp) {
+        if (sp == null) return null;
+
+        int rotation = 0;
+        ColorMode colorMode = ColorMode.COLOR;
+
+        if (sp.getProfileSettings() != null) {
+            for (ProfileSetting ps : sp.getProfileSettings()) {
+                String name = ps.getSetting().getName().toLowerCase();
+                String value = ps.getValue().toLowerCase();
+
+                if (name.contains("rotation")) {
+                    try {
+                        rotation = Integer.parseInt(value);
+                        // Normalize rotation to 0, 90, 180, 270
+                        rotation = (rotation / 90) * 90;
+                    } catch (NumberFormatException e) {
+                        rotation = 0;
+                    }
+                }
+
+                if (name.contains("color")) {
+                    switch (value) {
+                        case "grayscale": colorMode = ColorMode.GRAYSCALE; break;
+                        case "black and white": colorMode = ColorMode.BLACK_WHITE; break;
+                        default: colorMode = ColorMode.COLOR;
+                    }
+                }
+            }
+        }
+
+        return new Profile(sp.getId(), sp.getName(), rotation, colorMode, "barcode");
+    }
 
     // ================= SCAN =================
 

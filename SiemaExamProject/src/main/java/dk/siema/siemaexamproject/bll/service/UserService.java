@@ -1,6 +1,7 @@
 package dk.siema.siemaexamproject.bll.service;
 
 import com.github.f4b6a3.uuid.UuidCreator;
+import dk.siema.siemaexamproject.be.ProfileSetting;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.bll.exceptions.*;
@@ -16,8 +17,11 @@ public class UserService {
 
     private final IUserDAO userDAO;
 
-    public UserService(IUserDAO userDAO) {
+    private final ClientProfileService clientProfileService;
+
+    public UserService(IUserDAO userDAO, ClientProfileService clientProfileService) {
         this.userDAO = userDAO;
+        this.clientProfileService = clientProfileService;
     }
 
     // CREATE
@@ -156,12 +160,26 @@ try {
 
     public List<ScanningProfile> getProfilesForUser(UUID id) throws BackendFailureException {
         try {
-            return userDAO.getProfilesForUser(id);
+            List<ScanningProfile> profiles = userDAO.getProfilesForUser(id);
+
+            // Load settings for each profile
+            for (ScanningProfile profile : profiles) {
+                List<ProfileSetting> settings = clientProfileService.getSettingsForProfile(profile.getId());
+                profile.setSettings(settings);
+                System.out.println("Loaded " + settings.size() + " settings for profile: " + profile.getName());
+            }
+
+            return profiles;
         } catch (DalException e) {
             throw new BackendFailureException("Error fetching profiles");
         }
     }
-    public void assignProfilesForUser(UUID id, int profileId) throws BackendFailureException, ValidationException {
+
+    public List<ProfileSetting> getProfileSettings(int profileId) throws ServiceException {
+        return clientProfileService.getSettingsForProfile(profileId);
+    }
+
+    public void assignProfilesForUser(UUID id, int profileId) throws BackendFailureException, ValidationException{
         if (id == null) {
             throw new ValidationException("User ID is required");
         }

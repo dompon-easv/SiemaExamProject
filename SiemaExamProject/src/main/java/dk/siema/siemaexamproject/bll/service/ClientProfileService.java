@@ -1,6 +1,7 @@
 package dk.siema.siemaexamproject.bll.service;
 
 import dk.siema.siemaexamproject.be.Client;
+import dk.siema.siemaexamproject.be.ProfileSetting;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.Setting;
 import dk.siema.siemaexamproject.bll.exceptions.BackendFailureException;
@@ -104,6 +105,14 @@ public class ClientProfileService {
         }catch (DalException e)
         {
             throw new BackendFailureException("Error updating client");
+        }
+    }
+
+    public List<ProfileSetting> getSettingsForProfile(int profileId) throws DataAccessException {
+        try {
+            return settingDAO.getSettingsForProfile(profileId);
+        } catch (DalException e) {
+            throw new DataAccessException("Error loading settings for profile", e);
         }
     }
 }
