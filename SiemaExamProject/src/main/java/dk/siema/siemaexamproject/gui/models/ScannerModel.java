@@ -1,21 +1,30 @@
 package dk.siema.siemaexamproject.gui.models;
 
+import dk.siema.siemaexamproject.be.Box;
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.be.Profile;
+import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
+import dk.siema.siemaexamproject.gui.util.AlertHelper;
+import dk.siema.siemaexamproject.bll.service.ExportService;
+import dk.siema.siemaexamproject.gui.ScannerViewController;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
@@ -23,6 +32,7 @@ public class ScannerModel {
 
     private final ListProperty<Document> documents = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final BooleanProperty scanning = new SimpleBooleanProperty(false);
+    private final BooleanProperty isExporting = new SimpleBooleanProperty(false);
     private final ObjectProperty<FileEntity> selectedFile = new SimpleObjectProperty<>();
     private final ObjectProperty<Image> currentPreviewImage = new SimpleObjectProperty<>();
     private final StringProperty pageCountInfo = new SimpleStringProperty("0 / 0");
@@ -34,18 +44,21 @@ public class ScannerModel {
 
     private final ScannerService scannerService;
     private final ExecutorService ioExecutor;
+    private final ExportService exportService;
 
     // Simple in-memory cache for loaded images (key = file path)
     private final Map<String, Image> imageCache = new ConcurrentHashMap<>();
 
-    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService) {
+    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService, ExportService exportService) {
         this.ioExecutor = ioExecutor;
         this.scannerService = scannerService;
+        this.exportService = exportService;
     }
 
     public ReadOnlyBooleanProperty scanningProperty() {
         return scanning;
     }
+    public BooleanProperty isExportingProperty() {return isExporting;}
 
     public ReadOnlyListProperty<Document> documentsProperty() {
         return documents;
@@ -57,6 +70,69 @@ public class ScannerModel {
 
     public ObjectProperty<Image> currentPreviewImageProperty() {
         return currentPreviewImage;
+    }
+
+    // ============ SCANNING PROFILES ============
+
+    private final ObjectProperty<Profile> selectedProfile = new SimpleObjectProperty<>();
+
+    public ObjectProperty<Profile> selectedProfileProperty() {
+        return selectedProfile;
+    }
+
+    public Profile getSelectedProfile() {
+        return selectedProfile.get();
+    }
+
+    public void setSelectedProfile(Profile profile) {
+        selectedProfile.set(profile);
+    }
+
+    private BufferedImage applyColorMode(BufferedImage img, String colorMode) {
+        if (colorMode == null || colorMode.equals("COLOR")) return img;
+
+        switch (colorMode) {
+            case "GRAYSCALE": {
+                BufferedImage gray = new BufferedImage(
+                        img.getWidth(),
+                        img.getHeight(),
+                        BufferedImage.TYPE_BYTE_GRAY
+                );
+                Graphics g = gray.getGraphics();
+                g.drawImage(img, 0, 0, null);
+                g.dispose();
+                return gray;
+            }
+            case "BLACK_WHITE": {
+                BufferedImage bw = new BufferedImage(
+                        img.getWidth(),
+                        img.getHeight(),
+                        BufferedImage.TYPE_BYTE_BINARY
+                );
+                Graphics g = bw.getGraphics();
+                g.drawImage(img, 0, 0, null);
+                g.dispose();
+                return bw;
+            }
+            default:
+                return img;
+        }
+    }
+
+    private BufferedImage rotateImage(BufferedImage img, int angle) {
+        if (angle == 0) return img;
+
+        double r = Math.toRadians(angle);
+        int w = img.getWidth();
+        int h = img.getHeight();
+
+        BufferedImage result = new BufferedImage(w, h, img.getType());
+        Graphics2D g = result.createGraphics();
+        g.rotate(r, w / 2.0, h / 2.0);
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+
+        return result;
     }
 
     // ================= BOX ID =================
@@ -82,12 +158,25 @@ public class ScannerModel {
 
     public void scanNext() {
 
+        Profile profile = selectedProfile.get();
+        System.out.println("scanNext called with profile: " + profile);
+        if (profile == null) {
+            System.out.println("ERROR: No profile selected!");
+            Platform.runLater(() -> {
+                AlertHelper.warning("No Profile Selected", "Please select a scanning profile before starting.");
+            });
+            return;
+        }
+        System.out.println("Using profile - Rotation: " + profile.getRotation() +
+                ", ColorMode: " + profile.getColorMode());
+
         Task<DocumentBuilderService.PageResult> task = new Task<>() {
             @Override
             protected DocumentBuilderService.PageResult call() throws Exception {
                 File file = scannerService.getRandomFile();
                 if (file == null) return null;
-                return scannerService.processFile(file);
+
+                return scannerService.processFile(file, profile);
             }
 
             @Override
@@ -135,8 +224,8 @@ public class ScannerModel {
         if (documentIndex >= 0 && documentIndex < documents.size()) {
             Document doc = documents.get(documentIndex);
 
-            if (!doc.getPages().isEmpty()) {
-                setSelectedFile(doc.getPages().get(0));
+            if (!doc.getFiles().isEmpty()) {
+                setSelectedFile(doc.getFiles().get(0));
                 return;
             }
         }
@@ -179,9 +268,12 @@ public class ScannerModel {
             try {
                 BufferedImage img = ImageIO.read(file.toFile());
 
-                Image fxImage = (img != null)
-                        ? SwingFXUtils.toFXImage(img, null)
-                        : null;
+                // Apply color mode
+                if (file.getColorMode() != null && !file.getColorMode().equals("COLOR")) {
+                    img = applyColorMode(img, file.getColorMode());
+                }
+
+                Image fxImage = (img != null) ? SwingFXUtils.toFXImage(img, null) : null;
 
                 Platform.runLater(() -> {
                     imageCache.put(file.getFilePath(), fxImage);
@@ -232,7 +324,7 @@ public class ScannerModel {
     private List<FileEntity> getAllPagesFlattened() {
         List<FileEntity> flatList = new ArrayList<>();
         for (Document doc : documents) {
-            flatList.addAll(doc.getPages());
+            flatList.addAll(doc.getFiles());
         }
         return flatList;
     }
@@ -242,7 +334,7 @@ public class ScannerModel {
         int totalFiles = 0;
 
         for (Document doc : documents) {
-            totalFiles += doc.getPages().size();
+            totalFiles += doc.getFiles().size();
         }
 
         totalScanInfo.set("Total scanned files: " + totalFiles);
@@ -259,7 +351,7 @@ public class ScannerModel {
 
         for (int d = 0; d < documents.size(); d++) {
             Document doc = documents.get(d);
-            List<FileEntity> filesInDoc = doc.getPages();
+            List<FileEntity> filesInDoc = doc.getFiles();
 
             for (int f = 0; f < filesInDoc.size(); f++) {
                 FileEntity checkFile = filesInDoc.get(f);
@@ -287,7 +379,7 @@ public class ScannerModel {
 
     public FileEntity findFileByPath(String path) {
         for (Document doc : documents) {
-            for (FileEntity file : doc.getPages()) {
+            for (FileEntity file : doc.getFiles()) {
                 if (file.getFilePath().equals(path)) {
                     return file;
                 }
@@ -305,9 +397,9 @@ public class ScannerModel {
 
         if (source == null || target == null) return;
 
-        source.getPages().remove(file);
+        source.getFiles().remove(file);
 
-        List<FileEntity> list = target.getPages();
+        List<FileEntity> list = target.getFiles();
         int index = list.indexOf(targetFile);
 
         if (index < 0) list.add(file);
@@ -325,8 +417,8 @@ public class ScannerModel {
 
         if (source == null || target == null) return;
 
-        source.getPages().remove(file);
-        target.getPages().add(file);
+        source.getFiles().remove(file);
+        target.getFiles().add(file);
 
         documents.setAll(new ArrayList<>(documents));
     }
@@ -338,7 +430,7 @@ public class ScannerModel {
 
     private Document findDocument(FileEntity file) {
         for (Document doc : documents) {
-            if (doc.getPages().contains(file)) return doc;
+            if (doc.getFiles().contains(file)) return doc;
         }
         return null;
     }
@@ -365,14 +457,64 @@ public class ScannerModel {
 
     // ================= EXPORT ========================
 
-    public void exportDocuments() {
+    public Task<Void> exportDocument(File targetDir, boolean isMultiPage, String exportName, int profileId) {
+        if (isExporting.get()) return null;
+        isExporting.set(true);
+
+        Task<Void> exportTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+
+                Box exportedBox = new Box();
+                exportedBox.setExportName(exportName);
+                exportedBox.setProfileId(profileId);
+
+                //Fix the Sort Order and relationships based on current state of TreeView/List state
+
+                List<Document> currentTreeView = new ArrayList<>(documents.get());
+                for (Document doc : currentTreeView) {
+                    List<FileEntity> files = doc.getFiles();
+                    for (int i = 0; i < files.size(); i++) {
+                        files.get(i).setSortOrder(i + 1);
+                    }
+                }
+                exportedBox.getDocuments().addAll(currentTreeView);
+
+
+                exportService.processExport(exportedBox, targetDir, isMultiPage, this);
+                return null;
+            }
+        };
+
+        exportTask.setOnSucceeded(e -> isExporting.set(false));
+        exportTask.setOnFailed(e -> {
+            isExporting.set(false);
+            exportTask.getException().printStackTrace();
+        });
+        ioExecutor.submit(exportTask);
+        return exportTask;
+    }
+
+    public void resetState(){
+        //clear the observable list
+        documents.clear();
+        //reset selection properties
+        selectedFile.set(null);
+        currentPreviewImage.set(null);
+
+        //clear the image cache to free up memory
+        imageCache.clear();
+
+        //reset counter strings
+        updateTotalScannedFiles();
+
     }
 
 
     //updates the rotation only for currently selected file
     public void updateRotationForCurrentFile(int newAngle) {
         FileEntity current = selectedFile.get();
-        if (current == null) {
+        if (current != null) {
             current.setRotation(newAngle);
         }
     }

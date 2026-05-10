@@ -2,9 +2,8 @@ package dk.siema.siemaexamproject.dal.interfaces;
 
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
-import dk.siema.siemaexamproject.bll.exceptions.DalException;
+import dk.siema.siemaexamproject.dal.exception.DalException;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 

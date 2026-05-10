@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -12,7 +15,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.TextField?>
 <BorderPane styleClass="scanner-root" stylesheets="@helpers/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.siema.siemaexamproject.gui.ScannerViewController">
 
     <!-- ================= LEFT SIDEBAR ================= -->
@@ -78,6 +80,7 @@
 
                     <!-- PUSH RIGHT -->
                     <Region HBox.hgrow="ALWAYS" />
+               <CheckBox fx:id="multiPageCheckBox" mnemonicParsing="false" text="save as multi-page" />
 
                     <!-- RIGHT SIDE -->
                     <Button onAction="#onExportAction" styleClass="top-action-button" text="⇩ Export" />
@@ -100,8 +103,9 @@
                     <HBox alignment="CENTER" spacing="12" styleClass="pagination-bar">
 
                         <Button onAction="#onPreviousPageAction" styleClass="pagination-button" text="‹" />
-                        <Label fx:id="pageInfoLbl" styleClass="tree-text" text="Page 1 of 3" />
-                        <Button onAction="#onNextPageAction" styleClass="pagination-button" text="›" />
+                        <Label fx:id="pageInfoLbl" styleClass="tree-text" text="Page 1 of 3" HBox.hgrow="NEVER" />
+                        <Button maxWidth="73.0" minWidth="19.0" onAction="#onNextPageAction" prefWidth="19.0" styleClass="pagination-button" text="›" />
+                  <ProgressBar fx:id="exportProgressBar" prefHeight="18.0" prefWidth="87.0" progress="0.0" />
 
                     </HBox>
 

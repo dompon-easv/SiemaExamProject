@@ -51,17 +51,10 @@ public class LoginViewController implements ApplicationServicesAware {
 
             sceneManager.setScene(currentStage, ViewPath.MAINSHELL, "Visione");
 
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
 
             errorLabel.setText("Invalid username or password");
 
-        } catch (ValidationException e) {
-
-            errorLabel.setText(e.getMessage());
-
-        } catch (ServiceException e) {
-
-            errorLabel.setText("Login failed");
-        }
+    }
     }
 }

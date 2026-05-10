@@ -2,12 +2,9 @@ package dk.siema.siemaexamproject.app;
 
 import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
-import dk.siema.siemaexamproject.dal.dao.ClientDAO;
-import dk.siema.siemaexamproject.dal.dao.ScanningProfileDAO;
-import dk.siema.siemaexamproject.dal.dao.SettingDAO;
-import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
-import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
-import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
+import dk.siema.siemaexamproject.bll.service.ExportService;
+import dk.siema.siemaexamproject.dal.dao.*;
+import dk.siema.siemaexamproject.dal.interfaces.*;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.ClientProfileModel;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
@@ -28,20 +25,29 @@ public class ApplicationServices {
 
     private final ViewFactory viewFactory;
     private final SceneManager sceneManager;
-    private final UserService userService;
-    private final ClientProfileService clientProfileService;
 
+
+
+    //services
     private final ExecutorService cpuExecutor;
     private final ExecutorService ioExecutor;
     private final TiffService tiffService;
     private final DocumentBuilderService documentBuilderService;
     private final ScannerService scannerService;
+    private final ExportService exportService;
+    private final UserService userService;
+    private final ClientProfileService clientProfileService;
 
 
+    //Models
     private final MainModel mainModel;
     private final AdminModel adminModel;
     private final ScannerModel scannerModel;
     private final ClientProfileModel clientProfileModel;
+
+    //DAOs
+    IBoxDAO boxDAO = new BoxDAO();
+    IUserDAO userDAO = new UserDAO();
 
 
 
@@ -63,24 +69,26 @@ public class ApplicationServices {
         this.ioExecutor = Executors.newCachedThreadPool();
 
         this.tiffService = new TiffService();
-        this.documentBuilderService = new DocumentBuilderService();
+        this.documentBuilderService = new DocumentBuilderService(boxDAO);
         this.scannerService = new ScannerService(tiffService, documentBuilderService, cpuExecutor);
 
+        this.exportService = new ExportService(boxDAO);
+
         /* User task*/
-        IUserDAO userDAO = new UserDAO();
-        this.userService = new UserService(userDAO);
+
 
         IClientDAO clientDAO = new ClientDAO();
         IScanningProfileDAO scanningProfileDAO = new ScanningProfileDAO();
         ISettingDAO settingDAO = new SettingDAO();
         this.clientProfileService = new ClientProfileService(clientDAO, scanningProfileDAO, settingDAO);
 
+        this.userService = new UserService(userDAO, clientProfileService);
 
 
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel(userService);
-        this.scannerModel = new ScannerModel(ioExecutor, scannerService);
+        this.scannerModel = new ScannerModel(ioExecutor, scannerService,exportService);
         this.clientProfileModel = new ClientProfileModel(clientProfileService);
     }
 

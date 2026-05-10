@@ -1,8 +1,12 @@
 package dk.siema.siemaexamproject.gui.models;
 
+import dk.siema.siemaexamproject.be.ProfileSetting;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
+import dk.siema.siemaexamproject.bll.exceptions.AuthenticationException;
+import dk.siema.siemaexamproject.bll.exceptions.BackendFailureException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
+import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.bll.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,18 +31,18 @@ public class AdminModel {
     }
 
     /*load all users*/
-    public void loadUsers() throws ServiceException {
+    public void loadUsers() throws BackendFailureException {
         users.setAll(userService.getAllUsers());
     }
 
     // create user
-    public void createUser(User user) throws ServiceException {
+    public void createUser(User user) throws BackendFailureException, ValidationException {
         userService.createUser(user);
         users.add(user); // immediate UI update (no reload)
     }
 
     /*update user*/
-    public void updateUser(User user) throws ServiceException {
+    public void updateUser(User user) throws BackendFailureException, ValidationException {
         userService.updateUser(user);
 
         // force UI refresh (JavaFX needs this sometimes)
@@ -49,7 +53,7 @@ public class AdminModel {
     }
 
     /*delete user*/
-    public void deleteUser(User user) throws ServiceException {
+    public void deleteUser(User user) throws BackendFailureException, ValidationException {
         userService.deleteUser(user.getId());
         users.remove(user);
     }
@@ -58,26 +62,33 @@ public class AdminModel {
     public void updatePassword(User user, String newPassword) throws ServiceException {
         userService.updatePassword(user.getId(), newPassword);
     }
-    public User authenticate(String username, String password)
-            throws ServiceException {
+    public User authenticate(String username, String password) throws BackendFailureException, ValidationException, AuthenticationException {
 
         return userService.authenticate(username, password);
     }
 
-    public void loadProfilesForUser(UUID id) throws ServiceException {
+    public void loadProfilesForUser(UUID id) throws BackendFailureException {
         profilesForUser.clear();
-        profilesForUser.setAll(userService.getProfilesForUser(id));
+        List<ScanningProfile> profiles = userService.getProfilesForUser(id);
+        // Settings are already loaded by UserService now
+        profilesForUser.setAll(profiles);
+
+        // Debug output
+        for (ScanningProfile profile : profiles) {
+            System.out.println("Profile: " + profile.getName() +
+                    ", Settings loaded: " + (profile.getProfileSettings() != null ? profile.getProfileSettings().size() : 0));
+        }
     }
 
-    public ObservableList<ScanningProfile> getProfilesForUser() throws ServiceException {
+    public ObservableList<ScanningProfile> getProfilesForUser()  {
         return profilesForUser;
     }
 
-    public void assignProfilesForUser(UUID id, int profileID) throws ServiceException {
+    public void assignProfilesForUser(UUID id, int profileID) throws BackendFailureException, ValidationException {
         userService.assignProfilesForUser(id, profileID);
     }
 
-    public void deleteProfilesForUser(UUID id, int profileID) throws ServiceException {
+    public void deleteProfilesForUser(UUID id, int profileID) throws BackendFailureException, ValidationException {
         userService.deleteProfilesFromUser(id, profileID);
     }
 }

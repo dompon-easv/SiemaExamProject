@@ -1,18 +1,17 @@
 package dk.siema.siemaexamproject.bll.service;
 
 import dk.siema.siemaexamproject.be.Client;
+import dk.siema.siemaexamproject.be.ProfileSetting;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.Setting;
-import dk.siema.siemaexamproject.bll.exceptions.DalException;
-import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
+import dk.siema.siemaexamproject.bll.exceptions.BackendFailureException;
+import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
 import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
-import javafx.collections.ObservableList;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class ClientProfileService {
@@ -27,85 +26,93 @@ public class ClientProfileService {
         this.settingDAO = settingDAO;
     }
 
-    public List<Client> getAllClients() throws ServiceException {
+    public List<Client> getAllClients() throws BackendFailureException {
         try {
             return clientDAO.getAllClients();
         } catch (DalException e) {
-            throw new DataAccessException("Error fetching clients", e);
+            throw new BackendFailureException("Error fetching clients");
         }
     }
 
-    public Client createClient(Client client) throws ServiceException {
+    public Client createClient(Client client) throws BackendFailureException, ValidationException {
         if (client.getName() == null || client.getName().isBlank()) {
             throw new ValidationException("Client name is required");
         }
         try {
             return clientDAO.add(client);
         } catch (DalException e) {
-            throw new DataAccessException("Error creating client", e);
+            throw new BackendFailureException("Error creating client");
         }
 
     }
 
-    public void deleteClient(Client client) throws ServiceException {
+    public void deleteClient(Client client) throws BackendFailureException {
         try {
             clientDAO.deleteClient(client);
         } catch (DalException e) {
-            throw new DataAccessException("Error deleting client", e);
+            throw new BackendFailureException("Error deleting client");
         }
     }
 
-    public void updateClient(Client client) throws ServiceException {
+    public void updateClient(Client client) throws BackendFailureException {
         try{
             clientDAO.updateClient(client);
         }catch (DalException e)
         {
-            throw new DataAccessException("Error updating client", e);
+            throw new BackendFailureException("Error updating client");
         }
     }
 
-    public ScanningProfile createProfile(ScanningProfile profile) throws ServiceException {
+    public ScanningProfile createProfile(ScanningProfile profile) throws BackendFailureException, ValidationException {
         if (profile.getName() == null || profile.getName().isBlank()) {
             throw new ValidationException("Profile name is required");
         }
         try {
             return scanningProfileDAO.add(profile);
         } catch (DalException e) {
-            throw new DataAccessException("Error creating profile", e);
+            throw new BackendFailureException("Error creating profile");
         }
 
     }
 
-    public void deleteProfile(ScanningProfile profile) throws ServiceException {
+    public void deleteProfile(ScanningProfile profile) throws BackendFailureException {
         try {
             scanningProfileDAO.deleteProfile(profile);
         } catch (DalException e) {
-            throw new DataAccessException("Error deleting profile", e);
+            throw new BackendFailureException("Error deleting profile");
         }
     }
 
-    public List<Setting> getAllSettings() throws DataAccessException {
+    public List<Setting> getAllSettings() throws BackendFailureException {
         try{
            return settingDAO.getAllSettings();
         } catch (DalException e){
-            throw new DataAccessException("Error fetching settings", e);
+            throw new BackendFailureException("Error fetching settings");
         }
     }
 
-    public List<ScanningProfile> getAllProfiles() throws DataAccessException {
+    public List<ScanningProfile> getAllProfiles() throws BackendFailureException {
         try {
             return scanningProfileDAO.getAllProfiles();
         } catch (DalException e) {
-            throw new DataAccessException("Error fetching clients", e);
+            throw new BackendFailureException("Error fetching clients");
         }
     }
 
-    public void updateProfile(ScanningProfile profileToEdit) throws DataAccessException {
+    public void updateProfile(ScanningProfile profileToEdit) throws BackendFailureException {
         try{
             scanningProfileDAO.updateProfile(profileToEdit);
         }catch (DalException e)
         {
-            throw new DataAccessException("Error updating client", e);
+            throw new BackendFailureException("Error updating client");
+        }
+    }
+
+    public List<ProfileSetting> getSettingsForProfile(int profileId) throws BackendFailureException {
+        try {
+            return settingDAO.getSettingsForProfile(profileId);
+        } catch (DalException e) {
+            throw new BackendFailureException("Error loading settings for profile");
         }
     }
 }

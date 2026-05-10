@@ -1,9 +1,11 @@
 package dk.siema.siemaexamproject.gui.models;
 
 import dk.siema.siemaexamproject.be.*;
-import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
+import dk.siema.siemaexamproject.bll.exceptions.BackendFailureException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
+import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
+import dk.siema.siemaexamproject.dal.dao.SettingDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -23,24 +25,24 @@ public class ClientProfileModel {
         this.clientProfileService = clientProfileService;
     }
 
-    public void loadAllClients() throws ServiceException {
+    public void loadAllClients() throws BackendFailureException {
         clients.setAll(clientProfileService.getAllClients());
     }
     public ObservableList<Client> getClients() {
         return clients;
     }
 
-    public void createClient(Client client) throws ServiceException {
+    public void createClient(Client client) throws BackendFailureException, ValidationException {
         clientProfileService.createClient(client);
         clients.add(client);
     }
 
-    public void deleteClient(Client client) throws ServiceException {
+    public void deleteClient(Client client) throws BackendFailureException {
         clientProfileService.deleteClient(client);
         clients.remove(client);
     }
 
-    public void updateClient(Client client) throws ServiceException {
+    public void updateClient(Client client) throws BackendFailureException {
         clientProfileService.updateClient(client);
         int index = clients.indexOf(client);
         if (index >= 0) {
@@ -48,18 +50,18 @@ public class ClientProfileModel {
         }
     }
 
-    public void saveNewProfile(ScanningProfile profile) throws ServiceException {
+    public void saveNewProfile(ScanningProfile profile) throws BackendFailureException, ValidationException {
         clientProfileService.createProfile(profile);
         allProfiles.add(profile);
     }
 
-    public void deleteProfile(ScanningProfile profile) throws ServiceException {
+    public void deleteProfile(ScanningProfile profile) throws BackendFailureException {
         clientProfileService.deleteProfile(profile);
         masterProfiles.remove(profile);
         allProfiles.remove(profile);
     }
 
-    public void loadAllSettings() throws DataAccessException {
+    public void loadAllSettings() throws BackendFailureException {
         settings.setAll(clientProfileService.getAllSettings());
     }
     public ObservableList<Setting> getAllSettings() {
@@ -93,12 +95,12 @@ public class ClientProfileModel {
     List<ScanningProfile> masterProfiles = new ArrayList<>();
 
 
-    public void loadAllProfilesFromService () throws ServiceException {
+    public void loadAllProfilesFromService () throws BackendFailureException {
         this.masterProfiles = clientProfileService.getAllProfiles();
         this.allProfiles.setAll(this.masterProfiles);
     }
 
-    public void filterByClient(int clientId) throws ServiceException {
+    public void filterByClient(int clientId) {
         List<ScanningProfile> filteredProfiles = new ArrayList<>();
         for(ScanningProfile profile: masterProfiles)
         {
@@ -107,7 +109,7 @@ public class ClientProfileModel {
         this.allProfiles.setAll(filteredProfiles);
     }
 
-    public void updateProfile(ScanningProfile profileToEdit) throws ServiceException {
+    public void updateProfile(ScanningProfile profileToEdit) throws BackendFailureException {
         clientProfileService.updateProfile(profileToEdit);
 
         for (int i = 0; i < masterProfiles.size(); i++) {

@@ -1,12 +1,9 @@
 package dk.siema.siemaexamproject.dal.dao;
 
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.User;
 import dk.siema.siemaexamproject.be.enums.UserRole;
-import dk.siema.siemaexamproject.bll.exceptions.DalException;
-import dk.siema.siemaexamproject.bll.exceptions.DataAccessException;
-import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
+import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 import dk.siema.siemaexamproject.dal.util.BytesConverter;

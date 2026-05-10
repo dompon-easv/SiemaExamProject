@@ -153,11 +153,7 @@ public class ScanningProfilesViewController implements ApplicationServicesAware 
             if (newVal == null || "Show All".equals(newVal.getName())) {
                 loadAllProfiles();}
             else{
-                try {
-                    model.filterByClient(newVal.getId());
-                } catch (ServiceException e) {
-                    e.printStackTrace();
-                }
+                model.filterByClient(newVal.getId());
             }
         });
     }

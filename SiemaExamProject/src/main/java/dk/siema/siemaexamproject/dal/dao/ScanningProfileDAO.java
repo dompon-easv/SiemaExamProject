@@ -1,13 +1,11 @@
 package dk.siema.siemaexamproject.dal.dao;
 
-import com.microsoft.sqlserver.jdbc.SQLServerException;
 import dk.siema.siemaexamproject.be.ProfileSetting;
 import dk.siema.siemaexamproject.be.ScanningProfile;
 import dk.siema.siemaexamproject.be.Setting;
-import dk.siema.siemaexamproject.bll.exceptions.DalException;
+import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
-import javafx.collections.ObservableList;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -77,9 +77,13 @@ public class TreeSelectionHelper {
         //if no explicit rotation is saved, look at the first file
 
         List<FileEntity> insideFiles = getFilesToRotate(folderNode);
-        if (insideFiles == null || insideFiles.isEmpty()) {
+        if (insideFiles != null && !insideFiles.isEmpty()) {
             return insideFiles.get(0).getRotation();
         }
         return 0;
     }
+    public static void clearCache() {
+        folderRotationCache.clear();
+    }
+
 }
