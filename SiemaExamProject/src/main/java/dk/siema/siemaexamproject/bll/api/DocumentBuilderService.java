@@ -101,9 +101,16 @@ public class DocumentBuilderService {
         int w = img.getWidth();
         int h = img.getHeight();
 
-        BufferedImage result = new BufferedImage(w, h, img.getType());
+        int type = (img.getType() == BufferedImage.TYPE_CUSTOM) ?
+                BufferedImage.TYPE_INT_RGB : img.getType();
+
+        BufferedImage result = new BufferedImage(w, h, type);
 
         Graphics2D g = result.createGraphics();
+        //quality improvement that makes the text in the scan stay sharp
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.rotate(r, w / 2.0, h / 2.0);
         g.drawImage(img, 0, 0, null);
         g.dispose();
