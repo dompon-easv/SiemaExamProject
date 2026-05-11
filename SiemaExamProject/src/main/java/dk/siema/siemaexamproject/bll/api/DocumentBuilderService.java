@@ -45,6 +45,8 @@ public class DocumentBuilderService {
         System.out.println("Original image - Type: " + image.getType() +
                 ", Size: " + image.getWidth() + "x" + image.getHeight());
 
+        boolean isBarcode = barcodeReader.readBarcode(image) != null;
+
         // Apply Profile
         if (profile != null) {
             if (profile.getRotation() != 0) {
@@ -56,8 +58,6 @@ public class DocumentBuilderService {
                 System.out.println("Applied color mode: " + profile.getColorMode());
             }
         }
-
-        boolean isBarcode = barcodeReader.readBarcode(image) != null;
 
         //PREPARE FOR DB
         byte[] fileData;
