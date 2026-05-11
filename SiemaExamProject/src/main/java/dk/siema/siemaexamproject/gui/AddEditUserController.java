@@ -22,7 +22,7 @@ public class AddEditUserController implements ApplicationServicesAware {
 
     @FXML private Label titleLabel;
     @FXML private TextField usernameField;
-    @FXML private TextField emailField;
+    @FXML private TextField notesField;
     @FXML private ComboBox<UserRole> roleCombo;
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
@@ -123,7 +123,7 @@ public class AddEditUserController implements ApplicationServicesAware {
         if (user != null) {
             titleLabel.setText("Edit User");
             usernameField.setText(user.getUsername());
-            emailField.setText(user.getEmail());
+            notesField.setText(user.getNotes());
             roleCombo.setValue(user.getRole());
             passwordField.clear();
             passwordField.setPromptText("Leave empty to keep current password");
@@ -168,7 +168,7 @@ public class AddEditUserController implements ApplicationServicesAware {
 
         User user = new User(
                 usernameField.getText().trim(),
-                emailField.getText().trim(),
+                notesField.getText().trim(),
                 passwordField.getText(),
                 roleCombo.getValue()
         );
@@ -184,7 +184,7 @@ public class AddEditUserController implements ApplicationServicesAware {
     private void updateUser() throws ServiceException {
 
         currentUser.setUsername(usernameField.getText().trim());
-        currentUser.setEmail(emailField.getText().trim());
+        currentUser.setNotes(notesField.getText().trim());
         currentUser.changeRole(roleCombo.getValue());
 
         model.updateUser(currentUser);

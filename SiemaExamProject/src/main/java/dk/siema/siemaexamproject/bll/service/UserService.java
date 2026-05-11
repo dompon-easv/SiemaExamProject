@@ -31,9 +31,6 @@ public class UserService {
             throw new ValidationException("Username is required");
         }
 
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new ValidationException("Email is required");
-        }
 
         if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
             throw new ValidationException("Password is required");

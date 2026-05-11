@@ -19,14 +19,14 @@ public class UserDAO implements IUserDAO {
     //ADD
     @Override
     public User add(User user) throws DalException {
-        String sql = "INSERT INTO dbo.Users (id, username, email, password_hash, role) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dbo.Users (id, username, notes, password_hash, role) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setBytes(1, BytesConverter.uuidToBytes(user.getId()));
             stmt.setString(2, user.getUsername());
-            stmt.setString(3, user.getEmail());
+            stmt.setString(3, user.getNotes());
             stmt.setString(4, user.getPasswordHash());
             stmt.setString(5, user.getRole().name());
 
@@ -116,13 +116,13 @@ public class UserDAO implements IUserDAO {
     //UPDATE
     @Override
     public void update(User user) throws DalException {
-        String sql = "UPDATE dbo.Users SET username = ?, email = ?, role = ? WHERE id = ?";
+        String sql = "UPDATE dbo.Users SET username = ?, notes = ?, role = ? WHERE id = ?";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getEmail());
+            stmt.setString(2, user.getNotes());
             stmt.setString(3, user.getRole().name());
             stmt.setBytes(4, BytesConverter.uuidToBytes(user.getId()));
 
@@ -167,11 +167,11 @@ public class UserDAO implements IUserDAO {
 
         UUID id = BytesConverter.bytesToUUID(rs.getBytes("id"));
         String username = rs.getString("username");
-        String email = rs.getString("email");
+        String notes = rs.getString("notes");
         String password = rs.getString("password_hash");
         UserRole role = UserRole.valueOf(rs.getString("role"));
 
-        return new User(id, username, email, password, role);
+        return new User(id, username, notes, password, role);
     }
 
     public List<ScanningProfile> getProfilesForUser(UUID id) throws DalException {

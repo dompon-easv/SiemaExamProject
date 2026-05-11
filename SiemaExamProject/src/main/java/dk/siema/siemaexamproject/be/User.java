@@ -7,24 +7,24 @@ public class User {
 
     private UUID id;
     private String username;
-    private String email;
+    private String notes;
     private String passwordHash; // holds HASH, not raw password
     private UserRole role;
     private String profileNames;
 
     //Constructor (without id - for creation)
-    public User(String username, String email, String password, UserRole role) {
+    public User(String username, String notes, String password, UserRole role) {
         this.username = username;
-        this.email = email;
+        this.notes = notes;
         this.passwordHash = password;
         this.role = role;
     }
 
     //Constructor (with id - from DB)
-    public User(UUID id, String username, String email, String password, UserRole role) {
+    public User(UUID id, String username, String notes, String password, UserRole role) {
         this. id = id;
         this.username = username;
-        this.email = email;
+        this.notes = notes;
         this.passwordHash = password;
         this.role = role;
     }
@@ -36,8 +36,8 @@ public class User {
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 
     public String getPasswordHash() { return passwordHash; }
     public void changePassword(String hashedPassword) {this.passwordHash = hashedPassword;}
