@@ -37,6 +37,8 @@ public class ScannerModel {
     private final StringProperty totalScanInfo = new SimpleStringProperty("Total scanned files: 0");
     private final StringProperty currentBoxId = new SimpleStringProperty();
 
+    private boolean isFirstScan = true;
+
     //private List<File> files; getalltiffs
     //private int currentIndex = 0; getalltiffs
 
@@ -125,7 +127,17 @@ public class ScannerModel {
         Task<DocumentBuilderService.PageResult> task = new Task<>() {
             @Override
             protected DocumentBuilderService.PageResult call() throws Exception {
-                File file = scannerService.getRandomFile();
+                File file;
+
+                if (isFirstScan) {
+                    //try to get barcode as first scan
+                    file = scannerService.getBarcodeFile();
+                    isFirstScan = false;
+                } else {
+                    //subsequent scan fetch random file
+                    file = scannerService.getRandomFile();
+                }
+
                 if (file == null) return null;
 
                 return scannerService.processFile(file, profile);
