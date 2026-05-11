@@ -8,6 +8,7 @@ import dk.siema.siemaexamproject.bll.exceptions.BackendFailureException;
 import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
 import dk.siema.siemaexamproject.bll.exceptions.ValidationException;
+import dk.siema.siemaexamproject.dal.interfaces.IBoxDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IClientDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IScanningProfileDAO;
 import dk.siema.siemaexamproject.dal.interfaces.ISettingDAO;
@@ -19,6 +20,7 @@ public class ClientProfileService {
     private final IClientDAO clientDAO;
     private final IScanningProfileDAO scanningProfileDAO;
     private final ISettingDAO settingDAO;
+
 
     public ClientProfileService(IClientDAO clientDAO, IScanningProfileDAO scanningProfileDAO, ISettingDAO settingDAO) {
         this.clientDAO = clientDAO;

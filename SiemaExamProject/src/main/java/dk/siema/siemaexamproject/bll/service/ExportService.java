@@ -3,6 +3,9 @@ package dk.siema.siemaexamproject.bll.service;
 import dk.siema.siemaexamproject.be.Box;
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.be.ProfileSetting;
+import dk.siema.siemaexamproject.be.enums.ColorMode;
+import dk.siema.siemaexamproject.bll.exceptions.BackendFailureException;
 import dk.siema.siemaexamproject.dal.interfaces.IBoxDAO;
 import javafx.concurrent.Task;
 
@@ -12,18 +15,38 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.util.List;
+
 
 public class ExportService {
 
     private final IBoxDAO boxDAO;
+    private final ClientProfileService clientProfileService;
 
-    public ExportService(IBoxDAO boxDAO) {
+    public ExportService(IBoxDAO boxDAO, ClientProfileService clientProfileService) {
         this.boxDAO = boxDAO;
+        this.clientProfileService = clientProfileService;
     }
 
     public void processExport (Box box, File targetDir, boolean isMultiPage, Task<?> task) throws IOException {
 
+        ColorMode color = ColorMode.COLOR;
+
+        try {
+            List<ProfileSetting> settings = clientProfileService.getSettingsForProfile(box.getProfileId());
+            String value = settings.stream()
+                    .filter(s -> s.getSetting().getName().equalsIgnoreCase("ColorMode"))
+                    .map(ProfileSetting::getValue)
+                    .findFirst()
+                    .orElse(null);
+
+            if(value != null) {
+                color = ColorMode.valueOf(value.toUpperCase());
+            }
+        } catch (BackendFailureException | IllegalArgumentException e){
+            System.err.println("Could not fetch color mode for profile " + box.getProfileId() + ", using default " + e.getMessage());
+    }
 
         //Create the physical folder: profileName_boxId
         File mainFolder =new File(targetDir, box.getExportName());
@@ -47,8 +70,11 @@ public class ExportService {
                 //1. Read the temporary file
                 BufferedImage image = ImageIO.read(sourceFile);
 
+                //apply profile color mode
+                BufferedImage processedImage = color.apply(image);
+
                 //2. apply the rotation in the Model
-                BufferedImage rotatedImg = rotateImage(image, file.getRotation());
+                BufferedImage rotatedImg = rotateImage(processedImage, file.getRotation());
 
                 //3. save the permanent destination
                 File finalFile = new File(docFolder, "File_" + file.getSortOrder() + ".tiff");

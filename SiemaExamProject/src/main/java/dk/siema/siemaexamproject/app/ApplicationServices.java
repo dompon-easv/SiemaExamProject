@@ -72,7 +72,7 @@ public class ApplicationServices {
         this.documentBuilderService = new DocumentBuilderService(boxDAO);
         this.scannerService = new ScannerService(tiffService, documentBuilderService, cpuExecutor);
 
-        this.exportService = new ExportService(boxDAO);
+
 
         /* User task*/
 
@@ -83,6 +83,8 @@ public class ApplicationServices {
         this.clientProfileService = new ClientProfileService(clientDAO, scanningProfileDAO, settingDAO);
 
         this.userService = new UserService(userDAO, clientProfileService);
+
+        this.exportService = new ExportService(boxDAO,clientProfileService);
 
 
 
@@ -120,4 +122,6 @@ public class ApplicationServices {
     public AdminModel getAdminModel() {return adminModel;}
 
     public MainModel getMainModel() { return mainModel;}
+
+
 }

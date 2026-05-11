@@ -79,7 +79,7 @@ public class DocumentBuilderService {
         );
         entity.setFileData(fileData);
 
-        boxDAO.stageFile(entity);
+        //boxDAO.stageFile(entity);
 
         // Store rotation in the entity
         if (profile != null) {
