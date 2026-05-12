@@ -460,6 +460,8 @@ public class ScannerModel {
     }
 
     public void resetState(){
+        //clean the business logic service to avoid having exported documents when new scan starts
+        scannerService.resetState();
         //clear the observable list
         documents.clear();
         //reset selection properties

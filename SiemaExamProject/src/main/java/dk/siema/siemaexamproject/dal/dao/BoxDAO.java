@@ -103,7 +103,7 @@ public class BoxDAO implements IBoxDAO {
         String checkSql = "SELECT 1 FROM StagedFiles WHERE reference_id = ?";
         //insert metadata into FileEntities
         String insertSql = "INSERT INTO FileEntities " +
-                "(document_id, reference_id, sort_order, rotation, is_barcode VALUES (?,?,?,?,?)";
+                "(document_id, reference_id, sort_order, rotation, is_barcode) VALUES (?,?,?,?,?)";
 
         byte[] refBytes = BytesConverter.uuidToBytes(file.getReferenceId());
 
@@ -123,6 +123,8 @@ public class BoxDAO implements IBoxDAO {
             } else
                 insertFileNormally(conn, file, docId);
 
+        }catch (SQLException e){
+            throw new DalException("Upsert failed: " + e.getMessage());
         }
         }
 
@@ -138,6 +140,8 @@ public class BoxDAO implements IBoxDAO {
             pstmt.setBoolean(5, file.isBarcode());
 
             pstmt.executeUpdate();
+        }catch (SQLException e){
+            throw new DalException("Upsert failed: " + e.getMessage());
         }
     }
 

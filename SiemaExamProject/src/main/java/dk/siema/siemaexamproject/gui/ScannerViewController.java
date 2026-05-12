@@ -535,9 +535,10 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private void onExportAction(ActionEvent actionEvent) {
 
         ScanningProfile selectedProfile = (ScanningProfile) profileComboBox.getValue();
-        int profileId = selectedProfile.getId();
+
         if (selectedProfile == null)
             AlertHelper.error("Profile not selected", "Select a profile");
+        int profileId = selectedProfile.getId ();
 
         String boxIdInput = selectBoxId.getText().trim();
         String exportName = selectedProfile.getName() + "_" + boxIdInput;
