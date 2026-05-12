@@ -1,5 +1,6 @@
 package dk.siema.siemaexamproject.bll.service;
 
+import dk.siema.siemaexamproject.be.ActivityLog;
 import dk.siema.siemaexamproject.be.Box;
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
@@ -12,11 +13,13 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExportService {
 
     private final IBoxDAO boxDAO;
+    private List<ActivityLog> pendingLogs = new ArrayList<>();
 
     public ExportService(IBoxDAO boxDAO) {
         this.boxDAO = boxDAO;
@@ -64,7 +67,7 @@ public class ExportService {
                 rotatedImg.flush();
             }
         }
-            boxDAO.saveBox(box);
+            boxDAO.saveBox(box, pendingLogs);
 
             // 1. DATABASE: Save the Document and File records
             // documentRepo.create(doc);
@@ -127,4 +130,9 @@ public class ExportService {
                 }
             }
         }
-    }}
+    }
+    public void setLogs(List<ActivityLog> logs)
+    {
+        this.pendingLogs = logs;
+    }
+}

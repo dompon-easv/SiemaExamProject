@@ -1,21 +1,19 @@
 package dk.siema.siemaexamproject.gui.models;
 
-import dk.siema.siemaexamproject.be.Box;
-import dk.siema.siemaexamproject.be.Document;
-import dk.siema.siemaexamproject.be.FileEntity;
-import dk.siema.siemaexamproject.be.Profile;
-import dk.siema.siemaexamproject.be.ScanningProfile;
+import com.github.f4b6a3.uuid.UuidCreator;
+import dk.siema.siemaexamproject.app.ApplicationServices;
+import dk.siema.siemaexamproject.be.*;
+import dk.siema.siemaexamproject.be.enums.LogAction;
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.bll.service.ExportService;
-import dk.siema.siemaexamproject.gui.ScannerViewController;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
@@ -23,6 +21,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,14 +45,18 @@ public class ScannerModel {
     private final ScannerService scannerService;
     private final ExecutorService ioExecutor;
     private final ExportService exportService;
+    private final MainModel mainModel;
+
 
     // Simple in-memory cache for loaded images (key = file path)
     private final Map<String, Image> imageCache = new ConcurrentHashMap<>();
+    private ObservableList<ActivityLog> logEntry = FXCollections.observableArrayList();
 
-    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService, ExportService exportService) {
+    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService, ExportService exportService, MainModel mainModel) {
         this.ioExecutor = ioExecutor;
         this.scannerService = scannerService;
         this.exportService = exportService;
+        this.mainModel = mainModel;
     }
 
     public ReadOnlyBooleanProperty scanningProperty() {
@@ -176,7 +180,15 @@ public class ScannerModel {
                 File file = scannerService.getRandomFile();
                 if (file == null) return null;
 
-                return scannerService.processFile(file, profile);
+                DocumentBuilderService.PageResult result = scannerService.processFile(file, profile);
+                FileEntity entity = result.entity();
+                LocalDateTime scanTime = LocalDateTime.ofInstant(
+                        com.github.f4b6a3.uuid.util.UuidUtil.getInstant(entity.getReferenceId()),
+                        ZoneId.systemDefault());
+
+                logAction(entity, LogAction.SCANNED, "File scanned", scanTime);
+                logAction(entity, LogAction.PROFILE_APPLIED, "Profile applied: " + profile.getName(), scanTime);
+                return result;
             }
 
             @Override
@@ -198,6 +210,7 @@ public class ScannerModel {
                     setSelectedFile(page.entity());
                     updateTotalScannedFiles();
                 });
+
             }
 
             @Override
@@ -471,16 +484,25 @@ public class ScannerModel {
 
                 //Fix the Sort Order and relationships based on current state of TreeView/List state
 
+                List<ActivityLog> logsToSave = new ArrayList<>(logEntry);
+                LocalDateTime exportTime = LocalDateTime.now();
+
                 List<Document> currentTreeView = new ArrayList<>(documents.get());
                 for (Document doc : currentTreeView) {
                     List<FileEntity> files = doc.getFiles();
                     for (int i = 0; i < files.size(); i++) {
                         files.get(i).setSortOrder(i + 1);
+
+                        if(files.get(i).getRotation() != 0) {
+                            logsToSave.add(createLogEntry(files.get(i), LogAction.ROTATED_BY, ""+files.get(i).getRotation(), exportTime));
+                        }
+                        logsToSave.add(createLogEntry(files.get(i),
+                                LogAction.EXPORTED, " ", exportTime));
                     }
                 }
                 exportedBox.getDocuments().addAll(currentTreeView);
 
-
+                exportService.setLogs(logsToSave);
                 exportService.processExport(exportedBox, targetDir, isMultiPage, this);
                 return null;
             }
@@ -507,6 +529,7 @@ public class ScannerModel {
 
         //reset counter strings
         updateTotalScannedFiles();
+        logEntry.clear();
 
     }
 
@@ -523,5 +546,24 @@ public class ScannerModel {
         for (FileEntity file : filesToRotate) {
             file.setRotation(newAngle);
         }
+    }
+
+    public ActivityLog createLogEntry(FileEntity file, LogAction action, String details, LocalDateTime time) {
+        UUID userId = mainModel.getCurrentUser().getId();
+        UUID fileId = file.getReferenceId();
+        return new ActivityLog(userId, fileId, action, details, time);
+    }
+    public void logAction(FileEntity file, LogAction action, String details, LocalDateTime time) {
+        if (file == null) return;
+
+        ActivityLog entry = createLogEntry(file, action, details, time);
+
+        Platform.runLater(() -> {
+            logEntry.add(entry);
+        });
+    }
+
+    public ObservableList<ActivityLog> getLogList() {
+        return logEntry;
     }
 }

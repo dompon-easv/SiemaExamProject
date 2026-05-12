@@ -88,7 +88,7 @@ public class ApplicationServices {
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel(userService);
-        this.scannerModel = new ScannerModel(ioExecutor, scannerService,exportService);
+        this.scannerModel = new ScannerModel(ioExecutor, scannerService,exportService,mainModel);
         this.clientProfileModel = new ClientProfileModel(clientProfileService);
     }
 
