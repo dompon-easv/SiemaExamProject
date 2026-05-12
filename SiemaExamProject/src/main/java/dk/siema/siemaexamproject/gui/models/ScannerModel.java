@@ -419,6 +419,36 @@ public class ScannerModel {
         moveFileToLastDocument(file);
     }
 
+    // ================= DELETE FILES ========================
+
+    public void deleteFile(FileEntity fileToDelete) {
+        if (fileToDelete == null) return;
+
+        // Find which document contains this file
+        Document sourceDocument = findDocument(fileToDelete);
+        if (sourceDocument == null) return;
+
+        // Remove the file from the document
+        sourceDocument.getFiles().remove(fileToDelete);
+
+        // If the document becomes empty, delete the entire document
+        if (sourceDocument.getFiles().isEmpty()) {
+            documents.remove(sourceDocument);
+        }
+
+        // Refresh the documents list
+        documents.setAll(new ArrayList<>(documents));
+
+        // If the deleted file was selected, clear selection
+        if (selectedFile.get() != null && selectedFile.get().equals(fileToDelete)) {
+            selectedFile.set(null);
+            currentPreviewImage.set(null);
+            pageCountInfo.set("0 / 0");
+        }
+
+        updateTotalScannedFiles();
+    }
+
     // ================= EXPORT ========================
 
     public Task<Void> exportDocument(File targetDir, boolean isMultiPage, String exportName, int profileId) {
