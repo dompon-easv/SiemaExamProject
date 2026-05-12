@@ -36,7 +36,6 @@ import javafx.stage.DirectoryChooser;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 
 
 public class ScannerViewController implements ApplicationServicesAware {
@@ -126,7 +125,71 @@ public class ScannerViewController implements ApplicationServicesAware {
 
         rebuildTree();
 
-        setupContextMenu();
+        documentTree.setCellFactory(tv -> new TreeCell<>() {
+
+            @Override
+            protected void updateItem(TreeNode item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(empty || item == null ? null : item.toString());
+                setGraphic(null);
+
+                if (item == null || empty) {
+                    getStyleClass().remove(DRAG_OVER_CLASS);
+                    return;
+                }
+
+                // ================= DRAG START =================
+                setOnDragDetected(event -> {
+                    if (item.file() == null) return;
+
+                    Dragboard db = startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(item.file().getFilePath());
+                    db.setContent(content);
+                    event.consume();
+                });
+
+                // ================= DRAG OVER =================
+                setOnDragOver(event -> {
+                    if (event.getDragboard().hasString()) {
+                        event.acceptTransferModes(TransferMode.MOVE);
+                    }
+                    event.consume();
+                });
+
+                // ================= DRAG ENTER =================
+                setOnDragEntered(event -> {
+                    if (!event.getDragboard().hasString()) return;
+
+                    if (!getStyleClass().contains(DRAG_OVER_CLASS)) {
+                        getStyleClass().add(DRAG_OVER_CLASS);
+                    }
+                });
+
+                // ================= DRAG EXIT =================
+                setOnDragExited(event -> {
+                        getStyleClass().remove(DRAG_OVER_CLASS);
+                });
+
+                // ================= DROP =================
+                setOnDragDropped(event -> {
+                    getStyleClass().remove(DRAG_OVER_CLASS);
+
+                    String path = event.getDragboard().getString();
+                    FileEntity dragged = scannerModel.findFileByPath(path);
+
+                    if (dragged != null && item != null) {
+                        handleDrop(dragged, item);
+                        event.setDropCompleted(true);
+                    } else {
+                        event.setDropCompleted(false);
+                    }
+
+                    event.consume();
+                });
+            }
+        });
 
         previewImageView = new ImageView();
         previewImageView.setFitHeight(500);
@@ -209,95 +272,7 @@ public class ScannerViewController implements ApplicationServicesAware {
                 );
             }
         });
-    }
 
-    private void setupContextMenu() {
-
-        documentTree.setCellFactory(tv -> {
-            TreeCell<TreeNode> cell = new TreeCell<>() {
-                @Override
-                protected void updateItem(TreeNode item, boolean empty) {
-                    super.updateItem(item, empty);
-
-                    setText(empty || item == null ? null : item.toString());
-                    setGraphic(null);
-
-                    if (item == null || empty) {
-                        getStyleClass().remove(DRAG_OVER_CLASS);
-                        setContextMenu(null);
-                        return;
-                    }
-
-                    // Setup context menu to delete file nodes (images)
-                    if (item.isFile()) {
-                        ContextMenu contextMenu = new ContextMenu();
-                        MenuItem deleteItem = new MenuItem("Delete File");
-                        //deleteItem.setStyle("-fx-text-fill: red;");
-
-                        deleteItem.setOnAction(event -> {
-                            deleteFileFromTree(item.file());
-                        });
-
-                        contextMenu.getItems().add(deleteItem);
-                        setContextMenu(contextMenu);
-                    } else {
-                        setContextMenu(null);
-                    }
-
-                    // ================= DRAG START =================
-                    setOnDragDetected(event -> {
-                        if (item.file() == null) return;
-
-                        Dragboard db = startDragAndDrop(TransferMode.MOVE);
-                        ClipboardContent content = new ClipboardContent();
-                        content.putString(item.file().getFilePath());
-                        db.setContent(content);
-                        event.consume();
-                    });
-
-                    // ================= DRAG OVER =================
-                    setOnDragOver(event -> {
-                        if (event.getDragboard().hasString()) {
-                            event.acceptTransferModes(TransferMode.MOVE);
-                        }
-                        event.consume();
-                    });
-
-                    // ================= DRAG ENTER =================
-                    setOnDragEntered(event -> {
-                        if (!event.getDragboard().hasString()) return;
-
-                        if (!getStyleClass().contains(DRAG_OVER_CLASS)) {
-                            getStyleClass().add(DRAG_OVER_CLASS);
-                        }
-                    });
-
-                    // ================= DRAG EXIT =================
-                    setOnDragExited(event -> {
-                        getStyleClass().remove(DRAG_OVER_CLASS);
-                    });
-
-                    // ================= DROP =================
-                    setOnDragDropped(event -> {
-                        getStyleClass().remove(DRAG_OVER_CLASS);
-
-                        String path = event.getDragboard().getString();
-                        FileEntity dragged = scannerModel.findFileByPath(path);
-
-                        if (dragged != null && item != null) {
-                            handleDrop(dragged, item);
-                            event.setDropCompleted(true);
-                        } else {
-                            event.setDropCompleted(false);
-                        }
-
-                        event.consume();
-                    });
-                }
-            };
-
-            return cell;
-        });
     }
 
     private void setProfiles() {
@@ -380,7 +355,7 @@ public class ScannerViewController implements ApplicationServicesAware {
                     try {
                         rotation = Integer.parseInt(value);
                         // Normalize rotation to 0, 90, 180, 270
-                        //rotation = (rotation / 90) * 90;
+                        rotation = (rotation / 90) * 90;
                     } catch (NumberFormatException e) {
                         rotation = 0;
                     }
@@ -553,20 +528,6 @@ public class ScannerViewController implements ApplicationServicesAware {
         scannerModel.handleMove(dragged, targetNode.documentIndex(), targetNode.file());
 
         selectFileInTree(dragged);
-    }
-
-    // ================= DELETE ====================
-
-    private void deleteFileFromTree(FileEntity fileToDelete) {
-        if (fileToDelete == null) return;
-
-        String fileName = new File(fileToDelete.getFilePath()).getName();
-
-        if (AlertHelper.confirm("Delete File", "Are you sure you want to delete the file " + fileName + "?")) {
-            scannerModel.deleteFile(fileToDelete);
-            rebuildTree();
-            AlertHelper.information("Success", "File deleted successfully");
-        }
     }
 
     // ================= EXPORT ====================
