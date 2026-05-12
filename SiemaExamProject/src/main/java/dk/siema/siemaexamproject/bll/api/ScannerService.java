@@ -1,10 +1,8 @@
 package dk.siema.siemaexamproject.bll.api;
 
-import dk.siema.siemaexamproject.be.Document;
-import dk.siema.siemaexamproject.be.Profile;
-import dk.siema.siemaexamproject.be.ProfileSetting;
-import dk.siema.siemaexamproject.be.ScanningProfile;
+import dk.siema.siemaexamproject.be.*;
 import dk.siema.siemaexamproject.be.enums.ColorMode;
+import dk.siema.siemaexamproject.gui.ActivityLogsController;
 
 import java.io.File;
 import java.util.ArrayList;

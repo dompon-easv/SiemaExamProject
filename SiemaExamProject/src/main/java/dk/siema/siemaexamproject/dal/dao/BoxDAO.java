@@ -115,7 +115,7 @@ public void saveBox(Box box, List<ActivityLog> logs) {
         String checkSql = "SELECT 1 FROM StagedFiles WHERE reference_id = ?";
         //insert metadata into FileEntities
         String insertSql = "INSERT INTO FileEntities " +
-                "(document_id, reference_id, sort_order, rotation, is_barcode VALUES (?,?,?,?,?)";
+                "(document_id, reference_id, sort_order, rotation, is_barcode)VALUES (?,?,?,?,?)";
 
         byte[] refBytes = BytesConverter.uuidToBytes(file.getReferenceId());
 

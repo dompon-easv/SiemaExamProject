@@ -566,6 +566,12 @@ public class ScannerViewController implements ApplicationServicesAware {
 
             //setup FAILURE handler
             task.setOnFailed(event -> {
+                Throwable error = task.getException();
+                if (error != null) {
+                    System.err.println("\n❌ ============= EXPORT CRASH DETECTED =============");
+                    error.printStackTrace();
+                    System.err.println("====================================================\n");
+                }
                 Platform.runLater(() -> {
                     exportProgressBar.setVisible(false);
                     AlertHelper.error("Export Failed", "The database or file system returned an error. Data was not cleared");

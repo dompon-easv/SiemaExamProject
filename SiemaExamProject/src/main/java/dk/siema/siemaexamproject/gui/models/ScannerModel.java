@@ -11,6 +11,8 @@ import dk.siema.siemaexamproject.be.Profile;
 import dk.siema.siemaexamproject.be.enums.ColorMode;
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
+import dk.siema.siemaexamproject.bll.service.ActivityLogService;
+import dk.siema.siemaexamproject.gui.ActivityLogsController;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.bll.service.ExportService;
 import javafx.application.Platform;
@@ -53,17 +55,19 @@ public class ScannerModel {
     private final ExecutorService ioExecutor;
     private final ExportService exportService;
     private final MainModel mainModel;
+    private final ActivityLogService activityLogService;
 
 
     // Simple in-memory cache for loaded images (key = file path)
     private final Map<String, Image> imageCache = new ConcurrentHashMap<>();
     private ObservableList<ActivityLog> logEntry = FXCollections.observableArrayList();
 
-    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService, ExportService exportService, MainModel mainModel) {
+    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService, ExportService exportService, MainModel mainModel, ActivityLogService activityLogService) {
         this.ioExecutor = ioExecutor;
         this.scannerService = scannerService;
         this.exportService = exportService;
         this.mainModel = mainModel;
+        this.activityLogService = activityLogService;
     }
 
     public ReadOnlyBooleanProperty scanningProperty() {
@@ -534,7 +538,14 @@ public class ScannerModel {
         });
     }
 
-    public ObservableList<ActivityLog> getLogList() {
-        return logEntry;
+    private final ObservableList<ActivityLog> logEntries = FXCollections.observableArrayList();
+
+    public ObservableList<ActivityLog> getLogEntries() {
+        return logEntries;
+    }
+
+    public void loadLogs(ActivityLogsController.FilterType type, String value) {
+        List<ActivityLog> results = activityLogService.getFilteredLogs(type, value);
+        logEntries.setAll(results);
     }
 }

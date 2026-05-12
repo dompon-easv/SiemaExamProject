@@ -12,6 +12,7 @@ public class ActivityLog {
     private LogAction action;
     private String details;
     private LocalDateTime time;
+    private String username;
 
     public ActivityLog(UUID userId, UUID fileId, LogAction action, String details, LocalDateTime time) {
         this.userId = userId;
@@ -30,5 +31,7 @@ public class ActivityLog {
     public String getDetails() {return details;}
     public LocalDateTime getTime() {return time;}
     public int getId() { return id; }
-    public void setId(int id) {this.id = id;} /* to set generated id*/
+    public String getUsername() {return username;}
+    public void setId(int id) {this.id = id;}
+    public void setUsername(String username) {this.username = username;}/* to set generated id*/
 }
