@@ -33,6 +33,12 @@ public class DocumentBuilderService {
 
     public record PageResult(FileEntity entity, boolean barcode) {}
 
+    public boolean hasBarcode(File file) throws Exception {
+        BufferedImage image = ImageIO.read(file);
+        if (image == null) return false;
+        return barcodeReader.readBarcode(image) != null;
+    }
+
     public PageResult processFile(File file, Profile profile) throws Exception {
 
         System.out.println("Processing file: " + file.getName());
@@ -79,7 +85,7 @@ public class DocumentBuilderService {
         );
         entity.setFileData(fileData);
 
-        boxDAO.stageFile(entity);
+        //boxDAO.stageFile(entity);
 
         // Store rotation in the entity
         if (profile != null) {

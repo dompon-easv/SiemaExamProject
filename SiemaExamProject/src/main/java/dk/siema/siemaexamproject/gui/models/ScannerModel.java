@@ -4,6 +4,11 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.be.*;
 import dk.siema.siemaexamproject.be.enums.LogAction;
+import dk.siema.siemaexamproject.be.Box;
+import dk.siema.siemaexamproject.be.Document;
+import dk.siema.siemaexamproject.be.FileEntity;
+import dk.siema.siemaexamproject.be.Profile;
+import dk.siema.siemaexamproject.be.enums.ColorMode;
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
@@ -38,6 +43,8 @@ public class ScannerModel {
     private final StringProperty pageCountInfo = new SimpleStringProperty("0 / 0");
     private final StringProperty totalScanInfo = new SimpleStringProperty("Total scanned files: 0");
     private final StringProperty currentBoxId = new SimpleStringProperty();
+
+    private boolean isFirstScan = true;
 
     //private List<File> files; getalltiffs
     //private int currentIndex = 0; getalltiffs
@@ -92,52 +99,6 @@ public class ScannerModel {
         selectedProfile.set(profile);
     }
 
-    private BufferedImage applyColorMode(BufferedImage img, String colorMode) {
-        if (colorMode == null || colorMode.equals("COLOR")) return img;
-
-        switch (colorMode) {
-            case "GRAYSCALE": {
-                BufferedImage gray = new BufferedImage(
-                        img.getWidth(),
-                        img.getHeight(),
-                        BufferedImage.TYPE_BYTE_GRAY
-                );
-                Graphics g = gray.getGraphics();
-                g.drawImage(img, 0, 0, null);
-                g.dispose();
-                return gray;
-            }
-            case "BLACK_WHITE": {
-                BufferedImage bw = new BufferedImage(
-                        img.getWidth(),
-                        img.getHeight(),
-                        BufferedImage.TYPE_BYTE_BINARY
-                );
-                Graphics g = bw.getGraphics();
-                g.drawImage(img, 0, 0, null);
-                g.dispose();
-                return bw;
-            }
-            default:
-                return img;
-        }
-    }
-
-    private BufferedImage rotateImage(BufferedImage img, int angle) {
-        if (angle == 0) return img;
-
-        double r = Math.toRadians(angle);
-        int w = img.getWidth();
-        int h = img.getHeight();
-
-        BufferedImage result = new BufferedImage(w, h, img.getType());
-        Graphics2D g = result.createGraphics();
-        g.rotate(r, w / 2.0, h / 2.0);
-        g.drawImage(img, 0, 0, null);
-        g.dispose();
-
-        return result;
-    }
 
     // ================= BOX ID =================
 
@@ -177,7 +138,17 @@ public class ScannerModel {
         Task<DocumentBuilderService.PageResult> task = new Task<>() {
             @Override
             protected DocumentBuilderService.PageResult call() throws Exception {
-                File file = scannerService.getRandomFile();
+                File file;
+
+                if (isFirstScan) {
+                    //try to get barcode as first scan
+                    file = scannerService.getBarcodeFile();
+                    isFirstScan = false;
+                } else {
+                    //subsequent scan fetch random file
+                    file = scannerService.getRandomFile();
+                }
+
                 if (file == null) return null;
 
                 DocumentBuilderService.PageResult result = scannerService.processFile(file, profile);
@@ -282,8 +253,8 @@ public class ScannerModel {
                 BufferedImage img = ImageIO.read(file.toFile());
 
                 // Apply color mode
-                if (file.getColorMode() != null && !file.getColorMode().equals("COLOR")) {
-                    img = applyColorMode(img, file.getColorMode());
+                if (file.getColorMode() != null) {
+                    img = ColorMode.valueOf(file.getColorMode().toUpperCase()).apply(img);
                 }
 
                 Image fxImage = (img != null) ? SwingFXUtils.toFXImage(img, null) : null;

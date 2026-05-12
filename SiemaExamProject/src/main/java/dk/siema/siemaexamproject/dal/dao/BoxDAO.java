@@ -19,14 +19,13 @@ public class BoxDAO implements IBoxDAO {
 
     //called during scan to save file to db immediately
     public void stageFile(FileEntity fileEntity) {
-        String sql = "INSERT INTO StagedFiles (reference_id,file_data,is_barcode) VALUES (?,?,?)";
+        String sql = "INSERT INTO StagedFiles (reference_id,file_data) VALUES (?,?)";
 
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setBytes(1, BytesConverter.uuidToBytes(fileEntity.getReferenceId()));
             pstmt.setBytes(2, fileEntity.getFileData());
-            pstmt.setBoolean(3, fileEntity.isBarcode());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -112,41 +111,36 @@ public void saveBox(Box box, List<ActivityLog> logs) {
 
 
     private void upsertFile(Connection conn, FileEntity file, int docId) throws SQLException {
+        //if file was inserted after scanning into StagedFiles
+        String checkSql = "SELECT 1 FROM StagedFiles WHERE reference_id = ?";
+        //insert metadata into FileEntities
+        String insertSql = "INSERT INTO FileEntities " +
+                "(document_id, reference_id, sort_order, rotation, is_barcode VALUES (?,?,?,?,?)";
 
-        //move data from StagedFiles to FileEntities
-        String moveSql = "INSERT INTO FileEntities (document_id, reference_id, sort_order, rotation, is_barcode, file_data) " +
-                "SELECT ?, reference_id, ?, ?, is_barcode, file_data " +
-                "FROM StagedFiles WHERE reference_id = ?";
-
-                //Delete staging after moving
-               String deleteSql = "DELETE FROM StagedFiles WHERE reference_id = ?;";
         byte[] refBytes = BytesConverter.uuidToBytes(file.getReferenceId());
 
-        try (PreparedStatement movePstmt = conn.prepareStatement(moveSql)) {
+        try (PreparedStatement checkPstmt = conn.prepareStatement(checkSql)) {
+            checkPstmt.setBytes(1, refBytes);
 
-
-            movePstmt.setInt(1, docId);
-            movePstmt.setInt(2, file.getSortOrder());
-            movePstmt.setInt(3, file.getRotation());
-            movePstmt.setBytes(4, refBytes);
-
-
-            int rowsMoved = movePstmt.executeUpdate();
-
-            if(rowsMoved == 0) {
-                try(PreparedStatement deletePstmt = conn.prepareStatement(deleteSql)) {
-                    deletePstmt.setBytes(1, refBytes);
-                    deletePstmt.executeUpdate();
+            if (checkPstmt.executeQuery().next()) {
+                //File exists in staging, now save the metadata relatinship
+                try (PreparedStatement insertPstmt = conn.prepareStatement(insertSql)) {
+                    insertPstmt.setInt(1, docId);
+                    insertPstmt.setBytes(2, refBytes);
+                    insertPstmt.setInt(3, file.getSortOrder());
+                    insertPstmt.setInt(4, file.getRotation());
+                    insertPstmt.setBoolean(5, file.isBarcode());
+                    insertPstmt.executeUpdate();
                 }
-                //if it wasn't in staging
-            }else {insertFileNormally(conn, file, docId);}
+            } else
+                insertFileNormally(conn, file, docId);
 
-            }
+        }
         }
 
     private void insertFileNormally(Connection conn, FileEntity file, int docId) throws SQLException {
-        String sql = "INSERT INTO FileEntities (document_id, reference_id, sort_order, rotation, is_barcode, file_data) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO FileEntities (document_id, reference_id, sort_order, rotation, is_barcode) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, docId);
@@ -154,7 +148,6 @@ public void saveBox(Box box, List<ActivityLog> logs) {
             pstmt.setInt(3, file.getSortOrder());
             pstmt.setInt(4, file.getRotation());
             pstmt.setBoolean(5, file.isBarcode());
-            pstmt.setBytes(6, file.getFileData()); // Sending the heavy bytes now as a backup
 
             pstmt.executeUpdate();
         }

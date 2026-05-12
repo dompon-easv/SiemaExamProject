@@ -9,6 +9,7 @@ import dk.siema.siemaexamproject.be.enums.ColorMode;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
 public class ScannerService {
@@ -29,6 +30,31 @@ public class ScannerService {
         this.tiffService = tiffService;
         this.documentBuilderService = documentBuilderService;
         this.cpuExecutor = cpuExecutor;
+    }
+
+    public File getBarcodeFile() throws Exception {
+        List<File> allFiles = tiffService.getAllTiffs();
+
+        // Collect ALL barcode files
+        List<File> barcodeFiles = new ArrayList<>();
+        for (File file : allFiles) {
+            if (documentBuilderService.hasBarcode(file)) {
+                barcodeFiles.add(file);
+                System.out.println("  Found barcode: " + file.getName());
+            }
+        }
+
+        // If we found barcode files, return a RANDOM one
+        if (!barcodeFiles.isEmpty()) {
+            Random random = new Random();
+            File randomBarcode = barcodeFiles.get(random.nextInt(barcodeFiles.size()));
+            System.out.println("✓ Randomly selected barcode file: " + randomBarcode.getName());
+            return randomBarcode;
+        }
+
+        //If no barcode found, return first file
+        System.out.println("⚠ No barcode found, using first file: " + allFiles.get(0).getName());
+        return allFiles.isEmpty() ? null : allFiles.get(0);
     }
 
     public File getRandomFile() throws Exception {
