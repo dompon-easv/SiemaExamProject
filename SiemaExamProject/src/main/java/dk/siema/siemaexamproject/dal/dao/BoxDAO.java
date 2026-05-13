@@ -35,7 +35,7 @@ public class BoxDAO implements IBoxDAO {
 
 
     @Override
-public void saveBox(Box box, List<ActivityLog> logs) {
+public void saveBox(Box box, List<ActivityLog> logs) throws DalException {
         try (Connection conn = ConnectionManager.getConnection()) {
             conn.setAutoCommit(false);
             try {
@@ -121,7 +121,6 @@ public void saveBox(Box box, List<ActivityLog> logs) {
         String insertSql = "INSERT INTO FileEntities " +
                 "(document_id, reference_id, sort_order, rotation, is_barcode)VALUES (?,?,?,?,?)";
 
-                "(document_id, reference_id, sort_order, rotation, is_barcode) VALUES (?,?,?,?,?)";
         byte[] refBytes = BytesConverter.uuidToBytes(file.getReferenceId());
 
         try (PreparedStatement checkPstmt = conn.prepareStatement(checkSql)) {
