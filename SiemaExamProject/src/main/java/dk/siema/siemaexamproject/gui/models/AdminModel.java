@@ -38,7 +38,6 @@ public class AdminModel {
     // create user
     public void createUser(User user) throws BackendFailureException, ValidationException {
         userService.createUser(user);
-        users.add(user); // immediate UI update (no reload)
     }
 
     /*update user*/

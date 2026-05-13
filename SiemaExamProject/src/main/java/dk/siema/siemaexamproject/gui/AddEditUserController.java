@@ -178,6 +178,7 @@ public class AddEditUserController implements ApplicationServicesAware {
         for(Integer profileId : selectedProfileIds) {
             model.assignProfilesForUser(user.getId(), profileId);
         }
+        model.loadUsers();
     }
 
 
