@@ -71,11 +71,24 @@ public class ClientProfileModel {
     public ObservableList<ProfileSetting> getPendingSettings() {
         return pendingSettings;
     }
+
     public void addPendingSetting(ProfileSetting setting) throws ServiceException {
+        for (ProfileSetting existing : pendingSettings) {
+            if (existing.getSetting().getName().equalsIgnoreCase(setting.getSetting().getName())) {
+                throw new ServiceException("The setting '" + setting.getSetting().getName() + "' is already added.");
+            }
+        }
         pendingSettings.add(setting);
+
     }
+
     public void clearPendingSetting() {
         pendingSettings.clear();
+    }
+    public void removePendingSetting(ProfileSetting setting) {
+        if (setting != null) {
+            pendingSettings.remove(setting);
+        }
     }
 
     public List<ScanningProfile> getProfilesForClient(int clientId) {
