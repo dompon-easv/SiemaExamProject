@@ -1,18 +1,21 @@
 package dk.siema.siemaexamproject.dal.dao;
 
-import com.microsoft.sqlserver.jdbc.SQLServerException;
+import dk.siema.siemaexamproject.be.ActivityLog;
 import dk.siema.siemaexamproject.be.Box;
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
+import dk.siema.siemaexamproject.dal.interfaces.IActivityLogDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IBoxDAO;
 import dk.siema.siemaexamproject.dal.util.BytesConverter;
 
 import java.sql.*;
+import java.util.List;
 
 public class BoxDAO implements IBoxDAO {
 
+    IActivityLogDAO activityLogDAO = new ActivityLogDAO();
 
     //called during scan to save file to db immediately
     public void stageFile(FileEntity fileEntity) {
@@ -30,7 +33,9 @@ public class BoxDAO implements IBoxDAO {
         }
     }
 
-    public void saveBox(Box box) throws DalException {
+
+    @Override
+public void saveBox(Box box, List<ActivityLog> logs) throws DalException {
         try (Connection conn = ConnectionManager.getConnection()) {
             conn.setAutoCommit(false);
             try {
@@ -50,15 +55,23 @@ public class BoxDAO implements IBoxDAO {
                         filePstmt.executeBatch();
                     }
                 }
+                activityLogDAO.saveLogs(conn,logs);
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
+                e.printStackTrace();
+                throw new DalException("Transaction failed: " + e.getMessage());
             } finally {
                 conn.setAutoCommit(true);
             }
         } catch (SQLException e) {
             throw new DalException("Connection error: " + e.getMessage());
         }
+
+    }
+
+    @Override
+    public void saveLogs(List<ActivityLog> pendingLogs) throws DalException {
 
     }
 
@@ -106,7 +119,8 @@ public class BoxDAO implements IBoxDAO {
         String checkSql = "SELECT 1 FROM StagedFiles WHERE reference_id = ?";
         //insert metadata into FileEntities
         String insertSql = "INSERT INTO FileEntities " +
-                "(document_id, reference_id, sort_order, rotation, is_barcode) VALUES (?,?,?,?,?)";
+                "(document_id, reference_id, sort_order, rotation, is_barcode)VALUES (?,?,?,?,?)";
+
         byte[] refBytes = BytesConverter.uuidToBytes(file.getReferenceId());
 
         try (PreparedStatement checkPstmt = conn.prepareStatement(checkSql)) {
