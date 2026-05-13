@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 public class ScannerService {
@@ -130,5 +131,17 @@ public class ScannerService {
         this.documents.clear();
         this.currentDocument = null;
         this.docId = 1;
+    }
+
+    // ============ DELETE FILE ============
+
+    public void deleteStagedFile(UUID referenceId) throws Exception {
+        documentBuilderService.deleteStagedFile(referenceId);
+    }
+
+    // ============ CREATE LOGS ============
+
+    public void createLog(ActivityLog log) throws Exception {
+        documentBuilderService.createLog(log);
     }
 }

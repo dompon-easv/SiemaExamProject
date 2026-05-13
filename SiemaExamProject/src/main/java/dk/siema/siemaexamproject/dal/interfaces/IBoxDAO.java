@@ -8,6 +8,7 @@ import dk.siema.siemaexamproject.gui.ScannerViewController;
 
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
 
 public interface IBoxDAO {
     void stageFile(FileEntity fileEntity);
@@ -15,5 +16,5 @@ public interface IBoxDAO {
 
     void saveBox(Box box, List<ActivityLog> logs) throws DalException;
 
-    void saveLogs(List<ActivityLog> pendingLogs) throws DalException;
+    void deleteStagedFile(UUID referenceId) throws DalException;
 }

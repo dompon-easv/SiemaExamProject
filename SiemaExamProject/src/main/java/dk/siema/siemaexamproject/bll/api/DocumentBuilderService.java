@@ -1,5 +1,6 @@
 package dk.siema.siemaexamproject.bll.api;
 
+import dk.siema.siemaexamproject.be.ActivityLog;
 import dk.siema.siemaexamproject.be.FileEntity;
 import dk.siema.siemaexamproject.be.Profile;
 import dk.siema.siemaexamproject.be.ScanningProfile;
@@ -7,6 +8,7 @@ import dk.siema.siemaexamproject.be.enums.ColorMode;
 import dk.siema.siemaexamproject.bll.util.BarcodeReader;
 import com.github.f4b6a3.uuid.UuidCreator;
 
+import dk.siema.siemaexamproject.dal.interfaces.IActivityLogDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IBoxDAO;
 
 import javax.imageio.ImageIO;
@@ -25,10 +27,11 @@ public class DocumentBuilderService {
 
     private final BarcodeReader barcodeReader = new BarcodeReader();
     private final IBoxDAO boxDAO;
+    private final IActivityLogDAO activityLogDAO;
 
-    public DocumentBuilderService(IBoxDAO boxDAO) {
+    public DocumentBuilderService(IBoxDAO boxDAO, IActivityLogDAO activityLogDAO) {
         this.boxDAO = boxDAO;
-
+        this.activityLogDAO = activityLogDAO;
     }
 
     public record PageResult(FileEntity entity, boolean barcode) {}
@@ -156,5 +159,17 @@ public class DocumentBuilderService {
 
             default -> img;
         };
+    }
+
+    // ================= DELETE FILE =================
+
+    public void deleteStagedFile(UUID referenceId) throws Exception {
+        boxDAO.deleteStagedFile(referenceId);
+    }
+
+    // ================= CREATE LOG =================
+
+    public void createLog(ActivityLog log) throws Exception {
+        activityLogDAO.createLog(log);
     }
 }

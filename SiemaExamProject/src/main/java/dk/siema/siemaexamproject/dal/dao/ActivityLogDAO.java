@@ -87,4 +87,25 @@ public class ActivityLogDAO implements IActivityLogDAO {
         throw new DalException("Error while fetching logs from ActivityLogs", e); }
         return logs;
     }
+
+    @Override
+    public void createLog(ActivityLog log) throws DalException {
+        String sql = "INSERT INTO ActivityLogs (user_id, file_id, action, details, timestamp) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setBytes(1, BytesConverter.uuidToBytes(log.getUserId()));
+            pstmt.setBytes(2, BytesConverter.uuidToBytes(log.getFileId()));
+            pstmt.setString(3, log.getAction().name());
+            pstmt.setString(4, log.getDetails());
+            pstmt.setTimestamp(5, java.sql.Timestamp.valueOf(log.getTime()));
+            pstmt.executeUpdate();
+
+            System.out.println("Saved log: " + log.getAction() + " for file: " + log.getFileId());
+
+        } catch (SQLException e) {
+            throw new DalException("Failed to save log: " + e.getMessage(), e);
+        }
+    }
 }

@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface IActivityLogDAO {
     void saveLogs(Connection con, List<ActivityLog> logs) throws DalException;
-
+    void createLog(ActivityLog log) throws DalException;
     List<ActivityLog> getLogsFiltered(ActivityLogsController.FilterType type, String value) throws DalException;
 }

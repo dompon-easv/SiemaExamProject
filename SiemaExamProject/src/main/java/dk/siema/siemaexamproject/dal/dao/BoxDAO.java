@@ -12,6 +12,7 @@ import dk.siema.siemaexamproject.dal.util.BytesConverter;
 
 import java.sql.*;
 import java.util.List;
+import java.util.UUID;
 
 public class BoxDAO implements IBoxDAO {
 
@@ -30,6 +31,27 @@ public class BoxDAO implements IBoxDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DalException("Staging failed: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteStagedFile(UUID referenceId) throws DalException {
+        String sql = "DELETE FROM StagedFiles WHERE reference_id = ?";
+
+        try (Connection conn = ConnectionManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setBytes(1, BytesConverter.uuidToBytes(referenceId));
+            int rowsDeleted = pstmt.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                System.out.println("Deleted staged file: " + referenceId);
+            } else {
+                System.out.println("No staged file found: " + referenceId);
+            }
+
+        } catch (SQLException e) {
+            throw new DalException("Failed to delete staged file: " + e.getMessage(), e);
         }
     }
 
@@ -67,11 +89,6 @@ public void saveBox(Box box, List<ActivityLog> logs) throws DalException {
         } catch (SQLException e) {
             throw new DalException("Connection error: " + e.getMessage());
         }
-
-    }
-
-    @Override
-    public void saveLogs(List<ActivityLog> pendingLogs) throws DalException {
 
     }
 

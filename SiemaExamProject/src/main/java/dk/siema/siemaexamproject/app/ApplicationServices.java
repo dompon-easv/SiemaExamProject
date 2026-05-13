@@ -50,6 +50,7 @@ public class ApplicationServices {
     //DAOs
     IBoxDAO boxDAO = new BoxDAO();
     IUserDAO userDAO = new UserDAO();
+    IActivityLogDAO activityLogDAO = new ActivityLogDAO();
 
 
 
@@ -72,7 +73,7 @@ public class ApplicationServices {
         this.ioExecutor = Executors.newCachedThreadPool();
 
         this.tiffService = new TiffService();
-        this.documentBuilderService = new DocumentBuilderService(boxDAO);
+        this.documentBuilderService = new DocumentBuilderService(boxDAO, activityLogDAO);
         this.scannerService = new ScannerService(tiffService, documentBuilderService, cpuExecutor);
 
 
