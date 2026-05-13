@@ -378,9 +378,8 @@ public class ScannerViewController implements ApplicationServicesAware {
 
                 if (name.contains("rotation")) {
                     try {
+                        // Choose the preferred rotation
                         rotation = Integer.parseInt(value);
-                        // Normalize rotation to 0, 90, 180, 270
-                        //rotation = (rotation / 90) * 90;
                     } catch (NumberFormatException e) {
                         rotation = 0;
                     }
