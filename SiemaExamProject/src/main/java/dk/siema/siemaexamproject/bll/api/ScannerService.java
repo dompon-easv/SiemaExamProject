@@ -125,4 +125,10 @@ public class ScannerService {
 
         return new Profile(rotation, colorMode);
     }
+
+    public void resetState(){
+        this.documents.clear();
+        this.currentDocument = null;
+        this.docId = 1;
+    }
 }
