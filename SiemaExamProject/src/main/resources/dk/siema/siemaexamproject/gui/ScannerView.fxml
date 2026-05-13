@@ -80,7 +80,7 @@
 
                     <!-- PUSH RIGHT -->
                     <Region HBox.hgrow="ALWAYS" />
-               <CheckBox fx:id="multiPageCheckBox" mnemonicParsing="false" text="save as multi-page" />
+               <CheckBox fx:id="multiPageCheckBox" mnemonicParsing="false" text="save as multi-page" visible="false"/>
 
                     <!-- RIGHT SIDE -->
                     <Button onAction="#onExportAction" styleClass="top-action-button" text="⇩ Export" />

@@ -38,22 +38,17 @@
 
                 <TableColumn fx:id="usernameColumn"
                              text="Username"
-                             prefWidth="150"
-                             resizable="false"/>
-
-                <TableColumn fx:id="emailColumn"
-                             text="Email"
-                             prefWidth="260"
+                             prefWidth="200"
                              resizable="false"/>
 
                 <TableColumn fx:id="roleColumn"
                              text="Role"
-                             prefWidth="100"
+                             prefWidth="150"
                              resizable="false"/>
 
                 <TableColumn fx:id="profileAccessColumn"
                              text="Profile Access"
-                             prefWidth="400"
+                             prefWidth="600"
                              resizable="false"/>
 
                 <!-- 🔥 Actions column (controller will inject buttons) -->
