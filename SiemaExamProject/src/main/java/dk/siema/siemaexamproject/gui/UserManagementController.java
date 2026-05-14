@@ -152,6 +152,7 @@ public class UserManagementController implements ApplicationServicesAware {
     }
 
     private void deleteUser(User user) {
+        AlertHelper.confirm("Confirm delete", "Are you sure you want to delete the user?");
         try {
             model.deleteUser(user);
 
