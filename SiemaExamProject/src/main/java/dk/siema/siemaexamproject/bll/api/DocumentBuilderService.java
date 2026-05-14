@@ -167,9 +167,4 @@ public class DocumentBuilderService {
         boxDAO.deleteStagedFile(referenceId);
     }
 
-    // ================= CREATE LOG =================
-
-    public void createLog(ActivityLog log) throws Exception {
-        activityLogDAO.createLog(log);
-    }
 }

@@ -138,10 +138,4 @@ public class ScannerService {
     public void deleteStagedFile(UUID referenceId) throws Exception {
         documentBuilderService.deleteStagedFile(referenceId);
     }
-
-    // ============ CREATE LOGS ============
-
-    public void createLog(ActivityLog log) throws Exception {
-        documentBuilderService.createLog(log);
-    }
 }

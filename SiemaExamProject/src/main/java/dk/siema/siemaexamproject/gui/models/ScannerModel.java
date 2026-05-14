@@ -453,25 +453,20 @@ public class ScannerModel {
         if (sourceDocument == null) return;
 
         try {
-            // FIRST: Create and save the deletion log
-            LocalDateTime deleteTime = LocalDateTime.now();
-            ActivityLog deleteLog = createLogEntry(fileToDelete, LogAction.DELETED, "File deleted from StagedFiles table", deleteTime);
-            scannerService.createLog(deleteLog);
-            System.out.println("Created deletion log for file: " + fileToDelete.getReferenceId());
-
-            // SECOND: Delete from StagedFiles
+            // Delete from StagedFiles
             scannerService.deleteStagedFile(fileToDelete.getReferenceId());
             System.out.println("Deleted from StagedFiles: " + fileToDelete.getReferenceId());
 
-            // Add to in-memory log list for UI display
-            Platform.runLater(() -> logEntry.add(deleteLog));
+            // Add deletion log to batch
+            LocalDateTime deleteTime = LocalDateTime.now();
+            logAction(fileToDelete, LogAction.DELETED, "File deleted", deleteTime);
 
         } catch (Exception e) {
             System.err.println("Failed to delete file: " + e.getMessage());
             AlertHelper.warning("Database Warning", "Could not delete file from database, but file removed from view.");
         }
 
-        // Remove the file from the document
+        // Remove the file from memory
         sourceDocument.getFiles().remove(fileToDelete);
 
         // If the document becomes empty, delete the entire document
