@@ -1,6 +1,7 @@
 package dk.siema.siemaexamproject.dal.interfaces;
 
 import dk.siema.siemaexamproject.be.ActivityLog;
+import dk.siema.siemaexamproject.be.enums.FilterType;
 import dk.siema.siemaexamproject.dal.exception.DalException;
 import dk.siema.siemaexamproject.gui.ActivityLogsController;
 
@@ -10,5 +11,5 @@ import java.util.List;
 
 public interface IActivityLogDAO {
     void saveLogs(Connection con, List<ActivityLog> logs) throws DalException;
-    List<ActivityLog> getLogsFiltered(ActivityLogsController.FilterType type, String value) throws DalException;
+    List<ActivityLog> getLogsFiltered(FilterType type, String value) throws DalException;
 }

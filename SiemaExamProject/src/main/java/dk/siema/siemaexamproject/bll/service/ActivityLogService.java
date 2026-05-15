@@ -3,7 +3,7 @@ package dk.siema.siemaexamproject.bll.service;
 import dk.siema.siemaexamproject.be.ActivityLog;
 import dk.siema.siemaexamproject.dal.dao.ActivityLogDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IActivityLogDAO;
-import dk.siema.siemaexamproject.gui.ActivityLogsController.FilterType;
+import dk.siema.siemaexamproject.be.enums.FilterType;
 
 import java.util.ArrayList;
 import java.util.List;

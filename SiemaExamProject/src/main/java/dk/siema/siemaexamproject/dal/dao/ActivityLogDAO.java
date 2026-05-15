@@ -1,6 +1,7 @@
 package dk.siema.siemaexamproject.dal.dao;
 
 import dk.siema.siemaexamproject.be.ActivityLog;
+import dk.siema.siemaexamproject.be.enums.FilterType;
 import dk.siema.siemaexamproject.be.enums.LogAction;
 import dk.siema.siemaexamproject.dal.ConnectionManager;
 import dk.siema.siemaexamproject.dal.exception.DalException;
@@ -40,7 +41,7 @@ public class ActivityLogDAO implements IActivityLogDAO {
     }
 
     @Override
-    public List<ActivityLog> getLogsFiltered(ActivityLogsController.FilterType type, String value) {
+    public List<ActivityLog> getLogsFiltered(FilterType type, String value) {
         List<ActivityLog> logs = new ArrayList<>();
         String sql = "SELECT al.*, u.username FROM ActivityLogs al " +
                 "JOIN Users u ON al.user_id = u.id ";
