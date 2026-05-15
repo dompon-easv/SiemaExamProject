@@ -536,10 +536,8 @@ public class ScannerViewController implements ApplicationServicesAware {
 
         ScanningProfile selectedProfile = (ScanningProfile) profileComboBox.getValue();
 
-        if (selectedProfile == null){
+        if (selectedProfile == null)
             AlertHelper.error("Profile not selected", "Select a profile");
-            return;}
-
         int profileId = selectedProfile.getId ();
 
         String boxIdInput = selectBoxId.getText().trim();
