@@ -3,6 +3,7 @@ package dk.siema.siemaexamproject.gui.models;
 import com.github.f4b6a3.uuid.UuidCreator;
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.be.*;
+import dk.siema.siemaexamproject.be.enums.FilterType;
 import dk.siema.siemaexamproject.be.enums.LogAction;
 import dk.siema.siemaexamproject.be.Box;
 import dk.siema.siemaexamproject.be.Document;
@@ -590,7 +591,7 @@ public class ScannerModel {
         return logEntries;
     }
 
-    public void loadLogs(ActivityLogsController.FilterType type, String value) {
+    public void loadLogs(FilterType type, String value) {
         List<ActivityLog> results = activityLogService.getFilteredLogs(type, value);
         logEntries.setAll(results);
     }

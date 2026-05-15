@@ -20,7 +20,7 @@ public class ArchitectureComparisonTest {
                 UserRole.ADMIN);
 
         assertNotNull(corrupterUser, "The object was created successfully!");
-        assertEquals("", corrupterUser.getEmail(), "The object is holding wrong data");
+        assertEquals("", corrupterUser.getUsername(), "The object is holding wrong data");
 
         // THE RESULT:
         // We now have a 'corrupterUser' floating around in our RAM.
@@ -38,7 +38,7 @@ public class ArchitectureComparisonTest {
 
         //ACT 1
         //The UI creates bad object and we acknowledge now the object exists in memory
-        User badUser  = new User("","not-an-email",null,UserRole.ADMIN);
+        User badUser  = new User("","not-notes",null,UserRole.ADMIN);
 
         /*ACT 2 & ASSERT
         //hand the bad object to service

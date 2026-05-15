@@ -23,6 +23,10 @@ public class UserService {
         this.userDAO = userDAO;
         this.clientProfileService = clientProfileService;
     }
+    //for TESTING
+    public UserService(IUserDAO userDAO) {
+        this(userDAO,null);
+    }
 
     // CREATE
     public User createUser(User user) throws BackendFailureException, ValidationException {

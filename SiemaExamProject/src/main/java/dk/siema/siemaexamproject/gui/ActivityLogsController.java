@@ -3,12 +3,10 @@ package dk.siema.siemaexamproject.gui;
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.app.ApplicationServicesAware;
 import dk.siema.siemaexamproject.be.ActivityLog;
+import dk.siema.siemaexamproject.be.enums.FilterType;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.transformation.FilteredList;
-import javafx.concurrent.Task;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
@@ -16,7 +14,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.util.ArrayList;
 
 public class ActivityLogsController implements ApplicationServicesAware {
 
@@ -34,11 +31,6 @@ public class ActivityLogsController implements ApplicationServicesAware {
 
     @FXML private TextField searchField;
 
-    public enum FilterType {
-
-        BOX, DOCUMENT, FILE, USER
-
-    }
 
     private ScannerModel scannerModel;
     @Override
