@@ -472,6 +472,9 @@ public class ScannerModel {
         // If the document becomes empty, delete the entire document
         if (sourceDocument.getFiles().isEmpty()) {
             documents.remove(sourceDocument);
+            /*Also remove the document from ScannerService's internal state
+            This ensure that document order is preserved when deleting docs with only one file*/
+            scannerService.removeDocument(sourceDocument);
         }
 
         // Refresh the documents list

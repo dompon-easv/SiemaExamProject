@@ -138,4 +138,22 @@ public class ScannerService {
     public void deleteStagedFile(UUID referenceId) throws Exception {
         documentBuilderService.deleteStagedFile(referenceId);
     }
+
+    // ============ REMOVE DOCUMENT ============
+
+    public void removeDocument(Document documentToRemove) {
+        if (documentToRemove == null) return;
+
+        int index = documents.indexOf(documentToRemove);
+        if (index != -1) {
+            documents.remove(index);
+
+            // Adjust docId if needed (optional)
+            if (currentDocument != null && currentDocument.equals(documentToRemove)) {
+                currentDocument = null;
+            }
+
+            System.out.println("Removed document " + documentToRemove.getId() + " from ScannerService");
+        }
+    }
 }
