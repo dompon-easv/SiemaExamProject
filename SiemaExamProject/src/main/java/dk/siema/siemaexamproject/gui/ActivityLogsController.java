@@ -1,14 +1,28 @@
 package dk.siema.siemaexamproject.gui;
 
+<<<<<<< Updated upstream
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
+=======
+import dk.siema.siemaexamproject.app.ApplicationServices;
+import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.be.ActivityLog;
+import dk.siema.siemaexamproject.be.enums.FilterType;
+import dk.siema.siemaexamproject.gui.models.ScannerModel;
+import dk.siema.siemaexamproject.gui.util.AlertHelper;
+
+import javafx.event.ActionEvent;
+>>>>>>> Stashed changes
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
+<<<<<<< Updated upstream
 public class ActivityLogsController {
+=======
+>>>>>>> Stashed changes
 
     @FXML
     private TableView<LogRow> logsTable;
@@ -18,6 +32,18 @@ public class ActivityLogsController {
     @FXML private TableColumn<LogRow, String> detailsColumn;
     @FXML private TextField searchField;
 
+<<<<<<< Updated upstream
+=======
+
+    private ScannerModel scannerModel;
+    @Override
+    public void setApplicationServices(ApplicationServices services) {
+        this.scannerModel = services.getScannerModel();
+    }
+
+    public record LogRow(String timestamp, String user, String fileId, String action, String details) {}
+
+>>>>>>> Stashed changes
     @FXML
     private void initialize() {
         timestampColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().timestamp()));

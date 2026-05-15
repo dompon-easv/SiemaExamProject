@@ -1,5 +1,12 @@
 package dk.siema.siemaexamproject.gui.models;
 
+<<<<<<< Updated upstream
+=======
+
+import dk.siema.siemaexamproject.be.*;
+import dk.siema.siemaexamproject.be.enums.FilterType;
+import dk.siema.siemaexamproject.be.enums.LogAction;
+>>>>>>> Stashed changes
 import dk.siema.siemaexamproject.be.Box;
 import dk.siema.siemaexamproject.be.Document;
 import dk.siema.siemaexamproject.be.FileEntity;
@@ -7,6 +14,11 @@ import dk.siema.siemaexamproject.be.Profile;
 import dk.siema.siemaexamproject.be.enums.ColorMode;
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
+<<<<<<< Updated upstream
+=======
+import dk.siema.siemaexamproject.bll.service.ActivityLogService;
+
+>>>>>>> Stashed changes
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.bll.service.ExportService;
 import javafx.application.Platform;
@@ -490,4 +502,33 @@ public class ScannerModel {
             file.setRotation(newAngle);
         }
     }
+<<<<<<< Updated upstream
+=======
+
+    public ActivityLog createLogEntry(FileEntity file, LogAction action, String details, LocalDateTime time) {
+        UUID userId = mainModel.getCurrentUser().getId();
+        UUID fileId = file.getReferenceId();
+        return new ActivityLog(userId, fileId, action, details, time);
+    }
+    public void logAction(FileEntity file, LogAction action, String details, LocalDateTime time) {
+        if (file == null) return;
+
+        ActivityLog entry = createLogEntry(file, action, details, time);
+
+        Platform.runLater(() -> {
+            logEntry.add(entry);
+        });
+    }
+
+    private final ObservableList<ActivityLog> logEntries = FXCollections.observableArrayList();
+
+    public ObservableList<ActivityLog> getLogEntries() {
+        return logEntries;
+    }
+
+    public void loadLogs(FilterType type, String value) {
+        List<ActivityLog> results = activityLogService.getFilteredLogs(type, value);
+        logEntries.setAll(results);
+    }
+>>>>>>> Stashed changes
 }
