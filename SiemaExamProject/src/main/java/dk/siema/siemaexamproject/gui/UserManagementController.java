@@ -47,8 +47,8 @@ public class UserManagementController implements ApplicationServicesAware {
         usernameColumn.setCellValueFactory(data ->
                 new SimpleStringProperty(data.getValue().getUsername()));
 
-        emailColumn.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getNotes()));
+       // emailColumn.setCellValueFactory(data ->
+         //       new SimpleStringProperty(data.getValue().getNotes()));
 
         roleColumn.setCellValueFactory(data ->
                 new SimpleStringProperty(data.getValue().getRole().name()));
@@ -152,6 +152,7 @@ public class UserManagementController implements ApplicationServicesAware {
     }
 
     private void deleteUser(User user) {
+        AlertHelper.confirm("Confirm delete", "Are you sure you want to delete the user?");
         try {
             model.deleteUser(user);
 

@@ -1,6 +1,7 @@
 package dk.siema.siemaexamproject.app;
 
 import dk.siema.siemaexamproject.bll.api.ScannerService;
+import dk.siema.siemaexamproject.bll.service.ActivityLogService;
 import dk.siema.siemaexamproject.bll.service.ClientProfileService;
 import dk.siema.siemaexamproject.bll.service.ExportService;
 import dk.siema.siemaexamproject.dal.dao.*;
@@ -37,6 +38,7 @@ public class ApplicationServices {
     private final ExportService exportService;
     private final UserService userService;
     private final ClientProfileService clientProfileService;
+    private final ActivityLogService activityLogService;
 
 
     //Models
@@ -48,12 +50,14 @@ public class ApplicationServices {
     //DAOs
     IBoxDAO boxDAO = new BoxDAO();
     IUserDAO userDAO = new UserDAO();
+    IActivityLogDAO activityLogDAO = new ActivityLogDAO();
 
 
 
 // logic services here
 
     public ApplicationServices() {
+        this.activityLogService = new ActivityLogService();
         // here getters for all logic
 
         // here set all logic fx this.authenticationLogic = new AuthenticationLogic();
@@ -69,7 +73,7 @@ public class ApplicationServices {
         this.ioExecutor = Executors.newCachedThreadPool();
 
         this.tiffService = new TiffService();
-        this.documentBuilderService = new DocumentBuilderService(boxDAO);
+        this.documentBuilderService = new DocumentBuilderService(boxDAO, activityLogDAO);
         this.scannerService = new ScannerService(tiffService, documentBuilderService, cpuExecutor);
 
 
@@ -90,7 +94,7 @@ public class ApplicationServices {
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel(userService);
-        this.scannerModel = new ScannerModel(ioExecutor, scannerService,exportService);
+        this.scannerModel = new ScannerModel(ioExecutor, scannerService,exportService,mainModel,activityLogService);
         this.clientProfileModel = new ClientProfileModel(clientProfileService);
     }
 
@@ -108,6 +112,8 @@ public class ApplicationServices {
     public ScannerService getScannerService() {return scannerService;}
 
     public ScannerModel getScannerModel() {return scannerModel;}
+    public ClientProfileService getClientProfileService() {return clientProfileService;}
+    public ActivityLogService getActivityLogService() {return activityLogService;}
 
     public void shutdown() {
         cpuExecutor.shutdown();

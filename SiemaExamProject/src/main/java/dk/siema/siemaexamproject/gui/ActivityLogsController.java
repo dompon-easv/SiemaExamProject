@@ -1,52 +1,94 @@
 package dk.siema.siemaexamproject.gui;
 
+import dk.siema.siemaexamproject.app.ApplicationServices;
+import dk.siema.siemaexamproject.app.ApplicationServicesAware;
+import dk.siema.siemaexamproject.be.ActivityLog;
+import dk.siema.siemaexamproject.gui.models.ScannerModel;
+import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 
-public class ActivityLogsController {
+import java.util.ArrayList;
 
+public class ActivityLogsController implements ApplicationServicesAware {
+
+    @FXML private TextField boxFilterField;
+    @FXML private TextField docFilterField;
+    @FXML private TextField fileFilterField;
+    @FXML private TextField userFilterField;
     @FXML
-    private TableView<LogRow> logsTable;
-    @FXML private TableColumn<LogRow, String> timestampColumn;
-    @FXML private TableColumn<LogRow, String> userColumn;
-    @FXML private TableColumn<LogRow, String> actionColumn;
-    @FXML private TableColumn<LogRow, String> detailsColumn;
+    private TableView<ActivityLog> logsTable;
+    @FXML private TableColumn<ActivityLog, String> timestampColumn;
+    @FXML private TableColumn<ActivityLog, String> userColumn;
+    @FXML private TableColumn<ActivityLog, String> actionColumn;
+    @FXML private TableColumn<ActivityLog, String> detailsColumn;
+    @FXML private TableColumn<ActivityLog, String> fileIdColumn;
+
     @FXML private TextField searchField;
+
+    public enum FilterType {
+
+        BOX, DOCUMENT, FILE, USER
+
+    }
+
+    private ScannerModel scannerModel;
+    @Override
+    public void setApplicationServices(ApplicationServices services) {
+        this.scannerModel = services.getScannerModel();
+    }
+
+    public record LogRow(String timestamp, String user, String fileId, String action, String details) {}
 
     @FXML
     private void initialize() {
-        timestampColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().timestamp()));
-        userColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().user()));
-        actionColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().action()));
-        detailsColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().details()));
+        userColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+        timestampColumn.setCellValueFactory(new PropertyValueFactory<>("time"));
+        actionColumn.setCellValueFactory(new PropertyValueFactory<>("action"));
+        detailsColumn.setCellValueFactory(new PropertyValueFactory<>("details"));
+        fileIdColumn.setCellValueFactory(new PropertyValueFactory<>("fileId"));
 
-        FilteredList<LogRow> filteredList = new FilteredList<>(FXCollections.observableArrayList(
-                new LogRow("2026-04-22 10:30:15", "scanner_user", "Created case", "Invoice_2026_001.tiff"),
-                new LogRow("2026-04-22 11:15:42", "scanner_user", "Scanned document", "Receipt_Store_A.tiff"),
-                new LogRow("2026-04-22 14:20:33", "qa_user", "Started QA", "Contract_Draft.tiff"),
-                new LogRow("2026-04-22 15:05:12", "admin", "Created user", "qa_user")
-        ));
-
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> filteredList.setPredicate(logRow -> {
-            if (newValue == null || newValue.isBlank()) {
-                return true;
-            }
-            String filter = newValue.toLowerCase();
-            return logRow.timestamp().toLowerCase().contains(filter)
-                    || logRow.user().toLowerCase().contains(filter)
-                    || logRow.action().toLowerCase().contains(filter)
-                    || logRow.details().toLowerCase().contains(filter);
-        }));
-
-        logsTable.setItems(filteredList);
     }
 
-    public record LogRow(String timestamp, String user, String action, String details) {}
+    @FXML
+    public void handleApplyFilters(ActionEvent event) {
+        System.out.println("button apply filters");
+        String box = boxFilterField.getText().trim();
+        String doc = docFilterField.getText().trim();
+        String user = userFilterField.getText().trim();
+        String file = fileFilterField.getText().trim();
 
+        FilterType selectedType = null;
+        String filterValue = "";
+
+        if(!box.isEmpty()) {
+            selectedType = FilterType.BOX;
+            filterValue = box;
+        } else if(!doc.isEmpty()) {
+            selectedType = FilterType.DOCUMENT;
+            filterValue = doc;
+        } else if(!user.isEmpty()) {
+            selectedType = FilterType.USER;
+            filterValue = user;
+            System.out.println("filtering for user" + user);
+        } else if(!file.isEmpty()) {
+            selectedType = FilterType.FILE;
+            filterValue = file;
+        }
+        if(selectedType == null){
+            AlertHelper.error("Filter error", "Please select one valid filter type");
+            return;
+        }
+        scannerModel.loadLogs(selectedType, filterValue);
+        logsTable.setItems(scannerModel.getLogEntries());
+    }
 
 }

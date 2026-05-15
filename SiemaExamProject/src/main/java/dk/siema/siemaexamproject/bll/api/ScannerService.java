@@ -1,15 +1,14 @@
 package dk.siema.siemaexamproject.bll.api;
 
-import dk.siema.siemaexamproject.be.Document;
-import dk.siema.siemaexamproject.be.Profile;
-import dk.siema.siemaexamproject.be.ProfileSetting;
-import dk.siema.siemaexamproject.be.ScanningProfile;
+import dk.siema.siemaexamproject.be.*;
 import dk.siema.siemaexamproject.be.enums.ColorMode;
+import dk.siema.siemaexamproject.gui.ActivityLogsController;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 public class ScannerService {
@@ -132,5 +131,11 @@ public class ScannerService {
         this.documents.clear();
         this.currentDocument = null;
         this.docId = 1;
+    }
+
+    // ============ DELETE FILE ============
+
+    public void deleteStagedFile(UUID referenceId) throws Exception {
+        documentBuilderService.deleteStagedFile(referenceId);
     }
 }

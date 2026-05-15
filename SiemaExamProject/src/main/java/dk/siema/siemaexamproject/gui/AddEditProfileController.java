@@ -148,11 +148,15 @@ public class AddEditProfileController implements ApplicationServicesAware {
                 // Check for double click AND ensure they didn't click an empty row
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     ProfileSetting clickedSetting = row.getItem();
-                    loadSettingForEditing(clickedSetting);
-                }
+                    deleteSetting(clickedSetting);                }
             });
             return row;
         });
+    }
+
+    private void deleteSetting(ProfileSetting clickedSetting) {
+        AlertHelper.confirm("Confirm delete", "Are you sure you want to remove the setting?");
+        model.removePendingSetting(clickedSetting);
     }
 
     private void loadSettingForEditing(ProfileSetting clickedSetting) {
@@ -251,8 +255,12 @@ public class AddEditProfileController implements ApplicationServicesAware {
         ProfileSetting newSetting = new ProfileSetting(selectedSetting, finalValue);
         try {
             model.addPendingSetting(newSetting);
+            settingNameComboBox.getSelectionModel().clearSelection();
+            numericValueTextField.clear();
+            choiceValueComboBox.getSelectionModel().clearSelection();
         }catch (ServiceException e){
             e.printStackTrace();
+            AlertHelper.warning("Duplicate setting", e.getMessage());
         }
         settingNameComboBox.getSelectionModel().clearSelection();
         numericValueTextField.clear();
