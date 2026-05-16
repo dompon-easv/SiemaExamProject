@@ -1,9 +1,7 @@
 package dk.siema.siemaexamproject.app;
 
 import dk.siema.siemaexamproject.bll.api.ScannerService;
-import dk.siema.siemaexamproject.bll.service.ActivityLogService;
-import dk.siema.siemaexamproject.bll.service.ClientProfileService;
-import dk.siema.siemaexamproject.bll.service.ExportService;
+import dk.siema.siemaexamproject.bll.service.*;
 import dk.siema.siemaexamproject.dal.dao.*;
 import dk.siema.siemaexamproject.dal.interfaces.*;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
@@ -12,7 +10,6 @@ import dk.siema.siemaexamproject.gui.models.ScannerModel;
 import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.util.SceneManager;
 import dk.siema.siemaexamproject.gui.util.ViewFactory;
-import dk.siema.siemaexamproject.bll.service.UserService;
 import dk.siema.siemaexamproject.dal.dao.UserDAO;
 import dk.siema.siemaexamproject.dal.interfaces.IUserDAO;
 
@@ -35,6 +32,7 @@ public class ApplicationServices {
     private final TiffService tiffService;
     private final DocumentBuilderService documentBuilderService;
     private final ScannerService scannerService;
+    private final ImportService importService;
     private final ExportService exportService;
     private final UserService userService;
     private final ClientProfileService clientProfileService;
@@ -88,13 +86,14 @@ public class ApplicationServices {
 
         this.userService = new UserService(userDAO, clientProfileService);
 
+        this.importService = new ImportService();
         this.exportService = new ExportService(boxDAO,clientProfileService);
 
 
 
         this.mainModel = new MainModel();
         this.adminModel = new AdminModel(userService);
-        this.scannerModel = new ScannerModel(ioExecutor, scannerService,exportService,mainModel,activityLogService);
+        this.scannerModel = new ScannerModel(ioExecutor, scannerService, importService, exportService,mainModel,activityLogService);
         this.clientProfileModel = new ClientProfileModel(clientProfileService);
     }
 
@@ -114,6 +113,7 @@ public class ApplicationServices {
     public ScannerModel getScannerModel() {return scannerModel;}
     public ClientProfileService getClientProfileService() {return clientProfileService;}
     public ActivityLogService getActivityLogService() {return activityLogService;}
+    public ImportService getImportService() {return importService;}
 
     public void shutdown() {
         cpuExecutor.shutdown();

@@ -3,6 +3,7 @@ package dk.siema.siemaexamproject.gui.models;
 import com.github.f4b6a3.uuid.UuidCreator;
 import dk.siema.siemaexamproject.app.ApplicationServices;
 import dk.siema.siemaexamproject.be.*;
+import dk.siema.siemaexamproject.be.enums.ImportMode;
 import dk.siema.siemaexamproject.be.enums.LogAction;
 import dk.siema.siemaexamproject.be.Box;
 import dk.siema.siemaexamproject.be.Document;
@@ -12,6 +13,7 @@ import dk.siema.siemaexamproject.be.enums.ColorMode;
 import dk.siema.siemaexamproject.bll.api.DocumentBuilderService;
 import dk.siema.siemaexamproject.bll.api.ScannerService;
 import dk.siema.siemaexamproject.bll.service.ActivityLogService;
+import dk.siema.siemaexamproject.bll.service.ImportService;
 import dk.siema.siemaexamproject.gui.ActivityLogsController;
 import dk.siema.siemaexamproject.gui.util.AlertHelper;
 import dk.siema.siemaexamproject.bll.service.ExportService;
@@ -24,6 +26,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
+import javafx.stage.Window;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -53,6 +56,7 @@ public class ScannerModel {
 
     private final ScannerService scannerService;
     private final ExecutorService ioExecutor;
+    private final ImportService importService;
     private final ExportService exportService;
     private final MainModel mainModel;
     private final ActivityLogService activityLogService;
@@ -62,9 +66,10 @@ public class ScannerModel {
     private final Map<String, Image> imageCache = new ConcurrentHashMap<>();
     private ObservableList<ActivityLog> logEntry = FXCollections.observableArrayList();
 
-    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService, ExportService exportService, MainModel mainModel, ActivityLogService activityLogService) {
+    public ScannerModel(ExecutorService ioExecutor, ScannerService scannerService, ImportService importService, ExportService exportService, MainModel mainModel, ActivityLogService activityLogService) {
         this.ioExecutor = ioExecutor;
         this.scannerService = scannerService;
+        this.importService = importService;
         this.exportService = exportService;
         this.mainModel = mainModel;
         this.activityLogService = activityLogService;
@@ -488,6 +493,49 @@ public class ScannerModel {
         }
 
         updateTotalScannedFiles();
+    }
+
+    // ================= IMPORT ========================
+
+    public List<File> selectImportFiles(ImportMode mode, Window window) {
+        return importService.selectFiles(mode, window);
+    }
+
+    public Task<Void> importFiles(List<File> files, Profile profile) {
+
+        return new Task<>() {
+
+            @Override
+            protected Void call() throws Exception {
+
+                List<Document> allDocs = new ArrayList<>();
+
+                int i = 0;
+
+                for (File file : files) {
+
+                    // ScannerService does scanning logic
+                    DocumentBuilderService.PageResult result =
+                            scannerService.importFile(file, profile);
+
+                    if (result == null) continue;
+
+                    allDocs = scannerService.handlePage(result);
+
+                    i++;
+                    updateProgress(i, files.size());
+                }
+
+                List<Document> finalDocs = new ArrayList<>(allDocs);
+
+                Platform.runLater(() -> {
+                    documents.setAll(finalDocs);
+                    updateTotalScannedFiles();
+                });
+
+                return null;
+            }
+        };
     }
 
     // ================= EXPORT ========================

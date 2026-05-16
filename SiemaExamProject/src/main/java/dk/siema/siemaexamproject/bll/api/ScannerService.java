@@ -156,4 +156,10 @@ public class ScannerService {
             System.out.println("Removed document " + documentToRemove.getId() + " from ScannerService");
         }
     }
+
+    // ================ IMPORT ================
+
+    public DocumentBuilderService.PageResult importFile(File file, Profile profile) throws Exception {
+        return documentBuilderService.importFile(file, profile);
+    }
 }

@@ -15,6 +15,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.MenuButton?>
+
 <BorderPane styleClass="scanner-root" stylesheets="@helpers/app.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.siema.siemaexamproject.gui.ScannerViewController">
 
     <!-- ================= LEFT SIDEBAR ================= -->
@@ -83,6 +86,14 @@
                <CheckBox fx:id="multiPageCheckBox" mnemonicParsing="false" text="save as multi-page" visible="false"/>
 
                     <!-- RIGHT SIDE -->
+                    <MenuButton text="⇧ Import" styleClass="top-action-button">
+
+                        <items>
+                            <MenuItem text="📄 Import Files" onAction="#onImportFilesAction"/>
+                            <MenuItem text="📁 Import Folder" onAction="#onImportDirectoryAction"/>
+                        </items>
+
+                    </MenuButton>
                     <Button onAction="#onExportAction" styleClass="top-action-button" text="⇩ Export" />
 
                 </HBox>
@@ -105,7 +116,7 @@
                         <Button onAction="#onPreviousPageAction" styleClass="pagination-button" text="‹" />
                         <Label fx:id="pageInfoLbl" styleClass="tree-text" text="Page 1 of 3" HBox.hgrow="NEVER" />
                         <Button maxWidth="73.0" minWidth="19.0" onAction="#onNextPageAction" prefWidth="19.0" styleClass="pagination-button" text="›" />
-                  <ProgressBar fx:id="exportProgressBar" prefHeight="18.0" prefWidth="87.0" progress="0.0" />
+                  <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="87.0" progress="0.0" />
 
                     </HBox>
 

@@ -167,4 +167,78 @@ public class DocumentBuilderService {
         boxDAO.deleteStagedFile(referenceId);
     }
 
+    // ================= IMPORT =================
+
+    public PageResult importFile(File file, Profile profile) throws Exception {
+        System.out.println("Importing file: " + file.getName());
+        System.out.println("Applying profile - Rotation: " + profile.getRotation() +
+                ", ColorMode: " + profile.getColorMode());
+
+        BufferedImage image = ImageIO.read(file);
+        if (image == null) {
+            System.err.println("Failed to read image: " + file.getAbsolutePath());
+            return null;
+        }
+
+        System.out.println("Original image - Type: " + image.getType() +
+                ", Size: " + image.getWidth() + "x" + image.getHeight());
+
+        // Check for barcode (optional - can be false for imported files)
+        boolean isBarcode = barcodeReader.readBarcode(image) != null;
+
+        // Apply Profile settings
+        if (profile != null) {
+            if (profile.getRotation() != 0) {
+                image = rotate(image, profile.getRotation());
+                System.out.println("Applied rotation: " + profile.getRotation());
+            }
+            if (profile.getColorMode() != ColorMode.COLOR) {
+                image = applyColorMode(image, profile.getColorMode());
+                System.out.println("Applied color mode: " + profile.getColorMode());
+            }
+        }
+
+        // Prepare for DB
+        byte[] fileData;
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            // Determine output format based on file extension or default to TIFF
+            String format = getImageFormat(file);
+            ImageIO.write(image, format, outputStream);
+            fileData = outputStream.toByteArray();
+        }
+
+        image.flush();
+
+        UUID referenceId = UuidCreator.getTimeOrderedEpoch();
+
+        FileEntity entity = new FileEntity(
+                referenceId,
+                0,
+                file.getAbsolutePath(),
+                0,
+                isBarcode
+        );
+        entity.setFileData(fileData);
+
+        // Stage the file
+        boxDAO.stageFile(entity);
+
+        // Store rotation and color mode in the entity
+        if (profile != null) {
+            entity.setRotation(profile.getRotation());
+            entity.setColorMode(profile.getColorMode().toString());
+        }
+
+        return new PageResult(entity, isBarcode);
+    }
+
+    private String getImageFormat(File file) {
+        String fileName = file.getName().toLowerCase();
+        if (fileName.endsWith(".png")) return "png";
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) return "jpg";
+        if (fileName.endsWith(".bmp")) return "bmp";
+        return "tiff";
+    }
+
+
 }

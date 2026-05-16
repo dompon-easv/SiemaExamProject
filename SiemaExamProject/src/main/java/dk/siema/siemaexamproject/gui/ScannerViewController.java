@@ -7,7 +7,7 @@ import dk.siema.siemaexamproject.be.ScanningProfile;
 
 import dk.siema.siemaexamproject.be.*;
 import dk.siema.siemaexamproject.be.enums.ColorMode;
-import dk.siema.siemaexamproject.bll.exceptions.ServiceException;
+import dk.siema.siemaexamproject.be.enums.ImportMode;
 import dk.siema.siemaexamproject.gui.models.AdminModel;
 import dk.siema.siemaexamproject.gui.models.MainModel;
 import dk.siema.siemaexamproject.gui.models.ScannerModel;
@@ -33,6 +33,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.util.List;
@@ -52,7 +53,7 @@ public class ScannerViewController implements ApplicationServicesAware {
     @FXML private Slider rotationSlider;
     @FXML private Label rotationValueLbl;
 
-    @FXML private ProgressBar exportProgressBar;
+    @FXML private ProgressBar progressBar;
 
 
     @FXML private CheckBox multiPageCheckBox;
@@ -65,7 +66,8 @@ public class ScannerViewController implements ApplicationServicesAware {
 
     @FXML private ComboBox<ScanningProfile> profileComboBox;
     @FXML private Label profileDescriptionLabel;
-    
+    private FileChooser fileChooser;
+
     private StackPane mockRectangleVisual;
 
     private static final String DRAG_OVER_CLASS = "tree-cell-drag-over";
@@ -568,6 +570,95 @@ public class ScannerViewController implements ApplicationServicesAware {
         }
     }
 
+    // ================= IMPORT ====================
+
+    @FXML
+    private void onImportFilesAction(ActionEvent event) {
+        startImport(ImportMode.FILES);
+    }
+
+    @FXML
+    private void onImportDirectoryAction(ActionEvent event) {
+        System.out.println("=== onImportDirectoryAction CALLED ===");
+        startImport(ImportMode.DIRECTORY);
+    }
+
+    private void startImport(ImportMode mode) {
+        System.out.println("=== startImport called with mode: " + mode + " ===");
+
+        Profile selectedProfile = scannerModel.getSelectedProfile();
+        System.out.println("Selected profile: " + (selectedProfile != null ? selectedProfile.getName() : "NULL"));
+
+        if (selectedProfile == null) {
+            AlertHelper.warning("No Profile Selected", "Please select a scanning profile before importing.");
+            return;
+        }
+
+        String boxId = selectBoxId.getText();
+        System.out.println("Box ID: " + boxId);
+
+        if (boxId == null || boxId.isBlank()) {
+            AlertHelper.error("Missing Box ID", "Please enter a Box ID before importing.");
+            return;
+        }
+
+        // IMPORTANT: Set the Box ID in the model
+        scannerModel.setCurrentBoxId(boxId);
+        System.out.println("Box ID set in model: " + scannerModel.getCurrentBoxId());
+
+        System.out.println("Calling scannerModel.selectImportFiles with mode: " + mode);
+        List<File> files = scannerModel.selectImportFiles(
+                mode,
+                documentTree.getScene().getWindow()
+        );
+
+        System.out.println("Files returned: " + (files != null ? files.size() : "NULL"));
+        if (files != null && !files.isEmpty()) {
+            for (int i = 0; i < Math.min(files.size(), 10); i++) {
+                System.out.println("  File " + (i+1) + ": " + files.get(i).getAbsolutePath());
+            }
+            if (files.size() > 10) {
+                System.out.println("  ... and " + (files.size() - 10) + " more files");
+            }
+        }
+
+        if (files == null || files.isEmpty()) {
+            AlertHelper.information("No Files Found", "No image files were found in the selected folder.");
+            return;
+        }
+
+        System.out.println("Creating import task for " + files.size() + " files");
+        Task<Void> task = scannerModel.importFiles(files, selectedProfile);
+        setupImportTask(task, files.size());
+    }
+
+    private void setupImportTask(Task<Void> task, int fileCount) {
+
+        progressBar.setVisible(true);
+        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+
+        task.setOnSucceeded(e -> {
+            Platform.runLater(() -> {
+                progressBar.setVisible(false);
+                AlertHelper.information("Import Complete", fileCount + " files imported.");
+            });
+        });
+
+        task.setOnFailed(e -> {
+            Throwable ex = task.getException();
+            if (ex != null) {
+                ex.printStackTrace();
+            }
+
+            Platform.runLater(() -> {
+                progressBar.setVisible(false);
+                AlertHelper.error("Import Failed", "Something went wrong during import.");
+            });
+        });
+
+        new Thread(task).start();
+    }
+
     // ================= EXPORT ====================
 
     @FXML private void onExportAction(ActionEvent actionEvent) {
@@ -591,13 +682,13 @@ public class ScannerViewController implements ApplicationServicesAware {
             Task<Void> task = scannerModel.exportDocument(selectedDir, isMultiPage, exportName, selectedProfile.getId());
 
             //show the bar
-            exportProgressBar.setVisible(true);
-            exportProgressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            progressBar.setVisible(true);
+            progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
 
             //setup SUCCESS handler
             task.setOnSucceeded(event -> {
                 Platform.runLater(() -> {
-                    exportProgressBar.setVisible(false);
+                    progressBar.setVisible(false);
                     resetUI();
                     AlertHelper.information("Export Successful", "Data saved and workspace cleared.");
                 });
@@ -612,7 +703,7 @@ public class ScannerViewController implements ApplicationServicesAware {
                     System.err.println("====================================================\n");
                 }
                 Platform.runLater(() -> {
-                    exportProgressBar.setVisible(false);
+                    progressBar.setVisible(false);
                     AlertHelper.error("Export Failed", "The database or file system returned an error. Data was not cleared");
                 });
             });
