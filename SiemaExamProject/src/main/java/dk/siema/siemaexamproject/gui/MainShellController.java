@@ -55,7 +55,7 @@ public class MainShellController implements ApplicationServicesAware {
 
         scannerButton.setSelected(true);
 
-        KeyBindingHelper.setGlobalLogoutAction(this::logout, this::showScannerView, this::showAdminView, this::showHelpAction);
+        KeyBindingHelper.setGlobalLogoutAction(this::logout, this::showHelpAction);
         contentContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 // Calling clear here forces the helper to initialize the global shortcuts

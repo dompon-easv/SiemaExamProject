@@ -205,7 +205,9 @@ public class ScannerViewController implements ApplicationServicesAware {
                         this::startNewScan,
                         this::zoomIn,
                         this::zoomOut,
-                        this::doRotate
+                        this::doRotate,
+                        this::onExportAction,
+                        this::deleteShortcut
                 );
             }
         });
@@ -568,9 +570,20 @@ public class ScannerViewController implements ApplicationServicesAware {
         }
     }
 
+    private void deleteShortcut()
+    {
+        TreeItem<TreeNode> selectedNode = documentTree.getSelectionModel().getSelectedItem();
+        if (selectedNode != null && selectedNode.getValue() != null) {
+            FileEntity fileToDelete = selectedNode.getValue().file();
+            deleteFileFromTree(fileToDelete);
+        } else {
+            AlertHelper.warning("No Selection", "Please select a file to delete first.");
+        }
+    }
+
     // ================= EXPORT ====================
 
-    @FXML private void onExportAction(ActionEvent actionEvent) {
+    @FXML private void onExportAction() {
 
         ScanningProfile selectedProfile = (ScanningProfile) profileComboBox.getValue();
 

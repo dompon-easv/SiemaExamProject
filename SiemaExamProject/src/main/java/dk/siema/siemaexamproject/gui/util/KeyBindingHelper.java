@@ -28,12 +28,12 @@ public class KeyBindingHelper {
                 NEW SCAN: CTRL + S
                 PREVIEW ZOOM IN: CTRL + PLUS
                 PREVIEW ZOOM OUT: CTRL + MINUS
+                DELETE FILE: BACKSPACE
                 FILE ROTATION: CTRL + R
                 EXPORT BOX: CTRL + E """);
 
         shortcutInfo.put(UserRole.ADMIN, """
-                SCANNER VIEW: CTRL + 1
-                ADMIN VIEW: CTRL + 2
+
                 CYCLE THROUGH ADMIN TABS: CTRL + TAB
                 OPEN NEW USER/PROFILE WINDOW: CTRL + N
                 EDIT SELECTED USER/PROFILE WINDOW: CTRL + E
@@ -52,12 +52,10 @@ public class KeyBindingHelper {
 
     // ================= 1. GLOBAL SCOPE =================
 
-    public static void setGlobalLogoutAction(Runnable logoutAction, Runnable showScanner, Runnable showAdmin, Runnable showHelp) {
+    public static void setGlobalLogoutAction(Runnable logoutAction, Runnable showHelp) {
         globalShortcuts.clear();
         if (logoutAction != null) {
             globalShortcuts.put(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN), logoutAction);
-            globalShortcuts.put(new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.CONTROL_DOWN), showScanner);
-            globalShortcuts.put(new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.CONTROL_DOWN), showAdmin);
             globalShortcuts.put(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN), showHelp);
         }
     }
@@ -78,12 +76,14 @@ public class KeyBindingHelper {
 
     // ================= 3. VIEW SCOPE =================
 
-    public static void setupShortcutsForScanning(Scene scene, Runnable onScan, Runnable onZoomIn, Runnable onZoomOut, Runnable onRotation) {
+    public static void setupShortcutsForScanning(Scene scene, Runnable onScan, Runnable onZoomIn, Runnable onZoomOut, Runnable onRotation, Runnable onExport, Runnable onDelete) {
         viewShortcuts.clear();
         viewShortcuts.put(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), onScan);
         viewShortcuts.put(new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN), onZoomIn);
         viewShortcuts.put(new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN), onZoomOut);
         viewShortcuts.put(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN), onRotation);
+        viewShortcuts.put(new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), onExport);
+        viewShortcuts.put(new KeyCodeCombination(KeyCode.BACK_SPACE), onDelete);
 
         refreshAccelerators(scene);
     }
