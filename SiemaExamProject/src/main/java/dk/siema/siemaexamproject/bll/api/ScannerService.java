@@ -99,34 +99,6 @@ public class ScannerService {
         return documents;
     }
 
-    private Profile convert(ScanningProfile sp) {
-
-        int rotation = 0;
-        ColorMode colorMode = ColorMode.COLOR;
-
-        if (sp.getProfileSettings() != null) {
-            for (ProfileSetting ps : sp.getProfileSettings()) {
-
-                String name = ps.getSetting().getName().toLowerCase();
-                String value = ps.getValue().toLowerCase();
-
-                if (name.contains("rotation")) {
-                    rotation = Integer.parseInt(value);
-                }
-
-                if (name.contains("color")) {
-                    colorMode = switch (value) {
-                        case "grayscale" -> ColorMode.GRAYSCALE;
-                        case "black_white", "bw" -> ColorMode.BLACK_WHITE;
-                        default -> ColorMode.COLOR;
-                    };
-                }
-            }
-        }
-
-        return new Profile(rotation, colorMode);
-    }
-
     public void resetState(){
         this.documents.clear();
         this.currentDocument = null;
