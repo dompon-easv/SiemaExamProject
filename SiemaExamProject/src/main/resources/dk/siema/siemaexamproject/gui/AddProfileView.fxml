@@ -84,8 +84,8 @@
 
             <!-- ACTION BUTTONS -->
             <HBox spacing="12" alignment="CENTER_RIGHT">
-                <Button text="Cancel" onAction="#handleCancel" styleClass="secondary-button"/>
-                <Button text="Save Profile" onAction="#handleSaveProfile" styleClass="primary-button"/>
+                <Button text="Cancel" onAction="#handleCancel" styleClass="secondary-button" cancelButton="true"/>
+                <Button text="Save Profile" onAction="#handleSaveProfile" styleClass="primary-button" defaultButton="true"/>
             </HBox>
 
         </VBox>

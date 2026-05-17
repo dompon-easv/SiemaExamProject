@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 
 import java.util.*;
 
@@ -47,9 +48,31 @@ public class AddEditUserController implements ApplicationServicesAware {
         setupProfileChecklist();
         roleCombo.getItems().setAll(UserRole.values());
         setupClientFilter();
+
+        profilesList.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+
+                ScanningProfile selectedProfile = profilesList.getSelectionModel().getSelectedItem();
+
+                if (selectedProfile != null) {
+                    if(selectedProfileIds.contains(selectedProfile.getId())) {
+                        selectedProfileIds.remove(selectedProfile.getId());
+                    } else {
+                    selectedProfileIds.add(selectedProfile.getId());
+//
+                    profilesList.refresh();
+                }
+
+                event.consume();
+            }
+        };
+    });
     }
 
+
     private void setupClientFilter() {
+
+
 
         clientFilterComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
            if(clientProfileModel == null) { return;}
@@ -67,6 +90,8 @@ public class AddEditUserController implements ApplicationServicesAware {
                     private final CheckBox checkbox = new CheckBox();
 
                     {
+                        checkbox.setFocusTraversable(false);
+
                         checkbox.setOnAction(event -> {
                             ScanningProfile profile = getItem();
                             if (profile != null) {

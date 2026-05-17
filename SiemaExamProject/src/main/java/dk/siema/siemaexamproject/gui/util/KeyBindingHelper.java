@@ -37,7 +37,7 @@ public class KeyBindingHelper {
                 CYCLE THROUGH ADMIN TABS: CTRL + TAB
                 OPEN NEW USER/PROFILE WINDOW: CTRL + N
                 EDIT SELECTED USER/PROFILE WINDOW: CTRL + E
-                DELETE SELECTED USER/PROFILE WINDOW: CTRL + D""");
+                DELETE SELECTED USER/PROFILE WINDOW: BACKSPACE""");
     }
 
     public static Map<UserRole, String> getShortcutInfo() {
@@ -92,7 +92,7 @@ public class KeyBindingHelper {
         viewShortcuts.clear();
         viewShortcuts.put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), onAddUser);
         viewShortcuts.put(new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), onEditUser);
-        viewShortcuts.put(new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN), onDeleteUser);
+        viewShortcuts.put(new KeyCodeCombination(KeyCode.BACK_SPACE), onDeleteUser);
 
         refreshAccelerators(scene);
     }

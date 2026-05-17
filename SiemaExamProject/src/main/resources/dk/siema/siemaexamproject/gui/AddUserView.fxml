@@ -63,11 +63,13 @@
 
                 <Button text="Cancel"
                         styleClass="secondary-button"
-                        onAction="#handleCancel"/>
+                        onAction="#handleCancel"
+                cancelButton="true"/>
 
                 <Button text="Save"
                         styleClass="primary-button"
-                        onAction="#handleSave"/>
+                        onAction="#handleSave"
+                defaultButton="true"/>
             </HBox>
 
         </VBox>

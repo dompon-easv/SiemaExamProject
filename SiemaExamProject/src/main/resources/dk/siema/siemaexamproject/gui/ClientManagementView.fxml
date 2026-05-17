@@ -39,7 +39,7 @@
 
             <!-- BOTTOM ACTION BUTTONS -->
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Button text="Close" styleClass="secondary-button" onAction="#closeWindow"/>
+                <Button text="Close" styleClass="secondary-button" onAction="#closeWindow" cancelButton="true"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
